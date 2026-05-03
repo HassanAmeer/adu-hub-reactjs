@@ -11,10 +11,26 @@ import {
   ArrowRight,
   ChevronRight,
   TrendingUp,
-  CheckCircle2
+  CheckCircle2,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { auth } from '../services/firebase';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      navigate('/login');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-slate-50">
       {/* Mini Sidebar */}
@@ -26,6 +42,7 @@ const DashboardPage = () => {
            <button className="text-slate-500 hover:text-white transition-colors"><Bell className="w-6 h-6" /></button>
            <button className="text-slate-500 hover:text-white transition-colors"><FileText className="w-6 h-6" /></button>
            <button className="text-slate-500 hover:text-white transition-colors"><Settings className="w-6 h-6" /></button>
+           <button onClick={handleLogout} className="text-slate-500 hover:text-danger transition-colors mt-auto"><LogOut className="w-6 h-6" /></button>
         </div>
       </div>
 
@@ -40,10 +57,12 @@ const DashboardPage = () => {
               </div>
               <div className="flex items-center gap-3">
                  <div className="text-right hidden sm:block">
-                    <p className="text-sm font-bold">John Doe</p>
+                    <p className="text-sm font-bold">{currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User'}</p>
                     <p className="text-[10px] text-slate-400 uppercase font-bold">Pro Account</p>
                  </div>
-                 <div className="w-10 h-10 rounded-full bg-slate-100 border border-border"></div>
+                 <div className="w-10 h-10 rounded-full bg-slate-100 border border-border flex items-center justify-center text-primary font-bold">
+                    {currentUser?.email?.[0].toUpperCase() || 'U'}
+                 </div>
               </div>
            </div>
         </header>
@@ -52,7 +71,7 @@ const DashboardPage = () => {
            {/* Welcome Section */}
            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
               <div>
-                <h1 className="text-3xl text-primary mb-2">Welcome back, John! 👋</h1>
+                <h1 className="text-3xl text-primary mb-2">Welcome back, {currentUser?.email?.split('@')[0]}! 👋</h1>
                 <p className="text-slate-500">You have 3 active property checks and 2 new policy alerts.</p>
               </div>
               <button className="btn-primary flex items-center gap-2">
