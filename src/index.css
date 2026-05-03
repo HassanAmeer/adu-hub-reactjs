@@ -1,40 +1,57 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+:root {
+  --color-primary: #0F172A;
+  --color-secondary: #059669;
+  --color-accent: #F59E0B;
+  --color-danger: #EF4444;
+  --color-bg: #F8FAFC;
+  --color-text: #1E293B;
+  --color-muted: #94A3B8;
+  --color-border: #E2E8F0;
+  --color-card: #FFFFFF;
+  --color-card-dark: #1E293B;
+}
+
 @layer base {
   body {
-    @apply bg-background text-primary font-sans antialiased;
+    @apply bg-background text-slate-800 font-sans antialiased;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-bold;
+    @apply font-bold tracking-tight text-primary;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-secondary text-white rounded-xl font-semibold transition-all hover:bg-secondary/90 hover:shadow-lg active:scale-95;
+    @apply px-7 py-3 bg-secondary text-white rounded-xl font-semibold transition-all duration-200 hover:bg-emerald-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-95;
   }
-  
-  .btn-outline {
-    @apply px-6 py-3 border-2 border-border rounded-xl font-semibold transition-all hover:bg-slate-50 active:scale-95;
+
+  .btn-secondary {
+    @apply px-7 py-3 bg-transparent border-2 border-secondary text-secondary rounded-xl font-semibold transition-all duration-200 hover:bg-secondary hover:text-white active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply px-7 py-3 bg-transparent text-slate-400 rounded-xl font-semibold transition-all duration-200 hover:text-white active:scale-95;
   }
   
   .card {
-    @apply bg-white border border-border rounded-2xl shadow-soft p-6;
+    @apply bg-white border border-border rounded-2xl shadow-soft p-7 hover:-translate-y-1 hover:shadow-xl transition-all duration-200;
   }
   
   .input-field {
-    @apply w-full px-4 py-3 bg-white border border-border rounded-xl focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all;
+    @apply w-full px-4 py-3 bg-white border-[1.5px] border-border rounded-[10px] text-[15px] text-slate-800 focus:ring-4 focus:ring-secondary/20 focus:border-secondary outline-none transition-all placeholder:text-slate-400;
   }
   
   .badge {
-    @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+    @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest;
   }
   
-  .badge-allowed { @apply bg-accent/10 text-accent; }
-  .badge-conditional { @apply bg-warning/10 text-warning; }
-  .badge-prohibited { @apply bg-danger/10 text-danger; }
+  .badge-allowed { @apply bg-emerald-100 text-emerald-800 border border-emerald-300; }
+  .badge-conditional { @apply bg-amber-100 text-amber-800 border border-amber-300; }
+  .badge-prohibited { @apply bg-red-100 text-red-800 border border-red-300; }
 }

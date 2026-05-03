@@ -1,6 +1,7 @@
 import React from 'react';
 import Hero from '../components/home/Hero';
 import ValueProp from '../components/home/ValueProp';
+import AudienceSection from '../components/home/AudienceSection';
 import StateGrid from '../components/home/StateGrid';
 import { featuredCities } from '../data/mockData';
 import { ArrowRight, Star, CheckCircle } from 'lucide-react';
@@ -17,14 +18,15 @@ const Home = () => {
     >
       <Hero />
       <ValueProp />
+      <AudienceSection />
       <StateGrid />
       
       {/* Featured Cities Section */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl text-primary mb-4">Trending Cities</h2>
-            <p className="text-slate-500">The most active areas for new ADU development this month.</p>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-primary mb-4">Trending Cities</h2>
+            <p className="text-lg text-slate-500">The most active areas for new ADU development this month.</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -54,7 +56,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
-              <h2 className="text-3xl sm:text-5xl mb-8 leading-tight">Your ADU journey, <br /><span className="text-secondary">simplified.</span></h2>
+              <h2 className="text-3xl sm:text-5xl font-extrabold mb-8 leading-tight">Your ADU journey, <br /><span className="text-secondary">simplified.</span></h2>
               <div className="space-y-8">
                 {[
                   { title: 'Check your address', desc: 'Get instant insights on zoning, lot size, and setbacks.' },
@@ -72,14 +74,14 @@ const Home = () => {
                   </div>
                 ))}
               </div>
-              <button className="btn-primary mt-12 !px-10">Start Your Check</button>
+              <Link to="/property-checker" className="btn-primary mt-12 !px-10 inline-block">Start Your Check</Link>
             </div>
             
             <div className="relative">
               <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative z-20">
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-white">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center text-white">
                       <CheckCircle className="w-6 h-6" />
                     </div>
                     <div>
@@ -87,30 +89,30 @@ const Home = () => {
                       <p className="text-xs text-slate-400">San Diego, CA 92101</p>
                     </div>
                   </div>
-                  <span className="badge badge-allowed !bg-accent !text-white">Allowed</span>
+                  <span className="badge badge-allowed !bg-emerald-500/20 !text-emerald-300 !border-emerald-500/30">Allowed</span>
                 </div>
                 
                 <div className="space-y-4 mb-8">
                   <div className="flex justify-between items-center py-3 border-b border-white/10">
                     <span className="text-slate-300">Max Size</span>
-                    <span className="font-bold">1,200 sq ft</span>
+                    <span className="font-bold text-white">1,200 sq ft</span>
                   </div>
                   <div className="flex justify-between items-center py-3 border-b border-white/10">
                     <span className="text-slate-300">Height Limit</span>
-                    <span className="font-bold">16 ft</span>
+                    <span className="font-bold text-white">16 ft</span>
                   </div>
                   <div className="flex justify-between items-center py-3">
                     <span className="text-slate-300">Setbacks</span>
-                    <span className="font-bold">4 ft Rear/Side</span>
+                    <span className="font-bold text-white">4 ft Rear/Side</span>
                   </div>
                 </div>
                 
                 <div className="bg-secondary p-4 rounded-2xl flex items-center justify-between">
                   <div>
                     <p className="text-xs text-white/70 mb-1">Estimated Cost</p>
-                    <p className="text-xl font-bold">$240k - $310k</p>
+                    <p className="text-xl font-bold text-white">$240k - $310k</p>
                   </div>
-                  <ArrowRight className="w-6 h-6" />
+                  <ArrowRight className="w-6 h-6 text-white" />
                 </div>
               </div>
               
@@ -125,17 +127,17 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-24 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-secondary rounded-[3rem] p-12 sm:p-20 text-center relative overflow-hidden">
+          <div className="bg-primary rounded-[3rem] p-12 sm:p-20 text-center relative overflow-hidden shadow-2xl">
              <div className="absolute top-0 left-0 w-full h-full opacity-10">
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
               </div>
-            <h2 className="text-3xl sm:text-5xl text-white mb-8 relative z-10">Ready to build your <br /> dream ADU?</h2>
-            <p className="text-white/80 text-lg mb-12 max-w-xl mx-auto relative z-10">
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-8 relative z-10 tracking-tight">Ready to build your <br /> dream ADU?</h2>
+            <p className="text-slate-300 text-lg mb-12 max-w-xl mx-auto relative z-10 leading-relaxed">
               Join 50,000+ homeowners using ADU Hub to navigate laws and find professionals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-              <button className="bg-white text-secondary px-10 py-4 rounded-xl font-bold hover:bg-slate-50 transition-colors">Create Free Account</button>
-              <button className="bg-primary text-white px-10 py-4 rounded-xl font-bold hover:bg-primary/90 transition-colors">Book a Consultation</button>
+              <Link to="/signup" className="bg-secondary text-white px-10 py-4 rounded-xl font-bold hover:bg-emerald-500 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1 inline-block">Create Free Account</Link>
+              <Link to="/directory" className="bg-white text-primary px-10 py-4 rounded-xl font-bold hover:bg-slate-50 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1 inline-block">Find Professionals</Link>
             </div>
           </div>
         </div>

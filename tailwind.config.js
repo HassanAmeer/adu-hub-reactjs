@@ -8,8 +8,8 @@ export default {
     extend: {
       colors: {
         primary: "#0F172A",
-        secondary: "#0EA5E9",
-        accent: "#22C55E",
+        secondary: "#059669",
+        accent: "#F59E0B",
         warning: "#F59E0B",
         danger: "#EF4444",
         background: "#F8FAFC",
@@ -17,14 +17,14 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-        display: ['Poppins', 'sans-serif'],
       },
       borderRadius: {
-        'xl': '1rem',
-        '2xl': '1.5rem',
+        'xl': '12px',
+        '2xl': '20px',
+        '3xl': '32px',
       },
       boxShadow: {
-        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 10px -1px rgba(0, 0, 0, 0.03)',
+        'soft': '0 4px 6px -1px rgba(0,0,0,0.07)',
       }
     },
   },
