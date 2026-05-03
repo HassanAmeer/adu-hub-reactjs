@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap');
+
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply bg-background text-primary font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-secondary text-white rounded-xl font-semibold transition-all hover:bg-secondary/90 hover:shadow-lg active:scale-95;
+  }
+  
+  .btn-outline {
+    @apply px-6 py-3 border-2 border-border rounded-xl font-semibold transition-all hover:bg-slate-50 active:scale-95;
+  }
+  
+  .card {
+    @apply bg-white border border-border rounded-2xl shadow-soft p-6;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border border-border rounded-xl focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all;
+  }
+  
+  .badge {
+    @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+  }
+  
+  .badge-allowed { @apply bg-accent/10 text-accent; }
+  .badge-conditional { @apply bg-warning/10 text-warning; }
+  .badge-prohibited { @apply bg-danger/10 text-danger; }
+}
