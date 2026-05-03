@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { aduRules } from '../data/mockData';
+import { aduRules, states } from '../data/mockData';
 import { 
   CheckCircle2, 
   Info, 
@@ -14,13 +14,20 @@ import {
   UserCheck,
   TrendingUp,
   Banknote,
-  Landmark
+  Landmark,
+  Layers,
+  Zap,
+  Flame,
+  ShieldAlert
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const StatePage = () => {
   const { stateName } = useParams();
-  const formattedState = stateName ? stateName.charAt(0).toUpperCase() + stateName.slice(1) : 'California';
+  const stateData = states.find(s => s.id === stateName?.toLowerCase() || s.name.toLowerCase() === stateName?.toLowerCase());
+  const formattedState = stateData ? stateData.name : (stateName ? stateName.charAt(0).toUpperCase() + stateName.slice(1) : 'California');
+  const status = stateData?.status || 'Allowed';
+  const cities = stateData?.cities || ['San Diego', 'Los Angeles', 'San Francisco', 'San Jose', 'Sacramento', 'Oakland'];
 
   return (
     <motion.div 
@@ -43,7 +50,9 @@ const StatePage = () => {
             <div className="max-w-2xl">
               <div className="flex items-center gap-4 mb-4">
                 <h1 className="text-4xl sm:text-6xl font-extrabold text-white">{formattedState} ADU Laws</h1>
-                <span className="badge !bg-emerald-500/20 !text-emerald-300 !border-emerald-500/30">Pro-ADU State</span>
+                <span className={`badge ${status === 'Allowed' ? '!bg-emerald-500/20 !text-emerald-300 !border-emerald-500/30' : '!bg-amber-500/20 !text-amber-300 !border-amber-500/30'}`}>
+                  {status === 'Allowed' ? 'Pro-ADU State' : 'Restricted Rules'}
+                </span>
               </div>
               <p className="text-lg text-slate-300 leading-relaxed">
                 Comprehensive guide to ADU regulations in {formattedState}. Learn about size limits, parking requirements, grants, and recent legislation changes.
@@ -106,10 +115,14 @@ const StatePage = () => {
                   <div key={idx} className="bg-white rounded-[20px] p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-secondary/30 transition-all group">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
-                        {idx === 0 && <Ruler className="w-6 h-6" />}
-                        {idx === 1 && <Building className="w-6 h-6" />}
-                        {idx === 2 && <Car className="w-6 h-6" />}
-                        {idx === 3 && <UserCheck className="w-6 h-6" />}
+                        {rule.title.includes('Size') && <Ruler className="w-6 h-6" />}
+                        {rule.title.includes('Height') && <Building className="w-6 h-6" />}
+                        {rule.title.includes('Parking') && <Car className="w-6 h-6" />}
+                        {rule.title.includes('Occupancy') && <UserCheck className="w-6 h-6" />}
+                        {rule.title.includes('Setbacks') && <Layers className="w-6 h-6" />}
+                        {rule.title.includes('Utility') && <Zap className="w-6 h-6" />}
+                        {rule.title.includes('Fire') && <Flame className="w-6 h-6" />}
+                        {!['Size', 'Height', 'Parking', 'Occupancy', 'Setbacks', 'Utility', 'Fire'].some(k => rule.title.includes(k)) && <Info className="w-6 h-6" />}
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-800 mb-1">{rule.title}</h4>
@@ -180,7 +193,7 @@ const StatePage = () => {
             <section>
               <h2 className="text-3xl font-bold text-primary mb-8">Major Cities in {formattedState}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {['San Diego', 'Los Angeles', 'San Francisco', 'San Jose', 'Sacramento', 'Oakland'].map((city) => (
+                {cities.map((city) => (
                   <Link 
                     key={city}
                     to={`/state/${stateName || 'california'}/city/${city.toLowerCase().replace(' ', '-')}`}
@@ -235,13 +248,15 @@ const StatePage = () => {
               </ul>
             </div>
 
-            <div className="card bg-emerald-50 border-emerald-100 shadow-sm">
-              <div className="flex items-center gap-3 mb-4 text-emerald-600">
-                <CheckCircle2 className="w-6 h-6" />
-                <h4 className="font-bold text-emerald-900 text-lg">Law Status: Healthy</h4>
+            <div className={`card ${status === 'Allowed' ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100'} shadow-sm`}>
+              <div className={`flex items-center gap-3 mb-4 ${status === 'Allowed' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                {status === 'Allowed' ? <CheckCircle2 className="w-6 h-6" /> : <ShieldAlert className="w-6 h-6" />}
+                <h4 className={`font-bold ${status === 'Allowed' ? 'text-emerald-900' : 'text-amber-900'} text-lg`}>
+                  Law Status: {status === 'Allowed' ? 'Healthy' : 'Restricted'}
+                </h4>
               </div>
-              <p className="text-sm text-emerald-800/80 leading-relaxed font-medium">
-                {formattedState} has some of the most pro-ADU laws in the country, making it relatively easy to build.
+              <p className={`text-sm ${status === 'Allowed' ? 'text-emerald-800/80' : 'text-amber-800/80'} leading-relaxed font-medium`}>
+                {formattedState} {status === 'Allowed' ? 'has some of the most pro-ADU laws in the country, making it relatively easy to build.' : 'currently has some restrictions that might limit where and how you can build ADUs.'}
               </p>
             </div>
           </div>

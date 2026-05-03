@@ -42,6 +42,26 @@ const LawTrackerPage = () => {
       desc: 'Expands the use of revolving loan funds for ADU construction and infrastructure upgrades.',
       before: 'Limited state funding available specifically for homeowner-driven ADU projects.',
       after: 'Expands a $3M revolving loan fund to provide targeted financing for ADU construction.'
+    },
+    {
+      date: 'February 10, 2024',
+      state: 'California',
+      title: 'AB 1033: ADU Condominium Sales',
+      status: 'Passed',
+      impact: 'High',
+      desc: 'Allows local agencies to permit ADUs to be sold separately from the primary dwelling as condominiums.',
+      before: 'ADUs were required to be held under the same ownership as the primary residence and could not be sold separately.',
+      after: 'Cities can now opt-in to allow ADUs to be converted to condominiums and sold as separate titles.'
+    },
+    {
+      date: 'January 15, 2024',
+      state: 'National',
+      title: 'FHA Financing Rules Update',
+      status: 'Effective Now',
+      impact: 'High',
+      desc: 'FHA now allows 75% of projected rental income from an ADU to be considered for mortgage qualification.',
+      before: 'Rental income from an ADU could not be used to help a borrower qualify for an FHA-insured mortgage.',
+      after: 'Borrowers can now use potential ADU rental income to meet debt-to-income requirements for purchasing or refinancing.'
     }
   ];
 

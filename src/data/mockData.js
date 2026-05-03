@@ -1,8 +1,8 @@
 export const states = [
   { id: 'ca', name: 'California', status: 'Allowed', cities: ['San Diego', 'Los Angeles', 'San Francisco'] },
   { id: 'wa', name: 'Washington', status: 'Allowed', cities: ['Seattle', 'Tacoma', 'Spokane'] },
-  { id: 'or', name: 'Oregon', status: 'Conditional', cities: ['Portland', 'Salem', 'Eugene'] },
-  { id: 'tx', name: 'Texas', status: 'Conditional', cities: ['Austin', 'Dallas', 'Houston'] },
+  { id: 'or', name: 'Oregon', status: 'Restricted', cities: ['Portland', 'Salem', 'Eugene'] },
+  { id: 'tx', name: 'Texas', status: 'Restricted', cities: ['Austin', 'Dallas', 'Houston'] },
 ];
 
 export const featuredCities = [
@@ -16,6 +16,9 @@ export const aduRules = [
   { title: 'Maximum Height', value: '16-25 ft', description: 'Generally 16ft for detached ADUs, higher for attached.' },
   { title: 'Parking', value: 'None required', description: 'In most areas near transit or if replacing existing parking.' },
   { title: 'Owner Occupancy', value: 'Not Required', description: 'Recent state laws have removed this requirement for most ADUs.' },
+  { title: 'Setbacks', value: '4 ft Rear/Side', description: 'Most states now limit side and rear setbacks to a maximum of 4 feet.' },
+  { title: 'Utility Connection', value: 'Direct or Separate', description: 'Connection to primary utilities allowed; separate meters optional in most cases.' },
+  { title: 'Fire & Safety', value: 'Sprinklers if Primary', description: 'Fire sprinklers only required if they are required in the primary dwelling.' },
 ];
 
 export const buildSteps = [

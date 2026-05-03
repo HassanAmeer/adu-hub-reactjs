@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import { Mail, Lock, User, Globe } from 'lucide-react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { useAuth } from '../context/AuthContext';
 
 const SignupPage = () => {
   const [email, setEmail] = useState('');
@@ -11,14 +10,14 @@ const SignupPage = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [error, setError] = useState('');
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      // In a real app, you'd save first/last name to Firestore here
+      await signup(email, password, `${firstName} ${lastName}`);
       navigate('/dashboard');
     } catch (err) {
       setError('Failed to create an account. ' + err.message);
@@ -42,7 +41,6 @@ const SignupPage = () => {
               className="input-field" 
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              required
             />
           </div>
           <div>
@@ -53,7 +51,6 @@ const SignupPage = () => {
               className="input-field" 
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              required
             />
           </div>
         </div>
@@ -68,7 +65,6 @@ const SignupPage = () => {
               className="input-field !pl-12"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
         </div>
@@ -83,7 +79,6 @@ const SignupPage = () => {
               className="input-field !pl-12"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
           </div>
           <p className="text-[10px] text-slate-400 mt-2">Must be at least 8 characters with 1 number.</p>

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
+import StatesPage from './pages/StatesPage';
 import StatePage from './pages/StatePage';
 import CityPage from './pages/CityPage';
 import PropertyCheckerPage from './pages/PropertyCheckerPage';
@@ -20,6 +21,7 @@ function App() {
       <Routes>
         {/* Pages with Main Layout (Navbar + Footer) */}
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+        <Route path="/states" element={<MainLayout><StatesPage /></MainLayout>} />
         <Route path="/state/:stateName" element={<MainLayout><StatePage /></MainLayout>} />
         <Route path="/state/:state/city/:cityName" element={<MainLayout><CityPage /></MainLayout>} />
         <Route path="/property-checker" element={<MainLayout><PropertyCheckerPage /></MainLayout>} />

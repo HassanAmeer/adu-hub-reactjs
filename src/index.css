@@ -52,6 +52,6 @@
   }
   
   .badge-allowed { @apply bg-emerald-100 text-emerald-800 border border-emerald-300; }
-  .badge-conditional { @apply bg-amber-100 text-amber-800 border border-amber-300; }
+  .badge-restricted { @apply bg-amber-100 text-amber-800 border border-amber-300; }
   .badge-prohibited { @apply bg-red-100 text-red-800 border border-red-300; }
 }

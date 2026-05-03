@@ -2,20 +2,20 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import { Mail, Lock, Globe } from 'lucide-react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await login(email, password);
       navigate('/dashboard');
     } catch (err) {
       setError('Failed to log in. Please check your credentials.');
@@ -40,7 +40,6 @@ const LoginPage = () => {
               className="input-field !pl-12"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
         </div>
@@ -58,7 +57,6 @@ const LoginPage = () => {
               className="input-field !pl-12"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
           </div>
         </div>
