@@ -10,12 +10,12 @@ const AuthLayout = ({ children, title, subtitle }) => {
         <div className="absolute top-0 right-0 w-full h-full opacity-10">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:30px_30px]"></div>
         </div>
-        
+
         <Link to="/" className="flex items-center gap-2 relative z-10">
           <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl">A</div>
-          <span className="text-2xl font-display font-bold tracking-tight text-white">ADU<span className="text-secondary">Hub</span></span>
+          <span className="text-2xl font-display font-bold tracking-tight text-white">ADU<span className="text-secondary">Navi</span></span>
         </Link>
-        
+
         <div className="relative z-10 max-w-lg">
           <h1 className="text-5xl text-white mb-8 leading-tight">The most trusted source for ADU data.</h1>
           <div className="space-y-8">
@@ -39,9 +39,9 @@ const AuthLayout = ({ children, title, subtitle }) => {
             </div>
           </div>
         </div>
-        
+
         <p className="text-slate-500 text-sm relative z-10">
-          © 2024 ADU Hub Inc. All rights reserved.
+          © 2024 ADU Navi Inc. All rights reserved.
         </p>
       </div>
 

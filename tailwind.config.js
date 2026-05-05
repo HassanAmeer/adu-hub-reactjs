@@ -7,13 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#0F172A",
-        secondary: "#059669",
-        accent: "#F59E0B",
-        warning: "#F59E0B",
-        danger: "#EF4444",
-        background: "#F8FAFC",
-        border: "#E2E8F0",
+        primary: "var(--color-primary)",
+        secondary: "var(--color-secondary)",
+        "secondary-hover": "var(--color-secondary-hover)",
+        accent: "var(--color-accent)",
+        warning: "var(--color-accent)",
+        danger: "var(--color-danger)",
+        background: "var(--color-bg)",
+        border: "var(--color-border)",
+        card: "var(--color-card)",
+        muted: "var(--color-muted)",
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

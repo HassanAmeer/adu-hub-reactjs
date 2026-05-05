@@ -17,15 +17,15 @@ const AudienceSection = () => {
     <section className="py-24 bg-slate-50 border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-primary mb-6">Who is ADU Hub for?</h2>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-primary mb-6">Who is ADU Navi for?</h2>
           <p className="text-lg text-slate-500">
             Whether you are building your first ADU or planning city-wide initiatives, we have the data you need.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {audiences.map((aud, idx) => (
-            <motion.div 
+            <motion.div
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

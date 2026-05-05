@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-6">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg">A</div>
-              <span className="text-xl font-display font-bold text-primary">ADU<span className="text-secondary">Hub</span></span>
+              <span className="text-xl font-display font-bold text-primary">ADU<span className="text-secondary">Navi</span></span>
             </Link>
             <p className="text-slate-500 text-sm leading-relaxed mb-6">
               The all-in-one platform for ADU research, design, and construction. Making housing more accessible across the nation.
@@ -27,7 +27,7 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          
+
           <div>
             <h4 className="font-bold text-slate-900 mb-6">Platform</h4>
             <ul className="space-y-4 text-sm text-slate-500">
@@ -58,15 +58,15 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        
+
         <div className="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-slate-400">
-            © 2024 ADU Hub Inc. All rights reserved.
+            © 2024 ADU Navi Inc. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-slate-400">
             <span className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              support@aduhub.com
+              support@adunavi.com
             </span>
           </div>
         </div>

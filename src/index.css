@@ -4,31 +4,51 @@
 @config "../tailwind.config.js";
 
 :root {
+  /* Main Theme Colors - Change these to update the entire website */
   --color-primary: #0F172A;
+  /* Dark Blue (Heading/Text) */
   --color-secondary: #059669;
+  /* Emerald Green (Main Brand/Buttons) */
+  --color-secondary-hover: #10B981;
+  /* Lighter Green for Hover */
   --color-accent: #F59E0B;
+  /* Amber (Highlights) */
   --color-danger: #EF4444;
+  /* Red (Errors) */
+
+  /* Layout Colors */
   --color-bg: #F8FAFC;
+  /* Light Grayish Blue (Background) */
   --color-text: #1E293B;
+  /* Slate (Body Text) */
   --color-muted: #94A3B8;
+  /* Light Slate (Small Text) */
   --color-border: #E2E8F0;
+  /* Gray (Borders) */
   --color-card: #FFFFFF;
+  /* White (Card Background) */
   --color-card-dark: #1E293B;
+  /* Slate Dark (Dark Cards) */
 }
 
 @layer base {
   body {
     @apply bg-background text-slate-800 font-sans antialiased;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-bold tracking-tight text-primary;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply px-7 py-3 bg-secondary text-white rounded-xl font-semibold transition-all duration-200 hover:bg-emerald-500 hover:-translate-y-0.5 hover:shadow-lg active:scale-95;
+    @apply px-7 py-3 bg-secondary text-white rounded-xl font-semibold transition-all duration-200 hover:bg-secondary-hover hover:-translate-y-0.5 hover:shadow-lg active:scale-95;
   }
 
   .btn-secondary {
@@ -38,20 +58,28 @@
   .btn-ghost {
     @apply px-7 py-3 bg-transparent text-slate-400 rounded-xl font-semibold transition-all duration-200 hover:text-white active:scale-95;
   }
-  
+
   .card {
-    @apply bg-white border border-border rounded-2xl shadow-soft p-7 hover:-translate-y-1 hover:shadow-xl transition-all duration-200;
+    @apply bg-card border border-border rounded-2xl shadow-soft p-7 hover:-translate-y-1 hover:shadow-xl transition-all duration-200;
   }
-  
+
   .input-field {
-    @apply w-full px-4 py-3 bg-white border-[1.5px] border-border rounded-[10px] text-[15px] text-slate-800 focus:ring-4 focus:ring-secondary/20 focus:border-secondary outline-none transition-all placeholder:text-slate-400;
+    @apply w-full px-4 py-3 bg-card border-[1.5px] border-border rounded-[10px] text-[15px] text-slate-800 focus:ring-4 focus:ring-secondary/20 focus:border-secondary outline-none transition-all placeholder:text-slate-400;
   }
-  
+
   .badge {
     @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest;
   }
-  
-  .badge-allowed { @apply bg-emerald-100 text-emerald-800 border border-emerald-300; }
-  .badge-restricted { @apply bg-amber-100 text-amber-800 border border-amber-300; }
-  .badge-prohibited { @apply bg-red-100 text-red-800 border border-red-300; }
+
+  .badge-allowed {
+    @apply bg-emerald-100 text-emerald-800 border border-emerald-300;
+  }
+
+  .badge-restricted {
+    @apply bg-amber-100 text-amber-800 border border-amber-300;
+  }
+
+  .badge-prohibited {
+    @apply bg-red-100 text-red-800 border border-red-300;
+  }
 }
