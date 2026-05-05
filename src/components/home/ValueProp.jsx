@@ -60,13 +60,13 @@ const ValueProp = () => {
     <section className="py-24 bg-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-primary mb-6">Why ADU Hub?</h2>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-primary mb-6">Why ADU Navi?</h2>
           <p className="text-lg text-slate-500">
             We provide a single, authoritative source of truth for accessory dwelling units.
           </p>
         </div>
-        
-        <motion.div 
+
+        <motion.div
           variants={container}
           initial="hidden"
           whileInView="show"
@@ -74,14 +74,13 @@ const ValueProp = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {edges.map((p, idx) => (
-            <motion.div 
-              key={idx} 
+            <motion.div
+              key={idx}
               variants={item}
-              className={`p-8 rounded-[24px] border ${
-                p.darkBg 
-                  ? 'bg-slate-900 border-slate-800 text-white' 
-                  : 'bg-white border-slate-200 text-slate-800 shadow-soft hover:border-secondary/30'
-              } transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group`}
+              className={`p-8 rounded-[24px] border ${p.darkBg
+                ? 'bg-slate-900 border-slate-800 text-white'
+                : 'bg-white border-slate-200 text-slate-800 shadow-soft hover:border-secondary/30'
+                } transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group`}
             >
               <div className={`w-14 h-14 ${p.bg} ${p.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                 <p.icon className="w-7 h-7" />
