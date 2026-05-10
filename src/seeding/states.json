@@ -1,0 +1,7 @@
+[
+  { "id": "st_1", "name": "California", "code": "CA" },
+  { "id": "st_2", "name": "Texas", "code": "TX" },
+  { "id": "st_3", "name": "Florida", "code": "FL" },
+  { "id": "st_4", "name": "New York", "code": "NY" },
+  { "id": "st_5", "name": "Washington", "code": "WA" }
+]

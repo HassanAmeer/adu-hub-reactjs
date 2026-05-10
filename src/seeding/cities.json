@@ -1,0 +1,7 @@
+[
+  { "id": "ct_1", "stateId": "st_1", "name": "Los Angeles" },
+  { "id": "ct_2", "stateId": "st_2", "name": "Austin" },
+  { "id": "ct_3", "stateId": "st_3", "name": "Miami" },
+  { "id": "ct_4", "stateId": "st_4", "name": "New York City" },
+  { "id": "ct_5", "stateId": "st_5", "name": "Seattle" }
+]

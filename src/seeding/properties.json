@@ -1,0 +1,7 @@
+[
+  { "id": "prop_1", "userId": "usr_2", "stateId": "st_1", "cityId": "ct_1", "address": "123 CA St", "price": 500000, "status": "active", "title": "Modern ADU LA" },
+  { "id": "prop_2", "userId": "usr_2", "stateId": "st_2", "cityId": "ct_2", "address": "456 TX Ave", "price": 400000, "status": "active", "title": "Cozy Austin Guest House" },
+  { "id": "prop_3", "userId": "usr_3", "stateId": "st_3", "cityId": "ct_3", "address": "789 FL Blvd", "price": 600000, "status": "sold", "title": "Miami Beach ADU" },
+  { "id": "prop_4", "userId": "usr_4", "stateId": "st_4", "cityId": "ct_4", "address": "101 NY Rd", "price": 750000, "status": "active", "title": "NYC Backyard Studio" },
+  { "id": "prop_5", "userId": "usr_5", "stateId": "st_5", "cityId": "ct_5", "address": "202 WA Ln", "price": 550000, "status": "pending", "title": "Seattle Eco Cabin" }
+]

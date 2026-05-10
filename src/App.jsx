@@ -14,6 +14,7 @@ import AlertsPage from './pages/AlertsPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
+import SeedingPage from './pages/SeedingPage';
 
 function App() {
   return (
@@ -37,6 +38,9 @@ function App() {
         
         {/* Dashboard (Custom Layout) */}
         <Route path="/dashboard" element={<DashboardPage />} />
+        
+        {/* Development / Seeding Route */}
+        <Route path="/seeding" element={<SeedingPage />} />
       </Routes>
     </Router>
   );
