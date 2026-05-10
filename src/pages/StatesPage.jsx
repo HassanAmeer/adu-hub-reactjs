@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, MapPin, ChevronRight, Info, Building2, ShieldCheck, Globe } from 'lucide-react';
-import { states } from '../data/mockData';
+import { getStatesWithCities } from '../services/db';
 
 const StatesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [states, setStates] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      const data = await getStatesWithCities();
+      setStates(data);
+      setLoading(false);
+    };
+    fetchStates();
+  }, []);
 
   const filteredStates = states.filter(state => 
     state.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -116,7 +127,11 @@ const StatesPage = () => {
             </div>
           </div>
 
-          {filteredStates.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-20 bg-white rounded-[32px] border border-slate-200">
+              <p className="text-slate-500 font-medium">Loading database...</p>
+            </div>
+          ) : filteredStates.length > 0 ? (
             <motion.div 
               variants={containerVariants}
               initial="hidden"

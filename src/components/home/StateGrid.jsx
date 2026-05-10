@@ -1,9 +1,19 @@
-import React from 'react';
-import { states } from '../../data/mockData';
+import React, { useState, useEffect } from 'react';
+import { getStatesWithCities } from '../../services/db';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const StateGrid = () => {
+  const [states, setStates] = useState([]);
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      const data = await getStatesWithCities();
+      setStates(data);
+    };
+    fetchStates();
+  }, []);
+
   return (
     <section className="py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

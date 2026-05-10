@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Hero from '../components/home/Hero';
 import ValueProp from '../components/home/ValueProp';
 import AudienceSection from '../components/home/AudienceSection';
 import StateGrid from '../components/home/StateGrid';
-import { featuredCities } from '../data/mockData';
+import { getFeaturedCities } from '../services/db';
 import { ArrowRight, Star, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { motion } from 'framer-motion';
 
 const Home = () => {
+  const [featuredCities, setFeaturedCities] = useState([]);
+  
+  useEffect(() => {
+    const fetchCities = async () => {
+      const data = await getFeaturedCities();
+      setFeaturedCities(data);
+    };
+    fetchCities();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}

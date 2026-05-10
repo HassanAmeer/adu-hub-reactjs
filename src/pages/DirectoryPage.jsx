@@ -17,69 +17,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import Skeleton, { CardSkeleton } from '../components/common/Skeleton';
 import Modal from '../components/common/Modal';
-
-const professionals = [
-  {
-    id: 1,
-    name: 'Coastal Design Studio',
-    role: 'Architect',
-    rating: 4.9,
-    reviews: 124,
-    location: 'San Diego, CA',
-    tags: ['Detached', 'Conversion', 'Modern'],
-    images: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=400&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=400&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?q=80&w=400&auto=format&fit=crop'
-    ],
-    price: '$$$',
-    verified: true
-  },
-  {
-    id: 2,
-    name: 'Precision Build ADU',
-    role: 'General Contractor',
-    rating: 4.7,
-    reviews: 89,
-    location: 'Los Angeles, CA',
-    tags: ['Modular', 'Eco-Friendly'],
-    images: [
-      'https://images.unsplash.com/photo-1541913007727-4dd01126ac03?q=80&w=400&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=400&auto=format&fit=crop'
-    ],
-    price: '$$',
-    verified: true
-  },
-  {
-    id: 3,
-    name: 'Urban Dwelling Co.',
-    role: 'ADU Consultant',
-    rating: 5.0,
-    reviews: 42,
-    location: 'San Francisco, CA',
-    tags: ['Feasibility', 'Permitting'],
-    images: [
-      'https://images.unsplash.com/photo-1574067769351-34440c836935?q=80&w=400&auto=format&fit=crop'
-    ],
-    price: '$',
-    verified: false
-  },
-  {
-    id: 4,
-    name: 'Golden State Architects',
-    role: 'Architect',
-    rating: 4.8,
-    reviews: 215,
-    location: 'Sacramento, CA',
-    tags: ['Luxury', 'Historical'],
-    images: [
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1600585154526-990dced4ea0d?q=80&w=400&auto=format&fit=crop'
-    ],
-    price: '$$$$',
-    verified: true
-  }
-];
+import { getProfessionals } from '../services/db';
 
 const ImageCarousel = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -140,10 +78,15 @@ const DirectoryPage = () => {
   const [role, setRole] = useState('All');
   const [loading, setLoading] = useState(true);
   const [selectedPro, setSelectedPro] = useState(null);
+  const [professionals, setProfessionals] = useState([]);
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
+    const fetchPros = async () => {
+      const data = await getProfessionals();
+      setProfessionals(data);
+      setLoading(false);
+    };
+    fetchPros();
   }, []);
 
   return (

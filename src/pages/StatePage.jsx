@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { aduRules, states } from '../data/mockData';
+import { getStateById, getCitiesByState, getAduRules } from '../services/db';
 import { 
   CheckCircle2, 
   Info, 
@@ -24,10 +24,37 @@ import { motion } from 'framer-motion';
 
 const StatePage = () => {
   const { stateName } = useParams();
-  const stateData = states.find(s => s.id === stateName?.toLowerCase() || s.name.toLowerCase() === stateName?.toLowerCase());
+  const [stateData, setStateData] = useState(null);
+  const [fetchedCities, setFetchedCities] = useState([]);
+  const [fetchedRules, setFetchedRules] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const state = await getStateById(stateName?.toLowerCase());
+      if (state) {
+        setStateData(state);
+        const cityList = await getCitiesByState(state.id);
+        setFetchedCities(cityList);
+      }
+      const rules = await getAduRules();
+      setFetchedRules(rules);
+      setLoading(false);
+    };
+    if (stateName) fetchData();
+  }, [stateName]);
+
   const formattedState = stateData ? stateData.name : (stateName ? stateName.charAt(0).toUpperCase() + stateName.slice(1) : 'California');
   const status = stateData?.status || 'Allowed';
-  const cities = stateData?.cities || ['San Diego', 'Los Angeles', 'San Francisco', 'San Jose', 'Sacramento', 'Oakland'];
+  const cities = fetchedCities.length > 0 ? fetchedCities : ['San Diego', 'Los Angeles', 'San Francisco', 'San Jose', 'Sacramento', 'Oakland'];
+
+  if (loading) {
+    return (
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center">
+        <p className="text-slate-500 font-medium">Loading state data...</p>
+      </div>
+    );
+  }
 
   return (
     <motion.div 
@@ -111,7 +138,7 @@ const StatePage = () => {
             <section>
               <h2 className="text-3xl font-bold text-primary mb-8">Key Regulations</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {aduRules.map((rule, idx) => (
+                {fetchedRules.map((rule, idx) => (
                   <div key={idx} className="bg-white rounded-[20px] p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-secondary/30 transition-all group">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">

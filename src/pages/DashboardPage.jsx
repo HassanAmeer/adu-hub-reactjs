@@ -26,6 +26,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getAlerts, getSavedProperties, getSavedPros } from '../services/db';
 
 const DashboardPage = () => {
   const { currentUser, logout } = useAuth();
@@ -49,20 +50,41 @@ const DashboardPage = () => {
     { id: 'settings', icon: SettingsIcon, label: 'Settings' },
   ];
 
+  const [alerts, setAlerts] = useState([]);
+  const [savedProperties, setSavedProperties] = useState([]);
+  const [savedPros, setSavedPros] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!currentUser) return;
+      const alertsData = await getAlerts(currentUser.id);
+      const propsData = await getSavedProperties(currentUser.id);
+      const prosData = await getSavedPros(currentUser.id);
+      
+      setAlerts(alertsData);
+      setSavedProperties(propsData);
+      setSavedPros(prosData);
+      setLoading(false);
+    };
+    fetchDashboardData();
+  }, [currentUser]);
+
   const renderContent = () => {
+    if (loading) return <div className="text-center py-20 text-slate-500">Loading dashboard...</div>;
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardOverview currentUser={currentUser} />;
+        return <DashboardOverview currentUser={currentUser} alerts={alerts} properties={savedProperties} />;
       case 'properties':
-        return <SavedProperties />;
+        return <SavedProperties properties={savedProperties} />;
       case 'pros':
-        return <SavedPros />;
+        return <SavedPros pros={savedPros} />;
       case 'alerts':
-        return <AlertsFeed />;
+        return <AlertsFeed alerts={alerts} />;
       case 'settings':
         return <SettingsView currentUser={currentUser} />;
       default:
-        return <DashboardOverview currentUser={currentUser} />;
+        return <DashboardOverview currentUser={currentUser} alerts={alerts} properties={savedProperties} />;
     }
   };
 
@@ -137,13 +159,13 @@ const DashboardPage = () => {
 
 /* --- Sub-components for Content --- */
 
-const DashboardOverview = ({ currentUser }) => (
+const DashboardOverview = ({ currentUser, alerts, properties }) => (
   <div className="space-y-12">
     {/* Welcome Section */}
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm">
       <div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-primary mb-3">Welcome back, {currentUser?.displayName || 'Builder'}! 👋</h1>
-        <p className="text-slate-500 text-lg">You have 3 active property checks and <span className="font-bold text-secondary">2 new policy alerts</span>.</p>
+        <p className="text-slate-500 text-lg">You have {properties.length} active property checks and <span className="font-bold text-secondary">{alerts.filter(a => a.unread).length} new policy alerts</span>.</p>
       </div>
       <button className="btn-secondary !py-3 !px-6 shadow-md hover:shadow-lg flex-shrink-0 flex items-center justify-center gap-2">
         <Plus className="w-5 h-5" />
@@ -208,18 +230,15 @@ const DashboardOverview = ({ currentUser }) => (
               <button className="text-sm font-bold text-secondary flex items-center gap-1 hover:underline">View All <ChevronRight className="w-4 h-4" /></button>
            </div>
            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                { addr: '123 Main St, San Diego', status: 'Feasible', date: '2h ago' },
-                { addr: '456 Oak Ln, Austin', status: 'In Review', date: '5h ago' },
-              ].map((item, idx) => (
+              {properties.slice(0, 2).map((item, idx) => (
                 <div key={idx} className="bg-white rounded-[20px] p-5 border border-slate-200 flex items-center justify-between group hover:border-secondary/50 hover:shadow-md transition-all cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-secondary group-hover:bg-secondary/5 transition-colors">
                       <MapPin className="w-6 h-6" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-800 text-sm mb-1 group-hover:text-primary transition-colors">{item.addr}</h4>
-                      <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">{item.date}</p>
+                      <h4 className="font-bold text-slate-800 text-sm mb-1 group-hover:text-primary transition-colors line-clamp-1">{item.addr}</h4>
+                      <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest">Recently</p>
                     </div>
                   </div>
                   <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${item.status === 'Feasible' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-indigo-50 text-indigo-600 border-indigo-100'}`}>
@@ -239,10 +258,7 @@ const DashboardOverview = ({ currentUser }) => (
             Recent Alerts
           </h3>
           <div className="space-y-4">
-            {[
-              { title: 'New Ordinance', desc: 'Austin height limit increased.', time: '2h ago' },
-              { title: 'Fee Waiver', desc: 'Ends in 12 days for San Diego.', time: '1d ago' },
-            ].map((alert, idx) => (
+            {alerts.slice(0, 2).map((alert, idx) => (
               <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-1 h-full bg-secondary opacity-50"></div>
                 <h4 className="text-sm font-bold text-slate-800 mb-1 pl-2">{alert.title}</h4>
@@ -269,7 +285,7 @@ const DashboardOverview = ({ currentUser }) => (
   </div>
 );
 
-const SavedProperties = () => (
+const SavedProperties = ({ properties }) => (
   <div className="space-y-8">
     <div className="flex justify-between items-center mb-8">
       <h3 className="text-2xl font-bold text-primary">Your Saved Locations</h3>
@@ -278,13 +294,7 @@ const SavedProperties = () => (
       </button>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[
-        { addr: '123 Main St, San Diego, CA 92101', status: 'Feasible', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=400&auto=format&fit=crop', tags: ['Detached', 'Solar'] },
-        { addr: '456 Oak Ln, Austin, TX 78701', status: 'In Review', img: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=400&auto=format&fit=crop', tags: ['Garage Conversion'] },
-        { addr: '789 Pine Rd, Seattle, WA 98101', status: 'Feasible', img: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?q=80&w=400&auto=format&fit=crop', tags: ['Two Story'] },
-        { addr: '101 Maple Dr, Portland, OR 97201', status: 'Restricted', img: 'https://images.unsplash.com/photo-1541913007727-4dd01126ac03?q=80&w=400&auto=format&fit=crop', tags: ['HOA Overlay'] },
-        { addr: '222 Cedar St, Los Angeles, CA 90001', status: 'Feasible', img: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=400&auto=format&fit=crop', tags: ['Junior ADU'] },
-      ].map((prop, idx) => (
+      {properties.map((prop, idx) => (
         <div key={idx} className="bg-white rounded-[24px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all group cursor-pointer">
           <div className="h-48 relative overflow-hidden">
             <img src={prop.img} alt={prop.addr} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
@@ -323,17 +333,14 @@ const SavedProperties = () => (
   </div>
 );
 
-const SavedPros = () => (
+const SavedPros = ({ pros }) => (
   <div className="space-y-8">
     <div className="flex justify-between items-center mb-8">
       <h3 className="text-2xl font-bold text-primary">Tracked Professionals</h3>
-      <p className="text-sm text-slate-500 font-bold">2 Professionals Saved</p>
+      <p className="text-sm text-slate-500 font-bold">{pros.length} Professionals Saved</p>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {[
-        { name: 'Coastal Design Studio', role: 'Architect', location: 'San Diego, CA', img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=200&auto=format&fit=crop', rating: 4.9, reviews: 124 },
-        { name: 'Precision Build ADU', role: 'General Contractor', location: 'Los Angeles, CA', img: 'https://images.unsplash.com/photo-1541913007727-4dd01126ac03?q=80&w=200&auto=format&fit=crop', rating: 4.7, reviews: 89 }
-      ].map((pro, idx) => (
+      {pros.map((pro, idx) => (
         <div key={idx} className="bg-white rounded-[24px] p-6 border border-slate-200 shadow-sm flex items-center gap-6 group hover:border-secondary/50 hover:shadow-xl transition-all cursor-pointer">
           <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-2xl">
             <img src={pro.img} alt={pro.name} className="w-full h-full object-cover" />
@@ -360,19 +367,14 @@ const SavedPros = () => (
   </div>
 );
 
-const AlertsFeed = () => (
+const AlertsFeed = ({ alerts }) => (
   <div className="space-y-8">
     <div className="flex justify-between items-center mb-8">
       <h3 className="text-2xl font-bold text-primary">Policy Alerts & Notifications</h3>
       <button className="text-sm font-bold text-secondary">Mark all as read</button>
     </div>
     <div className="space-y-4 max-w-4xl">
-      {[
-        { title: 'New Ordinance in Austin', desc: 'ADU height limit increased to 25ft for all single-family lots effective June 1st.', time: '2 hours ago', type: 'Law', impact: 'High', unread: true },
-        { title: 'Fee Waiver Reminder', desc: 'San Diego impact fee waiver program ends in 12 days. Submit applications now to save $15k.', time: '1 day ago', type: 'Finance', impact: 'Very High', unread: true },
-        { title: 'Statewide Zoning Update', desc: 'SB 423 implementation details released. New guidelines for multi-family property ADUs.', time: '3 days ago', type: 'Policy', impact: 'Medium', unread: false },
-        { title: 'FHA Rules Update', desc: 'New FHA financing rules now allow 75% of rental income to be used for qualification.', time: '1 week ago', type: 'Finance', impact: 'High', unread: false },
-      ].map((alert, idx) => (
+      {alerts.map((alert, idx) => (
         <div key={idx} className={`bg-white rounded-[20px] p-6 border transition-all hover:shadow-md cursor-pointer flex gap-6 ${alert.unread ? 'border-secondary/30 ring-1 ring-secondary/5 shadow-sm' : 'border-slate-200 opacity-80'}`}>
           <div className={`w-14 h-14 rounded-2xl shrink-0 flex items-center justify-center ${alert.type === 'Law' ? 'bg-amber-50 text-amber-500' : alert.type === 'Finance' ? 'bg-emerald-50 text-emerald-500' : 'bg-blue-50 text-blue-500'}`}>
             <BellRing className="w-7 h-7" />

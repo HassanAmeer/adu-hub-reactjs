@@ -1,0 +1,6 @@
+[
+  { "id": "al_1", "userId": "mock-user-id", "title": "New Ordinance in Austin", "desc": "ADU height limit increased to 25ft for all single-family lots effective June 1st.", "time": "2 hours ago", "type": "Law", "impact": "High", "unread": true },
+  { "id": "al_2", "userId": "mock-user-id", "title": "Fee Waiver Reminder", "desc": "San Diego impact fee waiver program ends in 12 days. Submit applications now to save $15k.", "time": "1 day ago", "type": "Finance", "impact": "Very High", "unread": true },
+  { "id": "al_3", "userId": "mock-user-id", "title": "Statewide Zoning Update", "desc": "SB 423 implementation details released. New guidelines for multi-family property ADUs.", "time": "3 days ago", "type": "Policy", "impact": "Medium", "unread": false },
+  { "id": "al_4", "userId": "mock-user-id", "title": "FHA Rules Update", "desc": "New FHA financing rules now allow 75% of rental income to be used for qualification.", "time": "1 week ago", "type": "Finance", "impact": "High", "unread": false }
+]

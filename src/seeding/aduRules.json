@@ -1,0 +1,9 @@
+[
+  { "id": "rule_1", "title": "Maximum Size", "value": "1,200 sq ft", "description": "Depending on lot size and existing primary dwelling size." },
+  { "id": "rule_2", "title": "Maximum Height", "value": "16-25 ft", "description": "Generally 16ft for detached ADUs, higher for attached." },
+  { "id": "rule_3", "title": "Parking", "value": "None required", "description": "In most areas near transit or if replacing existing parking." },
+  { "id": "rule_4", "title": "Owner Occupancy", "value": "Not Required", "description": "Recent state laws have removed this requirement for most ADUs." },
+  { "id": "rule_5", "title": "Setbacks", "value": "4 ft Rear/Side", "description": "Most states now limit side and rear setbacks to a maximum of 4 feet." },
+  { "id": "rule_6", "title": "Utility Connection", "value": "Direct or Separate", "description": "Connection to primary utilities allowed; separate meters optional in most cases." },
+  { "id": "rule_7", "title": "Fire & Safety", "value": "Sprinklers if Primary", "description": "Fire sprinklers only required if they are required in the primary dwelling." }
+]

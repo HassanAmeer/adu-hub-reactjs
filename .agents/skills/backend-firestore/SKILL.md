@@ -12,8 +12,10 @@ This skill is exclusively for developing and updating backend logic that connect
 1. **NO UI Changes:** Do NOT modify HTML, CSS, Tailwind classes, or React components' visual structure. Your changes should be invisible to the user's eye.
 2. **NO Firebase Auth:** Do NOT use, import, or configure Firebase Authentication (`getAuth`, `signInWith...`, etc.).
 3. **Firestore Only:** You may only interact with Firebase Firestore (`getFirestore`, `collection`, `doc`, `addDoc`, `getDocs`, `onSnapshot`, `updateDoc`, `deleteDoc`, etc.).
-4. **Backend Logic Only:** Focus solely on data fetching, data mutation, business logic, state management related to data, and connecting these pieces to the existing UI without changing its appearance.
-5. **Seeding Dummy Data:** If the project requires dummy data for testing, create JSON files in `src/seeding/` with perfect reference IDs (e.g., `userId` matching an `id` in `users.json`). Use a dedicated route like `/seeding` to migrate this data using `writeBatch`.
+4. **Centralized Collections Management:** ALL collection names MUST be imported and used from `src/services/collections-names.js` (e.g., `import { COLLECTIONS } from '../services/collections-names';`). NEVER use hardcoded strings for collection names.
+5. **Every future use able configration variables:** ALL  useable configration variables must be imported and used from `src/config/config.js` (e.g., `import { CONFIG } from '../config/';`). NEVER use hardcoded strings if its configureable or changeable in future
+6. **Backend Logic Only:** Focus solely on data fetching, data mutation, business logic, state management related to data, and connecting these pieces to the existing UI without changing its appearance.
+7. **Seeding Dummy Data:** If the project requires dummy data for testing, create JSON files in `src/seeding/` with perfect reference IDs (e.g., `userId` matching an `id` in `users.json`). Use a dedicated route like `/seeding` to migrate this data using `writeBatch`.
 
 ## Instructions
 When activated, follow these steps to integrate backend functionality:

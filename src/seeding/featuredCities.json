@@ -1,0 +1,5 @@
+[
+  { "id": "fc_1", "name": "San Diego", "state": "California", "img": "https://images.unsplash.com/photo-1513366208864-87536b8bd7b4?q=80&w=800&auto=format&fit=crop" },
+  { "id": "fc_2", "name": "Los Angeles", "state": "California", "img": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=800&auto=format&fit=crop" },
+  { "id": "fc_3", "name": "Seattle", "state": "Washington", "img": "https://images.unsplash.com/photo-1502175353174-a7a70e73b362?q=80&w=800&auto=format&fit=crop" }
+]
