@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { loginUser as dbLoginUser, signupUser as dbSignupUser } from '../services/db';
+import { CONFIG } from '../config';
 
 const AuthContext = createContext();
 
@@ -8,38 +10,40 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock login function - allows empty login for design purposes
-  const login = (email = 'Guest', password = '') => {
-    const user = { 
-      email: email || 'guest@example.com', 
-      id: 'mock-user-id', 
-      displayName: email ? email.split('@')[0] : 'Guest' 
-    };
-    setCurrentUser(user);
-    localStorage.setItem('adu-hub-user', JSON.stringify(user));
-    return Promise.resolve(user);
+  // Custom Firestore-based authentication
+  const login = async (email, password) => {
+    try {
+      const user = await dbLoginUser(email, password);
+      setCurrentUser(user);
+      localStorage.setItem(CONFIG.LOCAL_STORAGE_KEY, JSON.stringify(user));
+      return user;
+    } catch (error) {
+      console.error("AuthContext Login Error:", error);
+      throw error;
+    }
   };
 
-  const signup = (email = 'Guest', password = '', name = 'Guest User') => {
-    const user = { 
-      email: email || 'guest@example.com', 
-      id: 'mock-user-id', 
-      displayName: name || 'Guest User' 
-    };
-    setCurrentUser(user);
-    localStorage.setItem('adu-hub-user', JSON.stringify(user));
-    return Promise.resolve(user);
+  const signup = async (email, password, name) => {
+    try {
+      const user = await dbSignupUser(email, password, name);
+      setCurrentUser(user);
+      localStorage.setItem(CONFIG.LOCAL_STORAGE_KEY, JSON.stringify(user));
+      return user;
+    } catch (error) {
+      console.error("AuthContext Signup Error:", error);
+      throw error;
+    }
   };
 
   const logout = () => {
     setCurrentUser(null);
-    localStorage.removeItem('adu-hub-user');
+    localStorage.removeItem(CONFIG.LOCAL_STORAGE_KEY);
     return Promise.resolve();
   };
 
   useEffect(() => {
     // Check for saved session
-    const savedUser = localStorage.getItem('adu-hub-user');
+    const savedUser = localStorage.getItem(CONFIG.LOCAL_STORAGE_KEY);
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }

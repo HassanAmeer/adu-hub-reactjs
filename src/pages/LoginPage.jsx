@@ -15,10 +15,14 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
+      if (!email || !password) {
+        setError('Please enter both email and password.');
+        return;
+      }
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError('Failed to log in. Please check your credentials.');
+      setError(err.message || 'Failed to log in. Please check your credentials.');
       console.error(err);
     }
   };
@@ -72,7 +76,7 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <button className="btn-outline w-full !py-4 flex items-center justify-center gap-3">
+        <button type="button" className="btn-outline w-full !py-4 flex items-center justify-center gap-3">
           <Globe className="w-5 h-5" />
           Google Account
         </button>
