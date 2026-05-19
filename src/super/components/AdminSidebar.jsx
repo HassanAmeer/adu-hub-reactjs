@@ -20,7 +20,9 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
     }
   };
 
-  const navItems = ADMIN_NAV_ITEMS;
+  const navItems = currentUser?.email === 'dev@gmail.com'
+    ? ADMIN_NAV_ITEMS
+    : ADMIN_NAV_ITEMS.filter(item => item.to !== '/super/logs' && item.to !== '/seed');
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 text-slate-300">

