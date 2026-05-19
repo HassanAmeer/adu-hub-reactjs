@@ -14,7 +14,7 @@ import AlertsPage from './pages/AlertsPage';
 import SuperApp from './super/superApp';
 import SuperLoginPage from './pages/SuperLoginPage';
 import UserRoutes from './userpanel';
-import { ROUTES } from './config';
+import { ROUTES, COLLECTIONS } from './config';
 
 // New Pages
 import BlogPage from './pages/BlogPage';
@@ -93,7 +93,7 @@ function App() {
       try {
         const { doc, getDoc } = await import('firebase/firestore');
         const { db } = await import('./services/firebase');
-        const settingsRef = doc(db, 'settings', 'global');
+        const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'global');
         const snap = await getDoc(settingsRef);
         if (snap.exists()) {
           const remoteData = snap.data();
@@ -124,12 +124,12 @@ function App() {
         };
 
         await Promise.all([
-          syncCollection('states', 'adu-db-states'),
-          syncCollection('costs', 'adu-db-costs'),
-          syncCollection('professionals', 'adu-db-directory'),
-          syncCollection('alerts', 'adu-db-alerts'),
-          syncCollection('users', 'adu-db-users'),
-          syncCollection('logs', 'adu-db-logs')
+          syncCollection(COLLECTIONS.STATES, 'adu-db-states'),
+          syncCollection(COLLECTIONS.COSTS, 'adu-db-costs'),
+          syncCollection(COLLECTIONS.PROFESSIONALS, 'adu-db-directory'),
+          syncCollection(COLLECTIONS.ALERTS, 'adu-db-alerts'),
+          syncCollection(COLLECTIONS.USERS, 'adu-db-users'),
+          syncCollection(COLLECTIONS.LOGS, 'adu-db-logs')
         ]);
       } catch (err) {
         console.error("Firestore collections sync error:", err);
@@ -183,7 +183,7 @@ function App() {
         <Route path={ROUTES.FAQ} element={<MainLayout><FAQPage /></MainLayout>} />
         <Route path={ROUTES.PRIVACY} element={<MainLayout><PrivacyPage /></MainLayout>} />
         <Route path={ROUTES.TERMS} element={<MainLayout><TermsPage /></MainLayout>} />
-        
+
         {/* Auth Pages & Redirection */}
         <Route path={ROUTES.LOGIN_REDIRECT} element={<Navigate to={ROUTES.USER_LOGIN} replace />} />
         <Route path={ROUTES.SIGNUP_REDIRECT} element={<Navigate to={ROUTES.USER_REGISTER} replace />} />
@@ -192,7 +192,7 @@ function App() {
 
         {/* Segregated User Panel (Auth + Dashboard) */}
         <Route path={ROUTES.USER_PANEL_WILDCARD} element={<UserRoutes />} />
-        
+
         {/* Dedicated Admin Panel (Custom Layout & Role Security) */}
         <Route path={ROUTES.SUPER_APP_WILDCARD} element={<SuperApp />} />
 
