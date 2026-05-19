@@ -17,6 +17,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { dbService } from '../services/dbService';
+import Skeleton from '../components/common/Skeleton';
 
 
 const PropertyCheckerPage = () => {
@@ -231,10 +232,10 @@ const PropertyCheckerPage = () => {
                       className="btn-primary !px-10 flex items-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       {loading ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Analyzing...
-                        </>
+                        <span className="flex items-center gap-3">
+                          <Skeleton variant="circular" className="w-5 h-5 inline-block" />
+                          <span className="text-white/70">Analyzing...</span>
+                        </span>
                       ) : (
                         <>
                           Generate Report

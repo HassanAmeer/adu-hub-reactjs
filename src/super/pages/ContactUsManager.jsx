@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Mail, Trash2, CheckCircle2, Loader2, MessageSquare, Clock, User, Inbox } from 'lucide-react';
+import { TableSkeleton } from '../../components/common/Skeleton';
 import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { COLLECTIONS } from '../../config';
@@ -134,10 +135,7 @@ const ContactUsManager = () => {
           </div>
 
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center gap-3">
-              <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
-              <p className="text-xs text-slate-400">Loading submitted messages...</p>
-            </div>
+            <TableSkeleton rows={5} cols={5} />
           ) : messages.length === 0 ? (
             <div className="py-20 text-center text-slate-400 space-y-2">
               <Inbox className="w-10 h-10 mx-auto text-slate-300" />

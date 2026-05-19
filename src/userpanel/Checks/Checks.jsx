@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
 import { Plus, Trash2, MapPin, CheckCircle2, ShieldCheck, Compass, Info } from 'lucide-react';
+import Skeleton from '../../components/common/Skeleton';
 
 const Checks = () => {
   const { currentUser, refreshUser } = useAuth();
@@ -129,8 +130,18 @@ const Checks = () => {
           </form>
 
           {simulating && (
-            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 animate-pulse text-xs font-semibold text-slate-500">
-              <Compass className="w-5 h-5 text-emerald-500 animate-spin" /> Retrieving parcel zoning information from municipal databases...
+            <div className="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="flex items-center gap-3">
+                <Skeleton variant="circular" className="w-8 h-8" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+              <Skeleton className="h-3 w-1/2" />
+              <div className="grid grid-cols-2 gap-3">
+                <Skeleton className="h-16 rounded-xl" />
+                <Skeleton className="h-16 rounded-xl" />
+                <Skeleton className="h-16 rounded-xl" />
+                <Skeleton className="h-16 rounded-xl" />
+              </div>
             </div>
           )}
 
