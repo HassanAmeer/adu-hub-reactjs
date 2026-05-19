@@ -31,7 +31,7 @@ const SeedPage = () => {
   useEffect(() => {
     if (loading) return;
     if (!currentUser || currentUser.role !== 'superAdmin') {
-      navigate('/super');
+      navigate('/');
     }
   }, [currentUser, loading, navigate]);
 
