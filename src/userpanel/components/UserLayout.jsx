@@ -4,6 +4,7 @@ import { Menu } from 'lucide-react';
 import { useAuth } from '../hooks/useUserAuth';
 import UserSidebar from './UserSidebar';
 import { ROUTES } from '../../config';
+import Skeleton from '../../components/common/Skeleton';
 
 const UserLayout = () => {
   const { currentUser, loading } = useAuth();
@@ -15,9 +16,13 @@ const UserLayout = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-          <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">Validating Session...</span>
+        <div className="flex flex-col items-center gap-6 w-full max-w-md px-8">
+          <Skeleton variant="circular" className="w-16 h-16" />
+          <div className="space-y-3 w-full">
+            <Skeleton className="h-4 w-3/4 mx-auto" />
+            <Skeleton className="h-3 w-1/2 mx-auto" />
+          </div>
+          <Skeleton className="h-10 w-40 mx-auto" />
         </div>
       </div>
     );

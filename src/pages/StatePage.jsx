@@ -21,6 +21,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { DetailPageSkeleton } from '../components/common/Skeleton';
 
 const StatePage = () => {
   const { stateName } = useParams();
@@ -37,11 +38,7 @@ const StatePage = () => {
   }, [stateName]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-20">
-        <div className="w-8 h-8 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <DetailPageSkeleton />;
   }
 
   const formattedState = stateData ? stateData.name : (stateName ? stateName.charAt(0).toUpperCase() + stateName.slice(1) : 'California');
