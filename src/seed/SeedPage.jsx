@@ -28,6 +28,24 @@ const SeedPage = () => {
   const { currentUser, loading } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (loading) return;
+    if (!currentUser || currentUser.role !== 'superAdmin') {
+      navigate('/super');
+    }
+  }, [currentUser, loading, navigate]);
+
+  if (loading || !currentUser || currentUser.role !== 'superAdmin') {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+          <span className="text-sm font-semibold text-slate-400">Verifying authorization...</span>
+        </div>
+      </div>
+    );
+  }
+
   // Seeding States
   const [selectedCollections, setSelectedCollections] = useState(
     Object.keys(COLLECTIONS).reduce((acc, key) => ({ ...acc, [COLLECTIONS[key]]: true }), {})
