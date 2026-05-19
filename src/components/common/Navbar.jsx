@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut, User } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { currentUser, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,11 +58,38 @@ const Navbar = () => {
                   }`} />
               </Link>
             ))}
+            {currentUser && (
+              <Link
+                to="/userpanel/dashboard"
+                className={`relative px-4 py-2 text-sm font-medium transition-colors group ${isActive('/userpanel/dashboard') ? 'text-white' : 'text-slate-400 hover:text-white'
+                  }`}
+              >
+                Dashboard
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-secondary transform origin-left transition-transform duration-300 ${isActive('/userpanel/dashboard') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  }`} />
+              </Link>
+            )}
           </div>
 
           <div className="hidden lg:flex items-center gap-4">
-            <Link to="/login" className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Log In</Link>
-            <Link to="/signup" className="btn-primary !py-2.5 !px-6 text-sm">Get Started</Link>
+            {currentUser ? (
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-semibold text-slate-300">
+                  Hi, {currentUser.name || currentUser.displayName || 'User'}
+                </span>
+                <Link to="/userpanel/dashboard" className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-white font-bold text-sm shadow-inner">
+                  {(currentUser.name || currentUser.displayName || 'U')[0].toUpperCase()}
+                </Link>
+                <button onClick={() => logout()} className="text-slate-400 hover:text-red-400 transition-colors p-1" title="Log Out">
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link to="/login" className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Log In</Link>
+                <Link to="/signup" className="btn-primary !py-2.5 !px-6 text-sm">Get Started</Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -90,9 +119,32 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
+            {currentUser && (
+              <Link
+                to="/userpanel/dashboard"
+                onClick={() => setIsOpen(false)}
+                className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${isActive('/userpanel/dashboard') ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                Dashboard
+              </Link>
+            )}
             <div className="pt-6 mt-4 border-t border-white/10 flex flex-col gap-3">
-              <Link to="/login" onClick={() => setIsOpen(false)} className="btn-ghost w-full text-center border border-white/20">Log In</Link>
-              <Link to="/signup" onClick={() => setIsOpen(false)} className="btn-primary w-full text-center">Get Started</Link>
+              {currentUser ? (
+                <div className="flex flex-col gap-3 text-center">
+                  <p className="text-slate-300 text-sm">
+                    Logged in as <span className="text-white font-bold">{currentUser.name || currentUser.email}</span>
+                  </p>
+                  <button onClick={() => { logout(); setIsOpen(false); }} className="btn-ghost w-full text-center border border-white/20 text-red-400 flex items-center justify-center gap-2">
+                    <LogOut className="w-4 h-4" /> Log Out
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setIsOpen(false)} className="btn-ghost w-full text-center border border-white/20">Log In</Link>
+                  <Link to="/signup" onClick={() => setIsOpen(false)} className="btn-primary w-full text-center">Get Started</Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -102,3 +154,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

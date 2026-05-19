@@ -43,18 +43,18 @@ const Footer = () => {
             <ul className="space-y-4 text-sm text-slate-500">
               <li><Link to="/how-to-build" className="hover:text-secondary">How to Build</Link></li>
               <li><Link to="/state/california" className="hover:text-secondary">California Laws</Link></li>
-              <li><a href="#" className="hover:text-secondary">Case Studies</a></li>
-              <li><a href="#" className="hover:text-secondary">Blog</a></li>
+              <li><Link to="/faq" className="hover:text-secondary">FAQ</Link></li>
+              <li><Link to="/blog" className="hover:text-secondary">Blog</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold text-slate-900 mb-6">Company</h4>
             <ul className="space-y-4 text-sm text-slate-500">
-              <li><a href="#" className="hover:text-secondary">About Us</a></li>
-              <li><a href="#" className="hover:text-secondary">Contact</a></li>
-              <li><a href="#" className="hover:text-secondary">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-secondary">Terms of Service</a></li>
+              <li><Link to="/about" className="hover:text-secondary">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-secondary">Contact</Link></li>
+              <li><Link to="/privacy" className="hover:text-secondary">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-secondary">Terms of Service</Link></li>
             </ul>
           </div>
         </div>

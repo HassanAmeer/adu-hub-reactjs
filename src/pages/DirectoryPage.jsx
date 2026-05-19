@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -17,6 +17,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import Skeleton, { CardSkeleton } from '../components/common/Skeleton';
 import Modal from '../components/common/Modal';
+import { dbService } from '../services/dbService';
+
 
 const professionals = [
   {
@@ -140,11 +142,61 @@ const DirectoryPage = () => {
   const [role, setRole] = useState('All');
   const [loading, setLoading] = useState(true);
   const [selectedPro, setSelectedPro] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedState, setSelectedState] = useState('All');
+  const [pros, setPros] = useState([]);
+  const [states, setStates] = useState([]);
+  const [selectedBudgets, setSelectedBudgets] = useState([]);
+  const [selectedSpecialties, setSelectedSpecialties] = useState([]);
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
+  useEffect(() => {
+    setPros(dbService.getDirectory());
+    setStates(dbService.getStates());
+    const timer = setTimeout(() => setLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleBudgetToggle = (budget) => {
+    setSelectedBudgets(prev => 
+      prev.includes(budget) ? prev.filter(b => b !== budget) : [...prev, budget]
+    );
+  };
+
+  const handleSpecialtyToggle = (specialty) => {
+    setSelectedSpecialties(prev => 
+      prev.includes(specialty) ? prev.filter(s => s !== specialty) : [...prev, specialty]
+    );
+  };
+
+  // Filtered results
+  const filteredPros = pros.filter(pro => {
+    if (role !== 'All' && pro.role !== role) return false;
+    
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchName = pro.name.toLowerCase().includes(q);
+      const matchLoc = pro.location.toLowerCase().includes(q);
+      const matchTags = pro.tags.some(tag => tag.toLowerCase().includes(q));
+      if (!matchName && !matchLoc && !matchTags) return false;
+    }
+
+    if (selectedState !== 'All' && !pro.location.toLowerCase().includes(selectedState.toLowerCase())) {
+      return false;
+    }
+
+    if (selectedBudgets.length > 0 && !selectedBudgets.includes(pro.price)) {
+      return false;
+    }
+
+    if (selectedSpecialties.length > 0) {
+      const hasSpecialty = selectedSpecialties.some(spec => 
+        pro.tags.some(tag => tag.toLowerCase().includes(spec.toLowerCase()))
+      );
+      if (!hasSpecialty) return false;
+    }
+
+    return true;
+  });
 
   return (
     <motion.div 
@@ -172,21 +224,24 @@ const DirectoryPage = () => {
                 type="text" 
                 placeholder="Search by name, location, or keyword..." 
                 className="input-field !pl-14 !py-4 text-lg w-full bg-white text-slate-900 border-none shadow-lg focus:ring-4 focus:ring-secondary/30"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
               />
             </div>
             <div className="flex gap-4">
               <div className="relative min-w-[200px]">
-                <select className="input-field appearance-none !pr-12 !py-4 text-lg bg-white text-slate-900 border-none shadow-lg cursor-pointer">
-                  <option>California</option>
-                  <option>Washington</option>
-                  <option>Oregon</option>
+                <select 
+                  className="input-field appearance-none !pr-12 !py-4 text-lg bg-white text-slate-900 border-none shadow-lg cursor-pointer"
+                  value={selectedState}
+                  onChange={e => setSelectedState(e.target.value)}
+                >
+                  <option value="All">All States</option>
+                  {states.map(s => (
+                    <option key={s.id} value={s.name}>{s.name}</option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 pointer-events-none" />
               </div>
-              <button className="btn-secondary !bg-white/10 hover:!bg-white/20 !text-white border border-white/20 flex items-center justify-center gap-2 !px-8 !py-4 shadow-lg backdrop-blur-md">
-                <Filter className="w-5 h-5" />
-                Filters
-              </button>
             </div>
           </div>
         </div>
@@ -221,7 +276,12 @@ const DirectoryPage = () => {
                   <div className="space-y-3">
                     {['Detached', 'Attached', 'Conversion', 'Junior ADU', 'Multi-family'].map(type => (
                       <label key={type} className="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" className="w-5 h-5 accent-secondary rounded" />
+                        <input 
+                          type="checkbox" 
+                          className="w-5 h-5 accent-secondary rounded" 
+                          checked={selectedSpecialties.includes(type)}
+                          onChange={() => handleSpecialtyToggle(type)}
+                        />
                         <span className="text-sm font-semibold text-slate-600 group-hover:text-primary transition-colors">{type}</span>
                       </label>
                     ))}
@@ -231,11 +291,22 @@ const DirectoryPage = () => {
                 <div className="pt-8 border-t border-slate-100">
                   <h4 className="font-bold text-slate-900 mb-4 text-lg">Budget Range</h4>
                   <div className="grid grid-cols-4 gap-2">
-                    {['$', '$$', '$$$', '$$$$'].map(b => (
-                      <button key={b} className="py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-500 hover:border-secondary hover:text-secondary hover:bg-secondary/5 transition-all">
-                        {b}
-                      </button>
-                    ))}
+                    {['$', '$$', '$$$', '$$$$'].map(b => {
+                      const isActive = selectedBudgets.includes(b);
+                      return (
+                        <button 
+                          key={b} 
+                          onClick={() => handleBudgetToggle(b)}
+                          className={`py-2.5 rounded-xl border text-sm font-bold transition-all ${
+                            isActive 
+                              ? 'border-secondary bg-secondary/10 text-secondary' 
+                              : 'border-slate-200 text-slate-500 hover:border-secondary hover:text-secondary'
+                          }`}
+                        >
+                          {b}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -245,7 +316,7 @@ const DirectoryPage = () => {
           {/* Cards Grid */}
           <div className="lg:col-span-3">
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <p className="text-sm text-slate-500 font-bold">{professionals.length} professionals found</p>
+                <p className="text-sm text-slate-500 font-bold">{filteredPros.length} professionals found</p>
                 <div className="flex items-center gap-2 text-sm text-slate-500 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
                   Sort by: <span className="font-bold text-primary flex items-center gap-1 cursor-pointer">Most Reviews <ChevronDown className="w-4 h-4" /></span>
                 </div>
@@ -254,11 +325,11 @@ const DirectoryPage = () => {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                 {loading ? (
                   [1, 2, 3, 4].map(i => <CardSkeleton key={i} />)
-                ) : (
-                  professionals.map((pro) => (
+                ) : filteredPros.length > 0 ? (
+                  filteredPros.map((pro) => (
                     <div key={pro.id} className="bg-white rounded-[24px] border border-slate-200 shadow-sm hover:shadow-xl hover:border-secondary/30 transition-all overflow-hidden group cursor-pointer flex flex-col" onClick={() => setSelectedPro(pro)}>
                       <div className="relative">
-                        <ImageCarousel images={pro.images} />
+                        <ImageCarousel images={pro.images || [pro.image]} />
                         
                         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-xs font-bold text-slate-800 flex items-center gap-1.5 shadow-md">
                           <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
@@ -293,7 +364,7 @@ const DirectoryPage = () => {
                         </div>
 
                         <div className="flex flex-wrap gap-2 mb-8 mt-auto">
-                          {pro.tags.map(tag => (
+                          {(pro.tags || []).map(tag => (
                             <span key={tag} className="px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-100 text-slate-600 text-[11px] font-bold uppercase tracking-wider">
                               {tag}
                             </span>
@@ -305,20 +376,25 @@ const DirectoryPage = () => {
                             <MessageCircle className="w-4.5 h-4.5" />
                             Message
                           </button>
-                          <button className="w-14 h-[46px] bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-primary transition-all">
+                          <button 
+                            className="w-14 h-[46px] bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-primary transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (pro.website) window.open(pro.website, '_blank');
+                            }}
+                          >
                             <ExternalLink className="w-5 h-5" />
                           </button>
                         </div>
                       </div>
                     </div>
                   ))
+                ) : (
+                  <div className="col-span-2 text-center py-20 bg-white rounded-3xl border border-slate-200">
+                    <p className="text-slate-400 font-bold text-lg mb-2">No professionals match your filters</p>
+                    <p className="text-slate-500 text-sm">Try relaxing your search terms or sidebar filters.</p>
+                  </div>
                 )}
-             </div>
-             
-             <div className="mt-16 flex justify-center">
-                <button className="btn-secondary !bg-white !text-primary border border-slate-200 hover:!bg-slate-50 shadow-sm !px-10">
-                  Load More Professionals
-                </button>
              </div>
           </div>
         </div>

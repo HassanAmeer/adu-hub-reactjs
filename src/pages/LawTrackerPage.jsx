@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   History, 
   ArrowRight, 
@@ -10,60 +10,25 @@ import {
   Bell
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { dbService } from '../services/dbService';
 
 const LawTrackerPage = () => {
-  const updates = [
-    {
-      date: 'May 2, 2024',
-      state: 'California',
-      title: 'SB 1211: Parking & Coverage Relief',
-      status: 'Passed',
-      impact: 'High',
-      desc: 'This bill removes local authority to require replacement parking when a garage is converted to an ADU, and clarifies lot coverage limits.',
-      before: 'Cities could require up to 1 parking space per bedroom for any ADU project, making many conversions unfeasible.',
-      after: 'No replacement parking required for conversions or projects near transit. Lot coverage exemptions expanded.'
-    },
-    {
-      date: 'April 15, 2024',
-      state: 'Washington',
-      title: 'HB 1110: Middle Housing Act',
-      status: 'Implementation Phase',
-      impact: 'Very High',
-      desc: 'Mandates cities to allow at least two ADUs per lot in all residential zones. Cities have until 2025 to update local codes.',
-      before: 'Most cities limited single-family lots to a maximum of one attached or detached ADU.',
-      after: 'Cities must allow at least two ADUs per lot in all residential zones, drastically increasing housing density options.'
-    },
-    {
-      date: 'March 28, 2024',
-      state: 'Oregon',
-      title: 'SB 1537: Housing Infrastructure',
-      status: 'Signed by Governor',
-      impact: 'Medium',
-      desc: 'Expands the use of revolving loan funds for ADU construction and infrastructure upgrades.',
-      before: 'Limited state funding available specifically for homeowner-driven ADU projects.',
-      after: 'Expands a $3M revolving loan fund to provide targeted financing for ADU construction.'
-    },
-    {
-      date: 'February 10, 2024',
-      state: 'California',
-      title: 'AB 1033: ADU Condominium Sales',
-      status: 'Passed',
-      impact: 'High',
-      desc: 'Allows local agencies to permit ADUs to be sold separately from the primary dwelling as condominiums.',
-      before: 'ADUs were required to be held under the same ownership as the primary residence and could not be sold separately.',
-      after: 'Cities can now opt-in to allow ADUs to be converted to condominiums and sold as separate titles.'
-    },
-    {
-      date: 'January 15, 2024',
-      state: 'National',
-      title: 'FHA Financing Rules Update',
-      status: 'Effective Now',
-      impact: 'High',
-      desc: 'FHA now allows 75% of projected rental income from an ADU to be considered for mortgage qualification.',
-      before: 'Rental income from an ADU could not be used to help a borrower qualify for an FHA-insured mortgage.',
-      after: 'Borrowers can now use potential ADU rental income to meet debt-to-income requirements for purchasing or refinancing.'
-    }
-  ];
+  const [updates, setUpdates] = useState([]);
+  const [emailInput, setEmailInput] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  useEffect(() => {
+    setUpdates(dbService.getAlerts());
+  }, []);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!emailInput) return;
+    dbService.addLog(`User subscribed to policy updates: ${emailInput}`);
+    setSubscribed(true);
+    setEmailInput('');
+  };
+
 
   return (
     <motion.div 
@@ -90,10 +55,23 @@ const LawTrackerPage = () => {
                  <Bell className="w-8 h-8 text-secondary mb-4" />
                  <h4 className="text-xl font-bold mb-2">Get Policy Alerts</h4>
                  <p className="text-slate-300 text-sm mb-6 leading-relaxed">Subscribe to receive email notifications when laws change in your specific area.</p>
-                 <div className="flex flex-col gap-3">
-                    <input type="email" placeholder="email@example.com" className="bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm outline-none w-full focus:bg-white/20 focus:border-secondary transition-all text-white placeholder-slate-400" />
-                    <button className="bg-secondary hover:bg-secondary/90 px-4 py-3 rounded-xl text-sm font-bold text-white transition-colors w-full shadow-md">Subscribe Now</button>
-                 </div>
+                 {subscribed ? (
+                   <div className="bg-emerald-500/20 border border-emerald-500/30 p-4 rounded-xl text-center">
+                     <p className="text-sm font-bold text-emerald-300">Successfully Subscribed!</p>
+                   </div>
+                 ) : (
+                   <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
+                     <input 
+                       type="email" 
+                       placeholder="email@example.com" 
+                       className="bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm outline-none w-full focus:bg-white/20 focus:border-secondary transition-all text-white placeholder-slate-400" 
+                       value={emailInput}
+                       onChange={e => setEmailInput(e.target.value)}
+                       required
+                     />
+                     <button type="submit" className="bg-secondary hover:bg-secondary/90 px-4 py-3 rounded-xl text-sm font-bold text-white transition-colors w-full shadow-md">Subscribe Now</button>
+                   </form>
+                 )}
               </div>
            </div>
         </div>

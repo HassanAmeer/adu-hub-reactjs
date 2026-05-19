@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { aduRules, states } from '../data/mockData';
+import { dbService } from '../services/dbService';
 import { 
   CheckCircle2, 
   Info, 
@@ -24,10 +24,32 @@ import { motion } from 'framer-motion';
 
 const StatePage = () => {
   const { stateName } = useParams();
-  const stateData = states.find(s => s.id === stateName?.toLowerCase() || s.name.toLowerCase() === stateName?.toLowerCase());
+  const [stateData, setStateData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const allStates = dbService.getStates();
+    const found = allStates.find(s => s.id === stateName?.toLowerCase() || s.name.toLowerCase() === stateName?.toLowerCase());
+    if (found) {
+      setStateData(found);
+    }
+    setLoading(false);
+  }, [stateName]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-20">
+        <div className="w-8 h-8 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   const formattedState = stateData ? stateData.name : (stateName ? stateName.charAt(0).toUpperCase() + stateName.slice(1) : 'California');
   const status = stateData?.status || 'Allowed';
   const cities = stateData?.cities || ['San Diego', 'Los Angeles', 'San Francisco', 'San Jose', 'Sacramento', 'Oakland'];
+  const rules = stateData?.rules || [];
+  const grants = stateData?.grants || [];
+
 
   return (
     <motion.div 
@@ -107,11 +129,11 @@ const StatePage = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-12">
             
-            {/* Summary Grid */}
-            <section>
+             {/* Summary Grid */}
+             <section>
               <h2 className="text-3xl font-bold text-primary mb-8">Key Regulations</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {aduRules.map((rule, idx) => (
+                {rules.map((rule, idx) => (
                   <div key={idx} className="bg-white rounded-[20px] p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-secondary/30 transition-all group">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
@@ -144,21 +166,19 @@ const StatePage = () => {
                   State Grant Programs
                 </h2>
                 <div className="space-y-4 relative z-10">
-                  <div className="bg-white p-5 rounded-xl border border-indigo-100 shadow-sm">
-                    <div className="flex justify-between items-start gap-4 mb-2">
-                      <h4 className="font-bold text-slate-800 text-lg">CalHFA ADU Grant Program</h4>
-                      <span className="badge !bg-emerald-100 !text-emerald-700 !border-emerald-200">Active</span>
+                  {grants.map((g, idx) => (
+                    <div key={idx} className="bg-white p-5 rounded-xl border border-indigo-100 shadow-sm">
+                      <div className="flex justify-between items-start gap-4 mb-2">
+                        <h4 className="font-bold text-slate-800 text-lg">{g.name}</h4>
+                        <span className="badge !bg-emerald-100 !text-emerald-700 !border-emerald-200">{g.status || 'Active'}</span>
+                      </div>
+                      <p className="text-slate-600 mb-4">{g.desc}</p>
+                      <span className="text-secondary font-black text-sm block">Value: {g.value}</span>
                     </div>
-                    <p className="text-slate-600 mb-4">Provides up to $40,000 to reimburse pre-development and non-reoccurring closing costs associated with the construction of the ADU.</p>
-                    <a href="#" className="text-indigo-600 font-bold text-sm hover:underline flex items-center gap-1">Check Eligibility <ChevronRight className="w-4 h-4" /></a>
-                  </div>
-                  <div className="bg-white p-5 rounded-xl border border-indigo-100 shadow-sm opacity-70">
-                    <div className="flex justify-between items-start gap-4 mb-2">
-                      <h4 className="font-bold text-slate-800 text-lg">Local City Grants</h4>
-                      <span className="badge !bg-slate-100 !text-slate-600 !border-slate-200">Varies</span>
-                    </div>
-                    <p className="text-slate-600 mb-4">Many cities offer their own localized grants, fee waivers, or forgivable loans. Check individual city pages for details.</p>
-                  </div>
+                  ))}
+                  {grants.length === 0 && (
+                    <p className="text-slate-500 text-sm font-medium">No grant programs currently listed for this state.</p>
+                  )}
                 </div>
               </div>
             </section>

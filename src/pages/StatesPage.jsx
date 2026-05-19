@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, MapPin, ChevronRight, Info, Building2, ShieldCheck, Globe } from 'lucide-react';
-import { states } from '../data/mockData';
+import { dbService } from '../services/dbService';
 
 const StatesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [states, setStates] = useState([]);
+
+  useEffect(() => {
+    setStates(dbService.getStates());
+  }, []);
 
   const filteredStates = states.filter(state => 
     state.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   const containerVariants = {
     hidden: { opacity: 0 },

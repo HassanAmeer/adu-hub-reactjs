@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -11,8 +11,53 @@ import {
   PaintRoller
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { dbService } from '../services/dbService';
+
 
 const CostLibraryPage = () => {
+  const [costs, setCosts] = useState([]);
+  const [states, setStates] = useState([]);
+  const [selectedState, setSelectedState] = useState('All');
+  const [selectedType, setSelectedType] = useState('All');
+
+  useEffect(() => {
+    setCosts(dbService.getCosts());
+    setStates(dbService.getStates());
+  }, []);
+
+  const filteredCosts = costs.filter(c => {
+    if (selectedState !== 'All' && c.state.toLowerCase() !== selectedState.toLowerCase()) return false;
+    if (selectedType !== 'All' && c.type.toLowerCase() !== selectedType.toLowerCase()) return false;
+    return true;
+  });
+
+  // Calculate Averages dynamically
+  const count = filteredCosts.length;
+  const avgCost = count > 0 
+    ? Math.round(filteredCosts.reduce((sum, c) => sum + c.avgCost, 0) / count)
+    : 245000;
+
+  const avgPricePerSqFt = count > 0 
+    ? Math.round(filteredCosts.reduce((sum, c) => sum + c.pricePerSqFt, 0) / count)
+    : 385;
+
+  const avgDesignCost = count > 0 
+    ? Math.round(filteredCosts.reduce((sum, c) => sum + c.designCost, 0) / count)
+    : 18000;
+
+  const avgPermitCost = count > 0 
+    ? Math.round(filteredCosts.reduce((sum, c) => sum + c.permitCost, 0) / count)
+    : 8000;
+
+  const avgConstructionCost = count > 0 
+    ? Math.round(filteredCosts.reduce((sum, c) => sum + c.constructionCost, 0) / count)
+    : 219000;
+
+  // Format currency helper
+  const formatCurrency = (val) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -32,14 +77,30 @@ const CostLibraryPage = () => {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-              <button className="btn-secondary !bg-white/10 !text-white hover:!bg-white/20 border border-white/20 flex items-center justify-center gap-2 !py-3">
-                <Filter className="w-5 h-5" />
-                Customize View
-              </button>
-              <button className="btn-secondary flex items-center justify-center gap-2 !py-3">
-                <Download className="w-5 h-5" />
-                2024 Market Report
-              </button>
+              <div className="relative min-w-[150px]">
+                <select 
+                  className="w-full input-field !py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl outline-none cursor-pointer"
+                  value={selectedState}
+                  onChange={e => setSelectedState(e.target.value)}
+                >
+                  <option className="text-slate-900" value="All">All States</option>
+                  {states.map(s => (
+                    <option key={s.id} className="text-slate-900" value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="relative min-w-[150px]">
+                <select 
+                  className="w-full input-field !py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl outline-none cursor-pointer"
+                  value={selectedType}
+                  onChange={e => setSelectedType(e.target.value)}
+                >
+                  <option className="text-slate-900" value="All">All Types</option>
+                  <option className="text-slate-900" value="Detached">Detached</option>
+                  <option className="text-slate-900" value="Attached">Attached</option>
+                  <option className="text-slate-900" value="Garage Conversion">Garage Conversion</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -49,8 +110,8 @@ const CostLibraryPage = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {[
-            { label: 'Avg. Project Cost', value: '$245,000', change: '+4.2%', icon: DollarSign, color: 'text-indigo-500', bg: 'bg-indigo-50' },
-            { label: 'Avg. Price per sq ft', value: '$385', change: '+2.1%', icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+            { label: 'Avg. Project Cost', value: formatCurrency(avgCost), change: '+4.2%', icon: DollarSign, color: 'text-indigo-500', bg: 'bg-indigo-50' },
+            { label: 'Avg. Price per sq ft', value: formatCurrency(avgPricePerSqFt), change: '+2.1%', icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-50' },
             { label: 'Avg. Return on Invest', value: '12-18%', change: 'Steady', icon: PieChartIcon, color: 'text-amber-500', bg: 'bg-amber-50' },
             { label: 'Recent Price Trend', value: 'Stabilizing', change: '-1.5%', icon: BarChart3, color: 'text-blue-500', bg: 'bg-blue-50' },
           ].map((stat, idx) => (
@@ -74,14 +135,12 @@ const CostLibraryPage = () => {
             
             {/* Cost Breakdown Cards */}
             <section>
-              <h2 className="text-3xl font-bold text-primary mb-8">Detailed Breakdown <span className="text-slate-400 font-medium text-xl">(750 sq ft ADU)</span></h2>
+              <h2 className="text-3xl font-bold text-primary mb-8">Detailed Breakdown <span className="text-slate-400 font-medium text-xl">(Based on Selections)</span></h2>
               <div className="space-y-6">
                 {[
-                  { title: 'Design & Pre-construction', range: '$15k - $25k', items: ['Architectural Plans', 'Structural Engineering', 'Site Surveys', 'Energy Calculations'] },
-                  { title: 'Permits & City Fees', range: '$5k - $15k', items: ['Plan Check Fees', 'Impact Fees (Sewer/Water)', 'School District Fees', 'Permit Issuance'] },
-                  { title: 'Site Prep & Foundation', range: '$40k - $60k', items: ['Grading & Excavation', 'Concrete Foundation', 'Utility Trenching', 'Plumbing Rough-in'] },
-                  { title: 'Shell & Exterior', range: '$80k - $120k', items: ['Framing & Roofing', 'Windows & Doors', 'Siding & Stucco', 'Insulation'] },
-                  { title: 'Interior Finishes', range: '$45k - $75k', items: ['Drywall & Paint', 'Flooring & Trim', 'Cabinets & Countertops', 'Fixtures & Appliances'] }
+                  { title: 'Design & Pre-construction', range: formatCurrency(avgDesignCost), items: ['Architectural Plans', 'Structural Engineering', 'Site Surveys', 'Energy Calculations'] },
+                  { title: 'Permits & City Fees', range: formatCurrency(avgPermitCost), items: ['Plan Check Fees', 'Impact Fees (Sewer/Water)', 'School District Fees', 'Permit Issuance'] },
+                  { title: 'Construction & Shell Assembly', range: formatCurrency(avgConstructionCost), items: ['Grading & Foundation', 'Framing & Roofing', 'Siding, Doors & Windows', 'Plumbing & Electrical Rough-ins', 'Drywall, Paint & Trim', 'Kitchen & Bath Fixtures'] }
                 ].map((block, idx) => (
                   <div key={idx} className="bg-white border border-slate-200 rounded-[20px] overflow-hidden hover:border-secondary/50 hover:shadow-md transition-all group">
                     <div className="p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50/50 border-b border-slate-100 gap-4">
@@ -113,10 +172,9 @@ const CostLibraryPage = () => {
               </h4>
               <div className="space-y-6">
                  {[
-                   { label: 'Construction & Shell', value: '50%', color: 'bg-emerald-500' },
-                   { label: 'Interior Finishes', value: '20%', color: 'bg-indigo-500' },
-                   { label: 'Foundation & Prep', value: '15%', color: 'bg-amber-500' },
-                   { label: 'Design & Permits', value: '15%', color: 'bg-blue-500' },
+                   { label: 'Construction & Shell', value: Math.round((avgConstructionCost / avgCost) * 100) + '%', color: 'bg-emerald-500' },
+                   { label: 'Design Costs', value: Math.round((avgDesignCost / avgCost) * 100) + '%', color: 'bg-indigo-500' },
+                   { label: 'Permits & Fees', value: Math.round((avgPermitCost / avgCost) * 100) + '%', color: 'bg-blue-500' },
                  ].map(item => (
                    <div key={item.label}>
                       <div className="flex justify-between text-xs font-bold mb-3 uppercase tracking-wider">
@@ -126,7 +184,7 @@ const CostLibraryPage = () => {
                       <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
                         <motion.div 
                           initial={{ width: 0 }}
-                          whileInView={{ width: item.value }}
+                          animate={{ width: item.value }}
                           viewport={{ once: true }}
                           transition={{ duration: 1, ease: "easeOut" }}
                           className={`h-full ${item.color} rounded-full`}
@@ -145,7 +203,7 @@ const CostLibraryPage = () => {
                <p className="text-slate-300 text-sm mb-8 leading-relaxed relative z-10">
                  Our cost calculator uses live market data from your specific neighborhood to give you a 95% accurate estimate.
                </p>
-               <button className="w-full btn-secondary block text-center !py-3 relative z-10">Launch Calculator</button>
+               <a href="/property-checker" className="w-full btn-secondary block text-center !py-3 relative z-10">Launch Property Checker</a>
             </div>
             
             <div className="bg-white rounded-[24px] p-8 border border-slate-200 shadow-sm">
