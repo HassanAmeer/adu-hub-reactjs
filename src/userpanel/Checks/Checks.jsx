@@ -200,7 +200,7 @@ const Checks = () => {
               <div className="p-5">
                 <p className="font-bold text-slate-800 text-sm mb-3 line-clamp-1">{prop.address}</p>
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                  {prop.tags.map(t => (
+                  {prop.tags?.map(t => (
                     <span key={t} className="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px] font-bold uppercase">{t}</span>
                   ))}
                 </div>

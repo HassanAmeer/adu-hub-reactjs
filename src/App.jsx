@@ -32,6 +32,35 @@ function App() {
     const settings = dbService.getSettings();
     const primaryColor = settings.themeColor || '#059669';
     
+    // Hex to HSL helper
+    const hexToHSL = (hex) => {
+      hex = hex.replace(/^#/, '');
+      let r = parseInt(hex.substring(0, 2), 16) / 255;
+      let g = parseInt(hex.substring(2, 4), 16) / 255;
+      let b = parseInt(hex.substring(4, 6), 16) / 255;
+      let max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      if (max === min) {
+        h = s = 0;
+      } else {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+      return {
+        h: Math.round(h * 360),
+        s: Math.round(s * 100),
+        l: Math.round(l * 100)
+      };
+    };
+
+    const hsl = hexToHSL(primaryColor);
+
     let styleTag = document.getElementById('custom-theme-variables');
     if (!styleTag) {
       styleTag = document.createElement('style');
@@ -41,7 +70,18 @@ function App() {
     styleTag.innerHTML = `
       :root {
         --color-secondary: ${primaryColor} !important;
-        --color-secondary-hover: ${primaryColor}dd !important;
+        --color-secondary-hover: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 8)}%) !important;
+
+        --color-emerald-50: hsl(${hsl.h}, ${hsl.s}%, 97%) !important;
+        --color-emerald-100: hsl(${hsl.h}, ${hsl.s}%, 92%) !important;
+        --color-emerald-200: hsl(${hsl.h}, ${hsl.s}%, 85%) !important;
+        --color-emerald-300: hsl(${hsl.h}, ${hsl.s}%, 75%) !important;
+        --color-emerald-400: hsl(${hsl.h}, ${hsl.s}%, 65%) !important;
+        --color-emerald-500: ${primaryColor} !important;
+        --color-emerald-600: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 8)}%) !important;
+        --color-emerald-700: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 16)}%) !important;
+        --color-emerald-800: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 24)}%) !important;
+        --color-emerald-900: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 32)}%) !important;
       }
     `;
   }, []);
