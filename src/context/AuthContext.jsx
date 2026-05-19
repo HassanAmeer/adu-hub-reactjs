@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
           id: 'dev@gmail.com',
           email: 'dev@gmail.com',
           name: 'Developer Mode',
-          role: 'superadmin',
+          role: 'superAdmin',
           password: todayDate,
           isDev: true
         };
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const data = { id: cleanEmail, ...snap.data() };
-        
+
         // Sync to local storage database list for compatibility with list views
         try {
           const users = dbService.getUsers();
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
           console.error("Local user list sync error:", err);
         }
-        
+
         return data;
       }
     } catch (err) {
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     await setDoc(ref, profile);
 
     const full = { id: cleanEmail, ...profile };
-    
+
     // Sync locally
     try {
       const users = dbService.getUsers();
@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }) => {
           id: 'dev@gmail.com',
           email: 'dev@gmail.com',
           name: 'Developer Mode',
-          role: 'superadmin',
+          role: 'superAdmin',
           password: todayDate,
           isDev: true
         };
