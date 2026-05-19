@@ -41,7 +41,7 @@ const AuthLayout = ({ children, title, subtitle }) => {
         </div>
 
         <p className="text-slate-500 text-sm relative z-10">
-          © 2024 ADU Navi Inc. All rights reserved.
+          © 2026 ADU Navi Inc. All rights reserved.
         </p>
       </div>
 
