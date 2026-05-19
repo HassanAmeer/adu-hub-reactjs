@@ -17,7 +17,8 @@ import {
   Heart,
   Download,
   Building2,
-  Database
+  Database,
+  Mail
 } from 'lucide-react';
 
 export const ADMIN_NAV_ITEMS = [
@@ -33,6 +34,7 @@ export const ADMIN_NAV_ITEMS = [
   { to: '/super/blogs', icon: BookOpen, label: 'Blog / News' },
   { to: '/super/settings', icon: Settings, label: 'Settings' },
   { to: '/super/logs', icon: Activity, label: 'System Logs' },
+  { to: '/super/contactus', icon: Mail, label: 'Contact Messages' },
   { to: '/seed', icon: Database, label: 'Database Seeder' },
 ];
 

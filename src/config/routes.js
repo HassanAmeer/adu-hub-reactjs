@@ -38,6 +38,7 @@ export const ROUTES = {
   SUPER_BLOGS: '/super/blogs',
   SUPER_SETTINGS: '/super/settings',
   SUPER_LOGS: '/super/logs',
+  SUPER_CONTACT_US: '/super/contactus',
 
   // User Panel Gates
   USER_PANEL_WILDCARD: '/userpanel/*',

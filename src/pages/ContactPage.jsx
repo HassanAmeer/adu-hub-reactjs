@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { COLLECTIONS } from '../config';
 
 const ContactPage = () => {
   const [name, setName] = useState('');
@@ -7,15 +10,53 @@ const ContactPage = () => {
   const [msg, setMsg] = useState('');
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !msg) return;
 
-    setSent(true);
-    setName('');
-    setEmail('');
-    setMsg('');
-    setTimeout(() => setSent(false), 4000);
+    try {
+      const inqId = 'inq-' + Date.now();
+      const inqRef = doc(db, COLLECTIONS.CONTACT_US, inqId);
+      await setDoc(inqRef, {
+        id: inqId,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        message: msg.trim(),
+        timestamp: new Date().toISOString(),
+        status: 'unread'
+      });
+
+      // Sync to local storage for local admin panel compatibility
+      try {
+        const existingStr = localStorage.getItem('adu-db-contactus');
+        let existing = [];
+        try {
+          existing = existingStr ? JSON.parse(existingStr) : [];
+        } catch {
+          existing = [];
+        }
+        existing.unshift({
+          id: inqId,
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          message: msg.trim(),
+          timestamp: new Date().toISOString(),
+          status: 'unread'
+        });
+        localStorage.setItem('adu-db-contactus', JSON.stringify(existing));
+      } catch (err) {
+        console.error("Local storage inquiry sync failed:", err);
+      }
+
+      setSent(true);
+      setName('');
+      setEmail('');
+      setMsg('');
+      setTimeout(() => setSent(false), 4000);
+    } catch (err) {
+      console.error("Error submitting contact form:", err);
+      alert("Error submitting message: " + err.message);
+    }
   };
 
   return (

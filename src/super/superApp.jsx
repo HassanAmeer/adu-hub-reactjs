@@ -18,6 +18,7 @@ import Subscriptions from './pages/Subscriptions';
 import BlogManager from './pages/BlogManager';
 import SystemSettings from './pages/SystemSettings';
 import ActivityLogs from './pages/ActivityLogs';
+import ContactUsManager from './pages/ContactUsManager';
 
 const SuperApp = () => {
   const { currentUser, loading } = useAuth();
@@ -114,6 +115,7 @@ const SuperApp = () => {
               <Route path="blogs" element={<BlogManager />} />
               <Route path="settings" element={<SystemSettings />} />
               <Route path="logs" element={<ActivityLogs />} />
+              <Route path="contactus" element={<ContactUsManager />} />
               <Route path="*" element={<Navigate to="dashboard" replace />} />
             </Routes>
           </div>

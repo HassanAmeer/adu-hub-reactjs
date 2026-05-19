@@ -10,7 +10,8 @@ export const COLLECTIONS = {
   NOTIFICATIONS: 'notifications',
   SUBSCRIPTIONS: 'subscriptions',
   ALERTS: 'alerts',
-  LOGS: 'logs'
+  LOGS: 'logs',
+  CONTACT_US: 'contactus'
 };
 
 export default COLLECTIONS;

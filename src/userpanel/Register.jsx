@@ -4,6 +4,7 @@ import AuthLayout from '../layouts/AuthLayout';
 import { Mail, Lock, User, Globe, Loader2 } from 'lucide-react';
 import { useAuth } from './hooks/useUserAuth';
 import { ROUTES } from '../config';
+import { dbService } from '../services/dbService';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -17,6 +18,26 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
+
+  const settings = dbService.getSettings();
+  const signupAllowed = settings.signupAllowed !== false;
+
+  if (!signupAllowed) {
+    return (
+      <AuthLayout
+        title="Sign-ups Disabled"
+        subtitle="Registrations are temporarily closed."
+      >
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-5 rounded-xl text-sm font-medium text-center space-y-3">
+          <p className="font-bold">The administrator has temporarily suspended new user registrations.</p>
+          <p className="text-xs text-slate-500">Please check back later or contact support if you require immediate access.</p>
+        </div>
+        <p className="text-center text-sm text-slate-500 mt-8">
+          Already have an account? <Link to={ROUTES.USER_LOGIN} className="text-secondary font-bold hover:underline">Log in</Link>
+        </p>
+      </AuthLayout>
+    );
+  }
 
   const getErrorMessage = (code) => {
     switch (code) {

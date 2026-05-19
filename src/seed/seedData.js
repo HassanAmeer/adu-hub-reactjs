@@ -335,3 +335,23 @@ export const SEED_LOGS = [
     timestamp: '2026-05-19T18:45:00Z'
   }
 ];
+
+export const SEED_INQUIRIES = [
+  {
+    id: 'inq-sample-1',
+    name: 'Michael Peterson',
+    email: 'michael.p@gmail.com',
+    message: 'Hello, I have a single-family house in San Diego (zoning RS-1-7) and wanted to know if I can convert my garage into a 450 sq ft ADU. Do I need to provide a replacement parking space?',
+    timestamp: '2026-05-19T14:30:00Z',
+    status: 'unread'
+  },
+  {
+    id: 'inq-sample-2',
+    name: 'Amanda Clark',
+    email: 'aclark@contracting.com',
+    message: 'I am a general contractor in Austin and am interested in listing my firm in your Professional Directory. What are the requirements for Verification badges?',
+    timestamp: '2026-05-19T12:15:00Z',
+    status: 'read'
+  }
+];
+

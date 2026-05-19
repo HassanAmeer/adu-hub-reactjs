@@ -27,8 +27,8 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
       {/* Brand Header */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-slate-800">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-          <div className="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">A</div>
-          <span className="text-lg font-bold tracking-tight text-white">ADU<span className="text-emerald-500">Navi</span> <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded ml-1">Admin</span></span>
+          <div className="w-9 h-9 bg-secondary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">A</div>
+          <span className="text-lg font-bold tracking-tight text-white">ADU<span className="text-secondary">Navi</span> <span className="text-[10px] bg-secondary/10 text-secondary px-1.5 py-0.5 rounded ml-1">Admin</span></span>
         </div>
         {mobileOpen && (
           <button 
@@ -51,7 +51,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
             className={({ isActive }) => 
               `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive 
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/10' 
+                  ? 'bg-secondary text-white shadow-md shadow-secondary/10' 
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
               }`
             }
@@ -65,7 +65,7 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
       {/* User Footer Profile & Logout */}
       <div className="p-4 border-t border-slate-800 bg-slate-950/40">
         <div className="flex items-center gap-3 mb-4 px-2">
-          <div className="w-9 h-9 rounded-full bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-sm">
+          <div className="w-9 h-9 rounded-full bg-secondary/20 border border-secondary/30 flex items-center justify-center text-secondary font-bold text-sm">
             {(currentUser?.name || currentUser?.email || 'A')[0].toUpperCase()}
           </div>
           <div className="min-w-0">

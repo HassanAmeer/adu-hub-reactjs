@@ -24,8 +24,52 @@ import FAQPage from './pages/FAQPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import SeedPage from './seed';
+import { dbService } from './services/dbService';
 
 function App() {
+  // 1. Theme Accent Injector
+  React.useEffect(() => {
+    const settings = dbService.getSettings();
+    const primaryColor = settings.themeColor || '#059669';
+    
+    let styleTag = document.getElementById('custom-theme-variables');
+    if (!styleTag) {
+      styleTag = document.createElement('style');
+      styleTag.id = 'custom-theme-variables';
+      document.head.appendChild(styleTag);
+    }
+    styleTag.innerHTML = `
+      :root {
+        --color-secondary: ${primaryColor} !important;
+        --color-secondary-hover: ${primaryColor}dd !important;
+      }
+    `;
+  }, []);
+
+  // 2. Maintenance Mode Interceptor
+  const settings = dbService.getSettings();
+  const isMaintenance = settings.maintenanceMode === true;
+  const isSuperRoute = window.location.pathname.startsWith('/super') || window.location.pathname === '/seed';
+
+  if (isMaintenance && !isSuperRoute) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center">
+        <div className="max-w-md bg-white p-8 rounded-2xl border border-slate-200 shadow-xs space-y-6">
+          <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto text-amber-500 text-3xl">
+            🛠️
+          </div>
+          <h1 className="text-2xl font-bold text-slate-800">Under Maintenance</h1>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            ADU Navi is currently undergoing scheduled maintenance to upgrade our system features. We apologize for any inconvenience.
+          </p>
+          <div className="pt-4 border-t border-slate-100 text-xs text-slate-400 font-semibold uppercase tracking-wider">
+            We will be back shortly
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <Routes>
