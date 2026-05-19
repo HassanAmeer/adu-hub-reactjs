@@ -69,8 +69,8 @@ const AdminDashboard = () => {
             <svg className="w-full h-full" viewBox="0 0 500 200" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity="0.00" />
+                  <stop offset="0%" stopColor="var(--color-secondary)" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity="0.00" />
                 </linearGradient>
               </defs>
               
@@ -89,15 +89,15 @@ const AdminDashboard = () => {
               <path 
                 d="M 0 170 C 60 150, 100 120, 150 140 C 200 160, 250 80, 300 90 C 350 100, 400 40, 500 30" 
                 fill="none" 
-                stroke="#059669" 
+                stroke="var(--color-secondary)" 
                 strokeWidth="3.5" 
                 strokeLinecap="round" 
               />
 
               {/* Data points */}
-              <circle cx="150" cy="140" r="5" fill="#059669" stroke="#FFFFFF" strokeWidth="1.5" />
-              <circle cx="300" cy="90" r="5" fill="#059669" stroke="#FFFFFF" strokeWidth="1.5" />
-              <circle cx="500" cy="30" r="6" fill="#059669" stroke="#FFFFFF" strokeWidth="2" />
+              <circle cx="150" cy="140" r="5" fill="var(--color-secondary)" stroke="#FFFFFF" strokeWidth="1.5" />
+              <circle cx="300" cy="90" r="5" fill="var(--color-secondary)" stroke="#FFFFFF" strokeWidth="1.5" />
+              <circle cx="500" cy="30" r="6" fill="var(--color-secondary)" stroke="#FFFFFF" strokeWidth="2" />
             </svg>
           </div>
 
