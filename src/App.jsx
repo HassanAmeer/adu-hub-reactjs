@@ -23,6 +23,7 @@ import ContactPage from './pages/ContactPage';
 import FAQPage from './pages/FAQPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
+import SeedPage from './seed';
 
 function App() {
   return (
@@ -57,6 +58,9 @@ function App() {
         
         {/* Dedicated Admin Panel (Custom Layout & Role Security) */}
         <Route path={ROUTES.SUPER_APP_WILDCARD} element={<SuperApp />} />
+
+        {/* Database Seeder Gateway */}
+        <Route path={ROUTES.SEED} element={<SeedPage />} />
       </Routes>
     </Router>
   );

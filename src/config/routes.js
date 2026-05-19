@@ -16,6 +16,7 @@ export const ROUTES = {
   FAQ: '/faq',
   PRIVACY: '/privacy',
   TERMS: '/terms',
+  SEED: '/seed',
 
   // Redirection aliases
   LOGIN_REDIRECT: '/login',

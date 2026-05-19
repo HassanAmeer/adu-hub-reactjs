@@ -16,7 +16,8 @@ import {
   MapPin,
   Heart,
   Download,
-  Building2
+  Building2,
+  Database
 } from 'lucide-react';
 
 export const ADMIN_NAV_ITEMS = [
@@ -32,6 +33,7 @@ export const ADMIN_NAV_ITEMS = [
   { to: '/super/blogs', icon: BookOpen, label: 'Blog / News' },
   { to: '/super/settings', icon: Settings, label: 'Settings' },
   { to: '/super/logs', icon: Activity, label: 'System Logs' },
+  { to: '/seed', icon: Database, label: 'Database Seeder' },
 ];
 
 export const getUserNavItems = (isProfessional) => [
