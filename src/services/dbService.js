@@ -3,7 +3,7 @@
 // Falls back to localStorage and loads default mock data if not initialized.
 
 import { states as initialStates, aduRules as initialRules } from '../data/mockData';
-import { doc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { COLLECTIONS } from '../config';
 
@@ -226,6 +226,12 @@ export const dbService = {
   deleteUser: (userId) => {
     const users = dbService.getUsers().filter(u => u.id !== userId);
     dbService.saveUsers(users);
+    try {
+      const userRef = doc(db, COLLECTIONS.USERS, userId);
+      deleteDoc(userRef);
+    } catch (err) {
+      console.error("Firestore user delete error:", err);
+    }
   },
   addUser: (user) => {
     const users = dbService.getUsers();
@@ -242,6 +248,12 @@ export const dbService = {
     };
     users.push(newUser);
     dbService.saveUsers(users);
+    try {
+      const userRef = doc(db, COLLECTIONS.USERS, newUser.id);
+      setDoc(userRef, newUser);
+    } catch (err) {
+      console.error("Firestore user add error:", err);
+    }
     return newUser;
   },
 
@@ -268,6 +280,12 @@ export const dbService = {
     };
     states.push(newState);
     dbService.saveStates(states);
+    try {
+      const stateRef = doc(db, COLLECTIONS.STATES, newState.id);
+      setDoc(stateRef, newState);
+    } catch (err) {
+      console.error("Firestore state add error:", err);
+    }
     return newState;
   },
   updateState: (stateId, updatedState) => {
@@ -276,6 +294,12 @@ export const dbService = {
     if (idx !== -1) {
       states[idx] = { ...states[idx], ...updatedState };
       dbService.saveStates(states);
+      try {
+        const stateRef = doc(db, COLLECTIONS.STATES, stateId);
+        setDoc(stateRef, updatedState, { merge: true });
+      } catch (err) {
+        console.error("Firestore state update error:", err);
+      }
       return states[idx];
     }
     return null;
@@ -283,6 +307,12 @@ export const dbService = {
   deleteState: (stateId) => {
     const states = dbService.getStates().filter(s => s.id !== stateId);
     dbService.saveStates(states);
+    try {
+      const stateRef = doc(db, COLLECTIONS.STATES, stateId);
+      deleteDoc(stateRef);
+    } catch (err) {
+      console.error("Firestore state delete error:", err);
+    }
   },
 
   // --- PROFESSIONAL DIRECTORY ---
@@ -308,6 +338,12 @@ export const dbService = {
     };
     dir.push(newPro);
     dbService.saveDirectory(dir);
+    try {
+      const proRef = doc(db, COLLECTIONS.PROFESSIONALS, String(newPro.id));
+      setDoc(proRef, newPro);
+    } catch (err) {
+      console.error("Firestore pro add error:", err);
+    }
     return newPro;
   },
   updatePro: (proId, updatedFields) => {
@@ -316,6 +352,12 @@ export const dbService = {
     if (idx !== -1) {
       dir[idx] = { ...dir[idx], ...updatedFields };
       dbService.saveDirectory(dir);
+      try {
+        const proRef = doc(db, COLLECTIONS.PROFESSIONALS, String(proId));
+        setDoc(proRef, updatedFields, { merge: true });
+      } catch (err) {
+        console.error("Firestore pro update error:", err);
+      }
       return dir[idx];
     }
     return null;
@@ -323,6 +365,12 @@ export const dbService = {
   deletePro: (proId) => {
     const dir = dbService.getDirectory().filter(p => p.id !== Number(proId));
     dbService.saveDirectory(dir);
+    try {
+      const proRef = doc(db, COLLECTIONS.PROFESSIONALS, String(proId));
+      deleteDoc(proRef);
+    } catch (err) {
+      console.error("Firestore pro delete error:", err);
+    }
   },
 
   // --- LAW TRACKER & ALERTS ---
@@ -344,6 +392,12 @@ export const dbService = {
     alerts.push(newAlert);
     dbService.saveAlerts(alerts);
     dbService.addLog(`Created law tracker alert: "${alert.title}"`);
+    try {
+      const alertRef = doc(db, COLLECTIONS.ALERTS, newAlert.id);
+      setDoc(alertRef, newAlert);
+    } catch (err) {
+      console.error("Firestore alert add error:", err);
+    }
     return newAlert;
   },
   updateAlert: (alertId, updatedFields) => {
@@ -352,6 +406,12 @@ export const dbService = {
     if (idx !== -1) {
       alerts[idx] = { ...alerts[idx], ...updatedFields };
       dbService.saveAlerts(alerts);
+      try {
+        const alertRef = doc(db, COLLECTIONS.ALERTS, alertId);
+        setDoc(alertRef, updatedFields, { merge: true });
+      } catch (err) {
+        console.error("Firestore alert update error:", err);
+      }
       return alerts[idx];
     }
     return null;
@@ -359,6 +419,12 @@ export const dbService = {
   deleteAlert: (alertId) => {
     const alerts = dbService.getAlerts().filter(a => a.id !== alertId);
     dbService.saveAlerts(alerts);
+    try {
+      const alertRef = doc(db, COLLECTIONS.ALERTS, alertId);
+      deleteDoc(alertRef);
+    } catch (err) {
+      console.error("Firestore alert delete error:", err);
+    }
   },
 
   // --- COST LIBRARY ---
@@ -380,6 +446,12 @@ export const dbService = {
     };
     costs.push(newCost);
     dbService.saveCosts(costs);
+    try {
+      const costRef = doc(db, COLLECTIONS.COSTS, newCost.id);
+      setDoc(costRef, newCost);
+    } catch (err) {
+      console.error("Firestore cost add error:", err);
+    }
     return newCost;
   },
   updateCost: (costId, updatedFields) => {
@@ -388,6 +460,12 @@ export const dbService = {
     if (idx !== -1) {
       costs[idx] = { ...costs[idx], ...updatedFields };
       dbService.saveCosts(costs);
+      try {
+        const costRef = doc(db, COLLECTIONS.COSTS, costId);
+        setDoc(costRef, updatedFields, { merge: true });
+      } catch (err) {
+        console.error("Firestore cost update error:", err);
+      }
       return costs[idx];
     }
     return null;
@@ -395,6 +473,12 @@ export const dbService = {
   deleteCost: (costId) => {
     const costs = dbService.getCosts().filter(c => c.id !== costId);
     dbService.saveCosts(costs);
+    try {
+      const costRef = doc(db, COLLECTIONS.COSTS, costId);
+      deleteDoc(costRef);
+    } catch (err) {
+      console.error("Firestore cost delete error:", err);
+    }
   },
 
   // --- SETTINGS ---

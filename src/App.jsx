@@ -108,7 +108,36 @@ function App() {
         console.error("Firestore settings sync error during boot:", err);
       }
     };
+
+    // Async sync other collections from Firestore in background
+    const syncCollections = async () => {
+      try {
+        const { collection, getDocs } = await import('firebase/firestore');
+        const { db } = await import('./services/firebase');
+
+        const syncCollection = async (firestoreColl, lsKey) => {
+          const snap = await getDocs(collection(db, firestoreColl));
+          if (!snap.empty) {
+            const list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            localStorage.setItem(lsKey, JSON.stringify(list));
+          }
+        };
+
+        await Promise.all([
+          syncCollection('states', 'adu-db-states'),
+          syncCollection('costs', 'adu-db-costs'),
+          syncCollection('professionals', 'adu-db-directory'),
+          syncCollection('alerts', 'adu-db-alerts'),
+          syncCollection('users', 'adu-db-users'),
+          syncCollection('logs', 'adu-db-logs')
+        ]);
+      } catch (err) {
+        console.error("Firestore collections sync error:", err);
+      }
+    };
+
     pullRemoteSettings();
+    syncCollections();
   }, []);
 
   // 2. Maintenance Mode Interceptor
