@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { PUBLIC_NAV_LINKS, ROUTES, appConfig } from '../../config';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,15 +18,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'States', path: '/states' },
-    { name: 'Property Checker', path: '/property-checker' },
-    { name: 'How to Build', path: '/how-to-build' },
-    { name: 'Directory', path: '/directory' },
-    { name: 'Costs', path: '/costs' },
-    { name: 'Law Tracker', path: '/law-tracker' },
-  ];
+  const navLinks = PUBLIC_NAV_LINKS;
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
@@ -39,7 +32,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-secondary/20">A</div>
+              <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-secondary/20">{appConfig.logoChar}</div>
               <span className="text-2xl font-bold tracking-tight text-white">ADU<span className="text-secondary">Navi</span></span>
             </Link>
           </div>
@@ -60,12 +53,12 @@ const Navbar = () => {
             ))}
             {currentUser && (
               <Link
-                to="/userpanel/dashboard"
-                className={`relative px-4 py-2 text-sm font-medium transition-colors group ${isActive('/userpanel/dashboard') ? 'text-white' : 'text-slate-400 hover:text-white'
+                to={ROUTES.USER_DASHBOARD}
+                className={`relative px-4 py-2 text-sm font-medium transition-colors group ${isActive(ROUTES.USER_DASHBOARD) ? 'text-white' : 'text-slate-400 hover:text-white'
                   }`}
               >
                 Dashboard
-                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-secondary transform origin-left transition-transform duration-300 ${isActive('/userpanel/dashboard') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-secondary transform origin-left transition-transform duration-300 ${isActive(ROUTES.USER_DASHBOARD) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                   }`} />
               </Link>
             )}
@@ -77,7 +70,7 @@ const Navbar = () => {
                 <span className="text-sm font-semibold text-slate-300">
                   Hi, {currentUser.name || currentUser.displayName || 'User'}
                 </span>
-                <Link to="/userpanel/dashboard" className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-white font-bold text-sm shadow-inner">
+                <Link to={ROUTES.USER_DASHBOARD} className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-white font-bold text-sm shadow-inner">
                   {(currentUser.name || currentUser.displayName || 'U')[0].toUpperCase()}
                 </Link>
                 <button onClick={() => logout()} className="text-slate-400 hover:text-red-400 transition-colors p-1" title="Log Out">
@@ -86,8 +79,8 @@ const Navbar = () => {
               </div>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Log In</Link>
-                <Link to="/signup" className="btn-primary !py-2.5 !px-6 text-sm">Get Started</Link>
+                <Link to={ROUTES.LOGIN_REDIRECT} className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Log In</Link>
+                <Link to={ROUTES.SIGNUP_REDIRECT} className="btn-primary !py-2.5 !px-6 text-sm">Get Started</Link>
               </>
             )}
           </div>
@@ -121,9 +114,9 @@ const Navbar = () => {
             ))}
             {currentUser && (
               <Link
-                to="/userpanel/dashboard"
+                to={ROUTES.USER_DASHBOARD}
                 onClick={() => setIsOpen(false)}
-                className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${isActive('/userpanel/dashboard') ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${isActive(ROUTES.USER_DASHBOARD) ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
               >
                 Dashboard
@@ -141,8 +134,8 @@ const Navbar = () => {
                 </div>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setIsOpen(false)} className="btn-ghost w-full text-center border border-white/20">Log In</Link>
-                  <Link to="/signup" onClick={() => setIsOpen(false)} className="btn-primary w-full text-center">Get Started</Link>
+                  <Link to={ROUTES.LOGIN_REDIRECT} onClick={() => setIsOpen(false)} className="btn-ghost w-full text-center border border-white/20">Log In</Link>
+                  <Link to={ROUTES.SIGNUP_REDIRECT} onClick={() => setIsOpen(false)} className="btn-primary w-full text-center">Get Started</Link>
                 </>
               )}
             </div>

@@ -5,6 +5,7 @@
 import { states as initialStates, aduRules as initialRules } from '../data/mockData';
 import { doc, updateDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { COLLECTIONS } from '../config';
 
 const DEFAULT_USERS = [
   {
@@ -213,7 +214,7 @@ export const dbService = {
 
       // Persist changes to Firestore user document
       try {
-        const userRef = doc(db, 'users', userId);
+        const userRef = doc(db, COLLECTIONS.USERS, userId);
         updateDoc(userRef, updatedFields);
       } catch (err) {
         console.error("Firestore sync failed:", err);

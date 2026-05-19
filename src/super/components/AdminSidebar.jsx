@@ -1,23 +1,11 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
-  Globe, 
-  FileText, 
-  Compass, 
-  Building, 
-  CreditCard, 
-  Bell, 
-  Users, 
-  PieChart, 
-  Settings, 
-  Activity, 
-  Database, 
   LogOut, 
-  X,
-  BookOpen
+  X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { ADMIN_NAV_ITEMS, ROUTES } from '../../config';
 
 const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
   const { logout, currentUser } = useAuth();
@@ -26,26 +14,13 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/super');
+      navigate(ROUTES.SUPER_GATEWAY);
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
-  const navItems = [
-    { to: '/super/dashboard', icon: LayoutDashboard, label: 'Dashboard', end: true },
-    { to: '/super/states', icon: Globe, label: 'States & Cities' },
-    { to: '/super/laws', icon: FileText, label: 'ADU Laws DB' },
-    { to: '/super/checker', icon: Compass, label: 'Property Checker' },
-    { to: '/super/costs', icon: CreditCard, label: 'Cost Library' },
-    { to: '/super/directory', icon: Building, label: 'Professionals' },
-    { to: '/super/alerts', icon: Bell, label: 'Law Changes & Alerts' },
-    { to: '/super/users', icon: Users, label: 'Users Management' },
-    { to: '/super/subscriptions', icon: PieChart, label: 'Subscriptions' },
-    { to: '/super/blogs', icon: BookOpen, label: 'Blog / News' },
-    { to: '/super/settings', icon: Settings, label: 'Settings' },
-    { to: '/super/logs', icon: Activity, label: 'System Logs' },
-  ];
+  const navItems = ADMIN_NAV_ITEMS;
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 text-slate-300">

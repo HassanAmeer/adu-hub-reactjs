@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import { Mail, Lock, User, Globe, Loader2 } from 'lucide-react';
 import { useAuth } from './hooks/useUserAuth';
+import { ROUTES } from '../config';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -54,7 +55,7 @@ const Register = () => {
     setLoading(true);
     try {
       await signup(email, password, `${firstName} ${lastName}`.trim(), role);
-      navigate('/userpanel/dashboard');
+      navigate(ROUTES.USER_DASHBOARD);
     } catch (err) {
       setError(getErrorMessage(err.code));
       console.error(err);
@@ -221,7 +222,7 @@ const Register = () => {
         </button>
 
         <p className="text-center text-sm text-slate-500 mt-8">
-          Already have an account? <Link to="/userpanel/login" className="text-secondary font-bold hover:underline">Log in</Link>
+          Already have an account? <Link to={ROUTES.USER_LOGIN} className="text-secondary font-bold hover:underline">Log in</Link>
         </p>
       </form>
     </AuthLayout>

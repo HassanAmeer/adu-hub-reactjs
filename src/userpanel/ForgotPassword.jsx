@@ -4,6 +4,7 @@ import AuthLayout from '../layouts/AuthLayout';
 import { Mail, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { COLLECTIONS, ROUTES } from '../config';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       const cleanEmail = email.trim().toLowerCase();
-      const ref = doc(db, 'users', cleanEmail);
+      const ref = doc(db, COLLECTIONS.USERS, cleanEmail);
       const snap = await getDoc(ref);
 
       if (snap.exists()) {
@@ -57,7 +58,7 @@ const ForgotPassword = () => {
               We've simulated sending a recovery link to <strong>{email}</strong>. Please follow the instructions in the email.
             </p>
           </div>
-          <Link to="/userpanel/login" className="btn-primary w-full block text-center !py-3 text-sm">
+          <Link to={ROUTES.USER_LOGIN} className="btn-primary w-full block text-center !py-3 text-sm">
             Back to Login
           </Link>
         </div>
@@ -102,7 +103,7 @@ const ForgotPassword = () => {
           </button>
 
           <div className="text-center pt-4">
-            <Link to="/userpanel/login" className="inline-flex items-center gap-2 text-sm text-secondary font-bold hover:underline">
+            <Link to={ROUTES.USER_LOGIN} className="inline-flex items-center gap-2 text-sm text-secondary font-bold hover:underline">
               <ArrowLeft className="w-4 h-4" /> Return to login
             </Link>
           </div>

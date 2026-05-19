@@ -3,6 +3,7 @@ import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { useAuth } from '../hooks/useUserAuth';
 import UserSidebar from './UserSidebar';
+import { ROUTES } from '../../config';
 
 const UserLayout = () => {
   const { currentUser, loading } = useAuth();
@@ -23,7 +24,7 @@ const UserLayout = () => {
   }
 
   if (!currentUser) {
-    return <Navigate to="/userpanel/login" replace />;
+    return <Navigate to={ROUTES.USER_LOGIN} replace />;
   }
 
   // Determine current page title

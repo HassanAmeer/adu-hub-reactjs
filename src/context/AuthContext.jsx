@@ -8,6 +8,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { dbService } from '../services/dbService';
+import { COLLECTIONS, ROLES } from '../config';
 
 const AuthContext = createContext();
 
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async (email) => {
     try {
       const cleanEmail = email.trim().toLowerCase();
-      const ref = doc(db, 'users', cleanEmail);
+      const ref = doc(db, COLLECTIONS.USERS, cleanEmail);
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const data = { id: cleanEmail, ...snap.data() };
@@ -53,11 +54,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ─── SIGN UP ─────────────────────────────────────────────────────────────
-  const signup = async (email, password, name = '', role = 'homeowner') => {
+  const signup = async (email, password, name = '', role = ROLES.HOMEOWNER) => {
     const cleanEmail = email.trim().toLowerCase();
 
     // 1. Check if user already exists in Firestore
-    const ref = doc(db, 'users', cleanEmail);
+    const ref = doc(db, COLLECTIONS.USERS, cleanEmail);
     const snap = await getDoc(ref);
     if (snap.exists()) {
       const err = new Error('Account already exists');

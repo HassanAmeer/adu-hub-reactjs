@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
+import { ROUTES } from '../../config';
 
 const UserDashboard = () => {
   const { currentUser } = useAuth();
@@ -54,7 +55,7 @@ const UserDashboard = () => {
         </div>
         <div className="flex gap-3">
           <button 
-            onClick={() => navigate('/userpanel/checks')} 
+            onClick={() => navigate(ROUTES.USER_CHECKS)} 
             className="btn-primary flex items-center gap-2"
           >
             <Compass className="w-5 h-5" /> Start Zoning Check
@@ -119,7 +120,7 @@ const UserDashboard = () => {
             <h3 className="text-lg font-bold text-primary mb-4">Quick Tools</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <button 
-                onClick={() => navigate('/userpanel/profile')}
+                onClick={() => navigate(ROUTES.USER_PROFILE)}
                 className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
               >
                 <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
@@ -129,7 +130,7 @@ const UserDashboard = () => {
               </button>
 
               <button 
-                onClick={() => navigate('/userpanel/resources')}
+                onClick={() => navigate(ROUTES.USER_RESOURCES)}
                 className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
               >
                 <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
@@ -139,7 +140,7 @@ const UserDashboard = () => {
               </button>
 
               <button 
-                onClick={() => navigate('/userpanel/settings')}
+                onClick={() => navigate(ROUTES.USER_SETTINGS)}
                 className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
               >
                 <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
@@ -167,7 +168,7 @@ const UserDashboard = () => {
                 </div>
               ))}
             </div>
-            <button onClick={() => navigate('/userpanel/notifications')} className="w-full text-center mt-4 text-xs font-bold text-secondary hover:underline">View All Alerts</button>
+            <button onClick={() => navigate(ROUTES.USER_NOTIFICATIONS)} className="w-full text-center mt-4 text-xs font-bold text-secondary hover:underline">View All Alerts</button>
           </div>
         </div>
       </div>

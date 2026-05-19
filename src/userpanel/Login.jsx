@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import { Mail, Lock, Globe, Loader2 } from 'lucide-react';
 import { useAuth } from './hooks/useUserAuth';
+import { isAuthorizedAdmin, ROUTES } from '../config';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -43,11 +44,11 @@ const Login = () => {
     try {
       const user = await login(email, password);
       // Prevent admins from logging in here
-      if (user.role === 'admin' || user.role === 'superAdmin') {
+      if (isAuthorizedAdmin(user.role)) {
         await logout();
-        setError('Admin accounts must log in through the secure portal at /super.');
+        setError(`Admin accounts must log in through the secure portal at ${ROUTES.SUPER_GATEWAY}.`);
       } else {
-        navigate('/userpanel/dashboard');
+        navigate(ROUTES.USER_DASHBOARD);
       }
     } catch (err) {
       setError(getErrorMessage(err.code));
@@ -89,7 +90,7 @@ const Login = () => {
         <div>
           <div className="flex justify-between mb-2">
             <label className="block text-sm font-bold text-slate-700">Password</label>
-            <Link to="/userpanel/forgot-password" className="text-xs font-bold text-secondary hover:underline">Forgot password?</Link>
+            <Link to={ROUTES.USER_FORGOT_PASSWORD} className="text-xs font-bold text-secondary hover:underline">Forgot password?</Link>
           </div>
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -135,7 +136,7 @@ const Login = () => {
         </button>
 
         <p className="text-center text-sm text-slate-500 mt-8">
-          Don't have an account? <Link to="/userpanel/register" className="text-secondary font-bold hover:underline">Sign up for free</Link>
+          Don't have an account? <Link to={ROUTES.USER_REGISTER} className="text-secondary font-bold hover:underline">Sign up for free</Link>
         </p>
       </form>
     </AuthLayout>

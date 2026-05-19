@@ -14,6 +14,7 @@ import AlertsPage from './pages/AlertsPage';
 import SuperApp from './super/superApp';
 import SuperLoginPage from './pages/SuperLoginPage';
 import UserRoutes from './userpanel';
+import { ROUTES } from './config';
 
 // New Pages
 import BlogPage from './pages/BlogPage';
@@ -28,34 +29,34 @@ function App() {
     <Router>
       <Routes>
         {/* Pages with Main Layout (Navbar + Footer) */}
-        <Route path="/" element={<MainLayout><Home /></MainLayout>} />
-        <Route path="/states" element={<MainLayout><StatesPage /></MainLayout>} />
-        <Route path="/state/:stateName" element={<MainLayout><StatePage /></MainLayout>} />
-        <Route path="/state/:state/city/:cityName" element={<MainLayout><CityPage /></MainLayout>} />
-        <Route path="/property-checker" element={<MainLayout><PropertyCheckerPage /></MainLayout>} />
-        <Route path="/how-to-build" element={<MainLayout><HowToBuildPage /></MainLayout>} />
-        <Route path="/directory" element={<MainLayout><DirectoryPage /></MainLayout>} />
-        <Route path="/costs" element={<MainLayout><CostLibraryPage /></MainLayout>} />
-        <Route path="/law-tracker" element={<MainLayout><LawTrackerPage /></MainLayout>} />
-        <Route path="/alerts" element={<MainLayout><AlertsPage /></MainLayout>} />
-        <Route path="/blog" element={<MainLayout><BlogPage /></MainLayout>} />
-        <Route path="/about" element={<MainLayout><AboutPage /></MainLayout>} />
-        <Route path="/contact" element={<MainLayout><ContactPage /></MainLayout>} />
-        <Route path="/faq" element={<MainLayout><FAQPage /></MainLayout>} />
-        <Route path="/privacy" element={<MainLayout><PrivacyPage /></MainLayout>} />
-        <Route path="/terms" element={<MainLayout><TermsPage /></MainLayout>} />
+        <Route path={ROUTES.HOME} element={<MainLayout><Home /></MainLayout>} />
+        <Route path={ROUTES.STATES} element={<MainLayout><StatesPage /></MainLayout>} />
+        <Route path={ROUTES.STATE_DETAIL} element={<MainLayout><StatePage /></MainLayout>} />
+        <Route path={ROUTES.CITY_DETAIL} element={<MainLayout><CityPage /></MainLayout>} />
+        <Route path={ROUTES.PROPERTY_CHECKER} element={<MainLayout><PropertyCheckerPage /></MainLayout>} />
+        <Route path={ROUTES.HOW_TO_BUILD} element={<MainLayout><HowToBuildPage /></MainLayout>} />
+        <Route path={ROUTES.DIRECTORY} element={<MainLayout><DirectoryPage /></MainLayout>} />
+        <Route path={ROUTES.COSTS} element={<MainLayout><CostLibraryPage /></MainLayout>} />
+        <Route path={ROUTES.LAW_TRACKER} element={<MainLayout><LawTrackerPage /></MainLayout>} />
+        <Route path={ROUTES.ALERTS} element={<MainLayout><AlertsPage /></MainLayout>} />
+        <Route path={ROUTES.BLOG} element={<MainLayout><BlogPage /></MainLayout>} />
+        <Route path={ROUTES.ABOUT} element={<MainLayout><AboutPage /></MainLayout>} />
+        <Route path={ROUTES.CONTACT} element={<MainLayout><ContactPage /></MainLayout>} />
+        <Route path={ROUTES.FAQ} element={<MainLayout><FAQPage /></MainLayout>} />
+        <Route path={ROUTES.PRIVACY} element={<MainLayout><PrivacyPage /></MainLayout>} />
+        <Route path={ROUTES.TERMS} element={<MainLayout><TermsPage /></MainLayout>} />
         
         {/* Auth Pages & Redirection */}
-        <Route path="/login" element={<Navigate to="/userpanel/login" replace />} />
-        <Route path="/signup" element={<Navigate to="/userpanel/register" replace />} />
-        <Route path="/super" element={<SuperLoginPage />} />
-        <Route path="/dashboard" element={<Navigate to="/userpanel/dashboard" replace />} />
+        <Route path={ROUTES.LOGIN_REDIRECT} element={<Navigate to={ROUTES.USER_LOGIN} replace />} />
+        <Route path={ROUTES.SIGNUP_REDIRECT} element={<Navigate to={ROUTES.USER_REGISTER} replace />} />
+        <Route path={ROUTES.SUPER_GATEWAY} element={<SuperLoginPage />} />
+        <Route path={ROUTES.DASHBOARD_REDIRECT} element={<Navigate to={ROUTES.USER_DASHBOARD} replace />} />
 
         {/* Segregated User Panel (Auth + Dashboard) */}
-        <Route path="/userpanel/*" element={<UserRoutes />} />
+        <Route path={ROUTES.USER_PANEL_WILDCARD} element={<UserRoutes />} />
         
         {/* Dedicated Admin Panel (Custom Layout & Role Security) */}
-        <Route path="/super/*" element={<SuperApp />} />
+        <Route path={ROUTES.SUPER_APP_WILDCARD} element={<SuperApp />} />
       </Routes>
     </Router>
   );

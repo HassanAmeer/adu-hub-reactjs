@@ -1,20 +1,11 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
-  User, 
-  Briefcase, 
-  MapPin, 
-  Heart, 
-  Bell, 
-  CreditCard, 
-  Download, 
-  Building2, 
-  Settings, 
   LogOut, 
   X 
 } from 'lucide-react';
 import { useAuth } from '../hooks/useUserAuth';
+import { getUserNavItems, ROUTES } from '../../config';
 
 const UserSidebar = ({ mobileOpen, setMobileOpen }) => {
   const { logout, currentUser } = useAuth();
@@ -23,7 +14,7 @@ const UserSidebar = ({ mobileOpen, setMobileOpen }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/userpanel/login');
+      navigate(ROUTES.USER_LOGIN);
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -32,20 +23,7 @@ const UserSidebar = ({ mobileOpen, setMobileOpen }) => {
   const isProfessional = currentUser?.role === 'professional';
 
   // Role-based navigation items
-  const navItems = [
-    { to: '/userpanel/dashboard', icon: LayoutDashboard, label: 'Dashboard', end: true },
-    { to: '/userpanel/profile', icon: User, label: 'My Profile' },
-    ...(isProfessional ? [
-      { to: '/userpanel/professionals', icon: Building2, label: 'Pro Partner Portal' }
-    ] : []),
-    { to: '/userpanel/projects', icon: Briefcase, label: 'My ADU Projects' },
-    { to: '/userpanel/checks', icon: MapPin, label: 'Property Checks' },
-    { to: '/userpanel/favorites', icon: Heart, label: 'Saved & Favorites' },
-    { to: '/userpanel/notifications', icon: Bell, label: 'Notifications', badge: true },
-    { to: '/userpanel/subscriptions', icon: CreditCard, label: 'Subscriptions' },
-    { to: '/userpanel/resources', icon: Download, label: 'Resources' },
-    { to: '/userpanel/settings', icon: Settings, label: 'Settings' }
-  ];
+  const navItems = getUserNavItems(isProfessional);
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 text-slate-300">

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import { Mail, Lock, ShieldAlert, Loader2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { isAuthorizedAdmin, ROUTES, appConfig } from '../config';
 
 const SuperLoginPage = () => {
   const [email, setEmail] = useState('');
@@ -15,8 +16,8 @@ const SuperLoginPage = () => {
 
   // Redirect if already logged in as admin
   useEffect(() => {
-    if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'superAdmin')) {
-      navigate('/super/dashboard');
+    if (currentUser && isAuthorizedAdmin(currentUser.role)) {
+      navigate(ROUTES.SUPER_DASHBOARD);
     }
   }, [currentUser, navigate]);
 
@@ -32,12 +33,12 @@ const SuperLoginPage = () => {
     setLoading(true);
     try {
       const user = await login(email, password);
-      if (user.role === 'admin' || user.role === 'superAdmin') {
-        navigate('/super/dashboard');
+      if (isAuthorizedAdmin(user.role)) {
+        navigate(ROUTES.SUPER_DASHBOARD);
       } else {
         // Sign out non-admins immediately
         await logout();
-        setError('Access Denied. Homeowner and Professional accounts must use the standard login at /login.');
+        setError(`Access Denied. Homeowner and Professional accounts must use the standard login at ${ROUTES.LOGIN_REDIRECT}.`);
       }
     } catch (err) {
       setError('Invalid administrator credentials. Please check and try again.');
@@ -55,7 +56,7 @@ const SuperLoginPage = () => {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md z-10">
         <div className="flex justify-center items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/20">A</div>
+          <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/20">{appConfig.logoChar}</div>
           <span className="text-xl font-bold tracking-tight text-white">ADU<span className="text-emerald-500">Navi</span></span>
         </div>
         <h2 className="mt-6 text-center text-2xl font-black tracking-tight text-white uppercase">

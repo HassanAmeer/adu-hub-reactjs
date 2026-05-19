@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { Menu, ShieldAlert, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import AdminSidebar from './components/AdminSidebar';
+import { ROUTES, ROLES, isAuthorizedAdmin } from '../config';
 
 // Pages
 import AdminDashboard from './pages/AdminDashboard';
@@ -36,10 +37,10 @@ const SuperApp = () => {
 
   // Enforce Admin access only
   if (!currentUser) {
-    return <Navigate to="/super" replace />;
+    return <Navigate to={ROUTES.SUPER_GATEWAY} replace />;
   }
 
-  if (currentUser.role !== 'admin' && currentUser.role !== 'superAdmin') {
+  if (!isAuthorizedAdmin(currentUser.role)) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 text-center">
         <div className="max-w-md bg-slate-950/40 p-8 rounded-3xl border border-slate-800 shadow-2xl space-y-6">
