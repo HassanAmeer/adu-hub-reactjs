@@ -3,7 +3,7 @@
 // Falls back to localStorage and loads default mock data if not initialized.
 
 import { states as initialStates, aduRules as initialRules } from '../data/mockData';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { COLLECTIONS } from '../config';
 
@@ -399,7 +399,15 @@ export const dbService = {
 
   // --- SETTINGS ---
   getSettings: () => loadCollection('adu-db-settings', DEFAULT_SETTINGS),
-  saveSettings: (settings) => saveCollection('adu-db-settings', settings),
+  saveSettings: (settings) => {
+    saveCollection('adu-db-settings', settings);
+    try {
+      const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'global');
+      setDoc(settingsRef, settings, { merge: true });
+    } catch (err) {
+      console.error("Firestore settings sync error:", err);
+    }
+  },
 
   // --- ACTIVITY LOGS ---
   getLogs: () => loadCollection('adu-db-logs', DEFAULT_LOGS),

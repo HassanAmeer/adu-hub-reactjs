@@ -11,7 +11,8 @@ export const COLLECTIONS = {
   SUBSCRIPTIONS: 'subscriptions',
   ALERTS: 'alerts',
   LOGS: 'logs',
-  CONTACT_US: 'contactus'
+  CONTACT_US: 'contactus',
+  SETTINGS: 'settings'
 };
 
 export default COLLECTIONS;

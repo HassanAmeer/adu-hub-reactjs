@@ -355,3 +355,34 @@ export const SEED_INQUIRIES = [
   }
 ];
 
+export const SEED_SETTINGS = [
+  {
+    id: 'global',
+    notificationEmailTemplate: 'Hello {{name}},\n\nWe would like to notify you that there has been an update to the ADU laws in {{location}}.\n\nUpdate Details:\n{{details}}\n\nBest regards,\nADU Navi Team',
+    notificationSmsTemplate: 'ADU Navi Law Change Alert: Laws in {{location}} have changed. Details: {{details}}',
+    siteTitle: 'ADU Navi - All-in-One ADU Platform',
+    metaDescription: 'Find state-by-state ADU laws, property checkers, cost estimation libraries, and professional directory lists for building ADUs.',
+    enableEmailAlerts: true,
+    enableSmsAlerts: false,
+    backupSchedule: 'weekly',
+    themeColor: '#059669',
+    siteName: 'ADU Navi',
+    contactEmail: 'support@adunavi.com',
+    contactPhone: '+1 (800) 555-0142',
+    logoUrl: '',
+    maintenanceMode: false,
+    signupAllowed: true,
+    darkMode: false,
+    sidebarStyle: 'solid',
+    metaKeywords: 'adu, accessory dwelling unit, zoning, permitting',
+    robotsTxt: 'Index, Follow',
+    mailProvider: 'smtp',
+    smtpHost: '',
+    smtpPort: '587',
+    smtpUser: '',
+    smtpPass: '',
+    fromEmail: 'noreply@adunavi.com',
+    fromName: 'ADU Navi Alerts'
+  }
+];
+

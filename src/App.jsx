@@ -27,11 +27,10 @@ import SeedPage from './seed';
 import { dbService } from './services/dbService';
 
 function App() {
-  // 1. Theme Accent Injector
+  const [settings, setSettings] = React.useState(() => dbService.getSettings());
+
+  // 1. Theme Accent Injector & Firestore Sync
   React.useEffect(() => {
-    const settings = dbService.getSettings();
-    const primaryColor = settings.themeColor || '#059669';
-    
     // Hex to HSL helper
     const hexToHSL = (hex) => {
       hex = hex.replace(/^#/, '');
@@ -59,35 +58,60 @@ function App() {
       };
     };
 
-    const hsl = hexToHSL(primaryColor);
-
-    let styleTag = document.getElementById('custom-theme-variables');
-    if (!styleTag) {
-      styleTag = document.createElement('style');
-      styleTag.id = 'custom-theme-variables';
-      document.head.appendChild(styleTag);
-    }
-    styleTag.innerHTML = `
-      :root {
-        --color-secondary: ${primaryColor} !important;
-        --color-secondary-hover: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 8)}%) !important;
-
-        --color-emerald-50: hsl(${hsl.h}, ${hsl.s}%, 97%) !important;
-        --color-emerald-100: hsl(${hsl.h}, ${hsl.s}%, 92%) !important;
-        --color-emerald-200: hsl(${hsl.h}, ${hsl.s}%, 85%) !important;
-        --color-emerald-300: hsl(${hsl.h}, ${hsl.s}%, 75%) !important;
-        --color-emerald-400: hsl(${hsl.h}, ${hsl.s}%, 65%) !important;
-        --color-emerald-500: ${primaryColor} !important;
-        --color-emerald-600: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 8)}%) !important;
-        --color-emerald-700: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 16)}%) !important;
-        --color-emerald-800: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 24)}%) !important;
-        --color-emerald-900: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 32)}%) !important;
+    const applyTheme = (color) => {
+      const hsl = hexToHSL(color);
+      let styleTag = document.getElementById('custom-theme-variables');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'custom-theme-variables';
+        document.head.appendChild(styleTag);
       }
-    `;
+      styleTag.innerHTML = `
+        :root {
+          --color-secondary: ${color} !important;
+          --color-secondary-hover: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 8)}%) !important;
+
+          --color-emerald-50: hsl(${hsl.h}, ${hsl.s}%, 97%) !important;
+          --color-emerald-100: hsl(${hsl.h}, ${hsl.s}%, 92%) !important;
+          --color-emerald-200: hsl(${hsl.h}, ${hsl.s}%, 85%) !important;
+          --color-emerald-300: hsl(${hsl.h}, ${hsl.s}%, 75%) !important;
+          --color-emerald-400: hsl(${hsl.h}, ${hsl.s}%, 65%) !important;
+          --color-emerald-500: ${color} !important;
+          --color-emerald-600: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 8)}%) !important;
+          --color-emerald-700: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 16)}%) !important;
+          --color-emerald-800: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 24)}%) !important;
+          --color-emerald-900: hsl(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 32)}%) !important;
+        }
+      `;
+    };
+
+    // Apply initial cached theme instantly
+    applyTheme(settings.themeColor || '#059669');
+
+    // Async pull settings from Firestore in background
+    const pullRemoteSettings = async () => {
+      try {
+        const { doc, getDoc } = await import('firebase/firestore');
+        const { db } = await import('./services/firebase');
+        const settingsRef = doc(db, 'settings', 'global');
+        const snap = await getDoc(settingsRef);
+        if (snap.exists()) {
+          const remoteData = snap.data();
+          // Write to local storage database cache
+          localStorage.setItem('adu-db-settings', JSON.stringify(remoteData));
+          setSettings(remoteData);
+          if (remoteData.themeColor) {
+            applyTheme(remoteData.themeColor);
+          }
+        }
+      } catch (err) {
+        console.error("Firestore settings sync error during boot:", err);
+      }
+    };
+    pullRemoteSettings();
   }, []);
 
   // 2. Maintenance Mode Interceptor
-  const settings = dbService.getSettings();
   const isMaintenance = settings.maintenanceMode === true;
   const isSuperRoute = window.location.pathname.startsWith('/super') || window.location.pathname === '/seed';
 

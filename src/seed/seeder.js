@@ -25,7 +25,8 @@ import {
   SEED_SUBSCRIPTIONS,
   SEED_ALERTS,
   SEED_LOGS,
-  SEED_INQUIRIES
+  SEED_INQUIRIES,
+  SEED_SETTINGS
 } from './seedData';
 
 // Map collections to seed data arrays
@@ -42,7 +43,8 @@ export const SEED_DATA_MAP = {
   [COLLECTIONS.SUBSCRIPTIONS]: SEED_SUBSCRIPTIONS,
   [COLLECTIONS.ALERTS]: SEED_ALERTS,
   [COLLECTIONS.LOGS]: SEED_LOGS,
-  [COLLECTIONS.CONTACT_US]: SEED_INQUIRIES
+  [COLLECTIONS.CONTACT_US]: SEED_INQUIRIES,
+  [COLLECTIONS.SETTINGS]: SEED_SETTINGS
 };
 
 // Map collections to LocalStorage sync keys
@@ -53,7 +55,8 @@ const LOCAL_STORAGE_SYNC_MAP = {
   [COLLECTIONS.COSTS]: 'adu-db-costs',
   [COLLECTIONS.ALERTS]: 'adu-db-alerts',
   [COLLECTIONS.LOGS]: 'adu-db-logs',
-  [COLLECTIONS.CONTACT_US]: 'adu-db-contactus'
+  [COLLECTIONS.CONTACT_US]: 'adu-db-contactus',
+  [COLLECTIONS.SETTINGS]: 'adu-db-settings'
 };
 
 // Helper to chunk array

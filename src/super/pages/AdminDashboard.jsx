@@ -48,7 +48,7 @@ const AdminDashboard = () => {
 
       {/* Analytics Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        
+
         {/* User Search Trends (Interactive SVG Chart) */}
         <div className="xl:col-span-2 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col justify-between">
           <div className="flex justify-between items-start mb-6">
@@ -73,25 +73,25 @@ const AdminDashboard = () => {
                   <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity="0.00" />
                 </linearGradient>
               </defs>
-              
+
               {/* Background gridlines */}
               <line x1="0" y1="50" x2="500" y2="50" stroke="#F1F5F9" strokeWidth="1" />
               <line x1="0" y1="100" x2="500" y2="100" stroke="#F1F5F9" strokeWidth="1" />
               <line x1="0" y1="150" x2="500" y2="150" stroke="#F1F5F9" strokeWidth="1" />
-              
+
               {/* Area under curve */}
-              <path 
-                d="M 0 170 C 60 150, 100 120, 150 140 C 200 160, 250 80, 300 90 C 350 100, 400 40, 500 30 L 500 200 L 0 200 Z" 
-                fill="url(#chartGradient)" 
+              <path
+                d="M 0 170 C 60 150, 100 120, 150 140 C 200 160, 250 80, 300 90 C 350 100, 400 40, 500 30 L 500 200 L 0 200 Z"
+                fill="url(#chartGradient)"
               />
-              
+
               {/* Main curve line */}
-              <path 
-                d="M 0 170 C 60 150, 100 120, 150 140 C 200 160, 250 80, 300 90 C 350 100, 400 40, 500 30" 
-                fill="none" 
-                stroke="var(--color-secondary)" 
-                strokeWidth="3.5" 
-                strokeLinecap="round" 
+              <path
+                d="M 0 170 C 60 150, 100 120, 150 140 C 200 160, 250 80, 300 90 C 350 100, 400 40, 500 30"
+                fill="none"
+                stroke="var(--color-secondary)"
+                strokeWidth="3.5"
+                strokeLinecap="round"
               />
 
               {/* Data points */}
@@ -119,7 +119,7 @@ const AdminDashboard = () => {
               <Activity className="w-5 h-5 text-emerald-500" />
               System Activity
             </h3>
-            
+
             <div className="space-y-4">
               {logs.map((log) => (
                 <div key={log.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-3">
@@ -156,7 +156,7 @@ const AdminDashboard = () => {
           Admin Checklist
         </h3>
         <p className="text-xs text-slate-400 mb-6 font-medium">Core verification tasks required to maintain the platform:</p>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
             { task: 'Approve pending contractor profiles in Professionals list', status: 'Requires Review' },
@@ -166,9 +166,8 @@ const AdminDashboard = () => {
           ].map((item, idx) => (
             <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between gap-3 text-sm">
               <div className="flex items-center gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${
-                  item.status === 'Completed' ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 bg-white'
-                }`}>
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center border ${item.status === 'Completed' ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 bg-white'
+                  }`}>
                   {item.status === 'Completed' && (
                     <svg className="w-3 h-3 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="3">
                       <polyline points="20 6 9 17 4 12" />
@@ -179,9 +178,8 @@ const AdminDashboard = () => {
                   {item.task}
                 </span>
               </div>
-              <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded ${
-                item.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'
-              }`}>
+              <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded ${item.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'
+                }`}>
                 {item.status}
               </span>
             </div>

@@ -76,48 +76,63 @@ const SystemSettings = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    const settings = dbService.getSettings();
+    const loadSettings = async () => {
+      let settings = dbService.getSettings();
 
-    // General
-    setSiteName(settings.siteName || 'ADU Navi');
-    setContactEmail(settings.contactEmail || 'support@adunavi.com');
-    setContactPhone(settings.contactPhone || '+1 (800) 555-0142');
-    setLogoUrl(settings.logoUrl || '');
-    setMaintenanceMode(settings.maintenanceMode !== undefined ? settings.maintenanceMode : false);
-    setSignupAllowed(settings.signupAllowed !== undefined ? settings.signupAllowed : true);
+      try {
+        const settingsRef = doc(db, COLLECTIONS.SETTINGS, 'global');
+        const snap = await getDoc(settingsRef);
+        if (snap.exists()) {
+          settings = snap.data();
+          dbService.saveSettings(settings);
+        }
+      } catch (err) {
+        console.error("Failed to load remote settings:", err);
+      }
 
-    // Appearance
-    setThemeColor(settings.themeColor || '#10b981');
-    setDarkMode(settings.darkMode !== undefined ? settings.darkMode : false);
-    setSidebarStyle(settings.sidebarStyle || 'solid');
+      // General
+      setSiteName(settings.siteName || 'ADU Navi');
+      setContactEmail(settings.contactEmail || 'support@adunavi.com');
+      setContactPhone(settings.contactPhone || '+1 (800) 555-0142');
+      setLogoUrl(settings.logoUrl || '');
+      setMaintenanceMode(settings.maintenanceMode !== undefined ? settings.maintenanceMode : false);
+      setSignupAllowed(settings.signupAllowed !== undefined ? settings.signupAllowed : true);
 
-    // SEO
-    setSiteTitle(settings.siteTitle || 'ADU Navi - All-in-One ADU Platform');
-    setMetaDescription(settings.metaDescription || 'Find state-by-state ADU laws, property checkers, cost estimation libraries, and professional directory lists for building ADUs.');
-    setMetaKeywords(settings.metaKeywords || 'adu, accessory dwelling unit, zoning, permitting');
-    setRobotsTxt(settings.robotsTxt || 'Index, Follow');
+      // Appearance
+      setThemeColor(settings.themeColor || '#10b981');
+      setDarkMode(settings.darkMode !== undefined ? settings.darkMode : false);
+      setSidebarStyle(settings.sidebarStyle || 'solid');
 
-    // Emails
-    setEmailTemplate(settings.notificationEmailTemplate || '');
-    setSmsTemplate(settings.notificationSmsTemplate || '');
-    setEnableEmailAlerts(settings.enableEmailAlerts !== undefined ? settings.enableEmailAlerts : true);
-    setEnableSmsAlerts(settings.enableSmsAlerts !== undefined ? settings.enableSmsAlerts : false);
+      // SEO
+      setSiteTitle(settings.siteTitle || 'ADU Navi - All-in-One ADU Platform');
+      setMetaDescription(settings.metaDescription || 'Find state-by-state ADU laws, property checkers, cost estimation libraries, and professional directory lists for building ADUs.');
+      setMetaKeywords(settings.metaKeywords || 'adu, accessory dwelling unit, zoning, permitting');
+      setRobotsTxt(settings.robotsTxt || 'Index, Follow');
 
-    // Mail Settings
-    setMailProvider(settings.mailProvider || 'smtp');
-    setSmtpHost(settings.smtpHost || '');
-    setSmtpPort(settings.smtpPort || '587');
-    setSmtpUser(settings.smtpUser || '');
-    setSmtpPass(settings.smtpPass || '');
-    setFromEmail(settings.fromEmail || 'no-reply@adunavi.com');
-    setFromName(settings.fromName || 'ADU Navi');
+      // Emails
+      setEmailTemplate(settings.notificationEmailTemplate || '');
+      setSmsTemplate(settings.notificationSmsTemplate || '');
+      setEnableEmailAlerts(settings.enableEmailAlerts !== undefined ? settings.enableEmailAlerts : true);
+      setEnableSmsAlerts(settings.enableSmsAlerts !== undefined ? settings.enableSmsAlerts : false);
 
-    // Credentials prefill
-    if (currentUser) {
-      setAdminEmail(currentUser.email || '');
-      setAdminPassword(currentUser.password || '');
-      setAdminConfirmPassword(currentUser.password || '');
-    }
+      // Mail Settings
+      setMailProvider(settings.mailProvider || 'smtp');
+      setSmtpHost(settings.smtpHost || '');
+      setSmtpPort(settings.smtpPort || '587');
+      setSmtpUser(settings.smtpUser || '');
+      setSmtpPass(settings.smtpPass || '');
+      setFromEmail(settings.fromEmail || 'no-reply@adunavi.com');
+      setFromName(settings.fromName || 'ADU Navi');
+
+      // Credentials prefill
+      if (currentUser) {
+        setAdminEmail(currentUser.email || '');
+        setAdminPassword(currentUser.password || '');
+        setAdminConfirmPassword(currentUser.password || '');
+      }
+    };
+
+    loadSettings();
   }, [currentUser]);
 
   const handleSaveSettings = async (e) => {
