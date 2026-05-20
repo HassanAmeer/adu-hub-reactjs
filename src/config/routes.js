@@ -42,9 +42,9 @@ export const ROUTES = {
 
   // User Panel Gates
   USER_PANEL_WILDCARD: '/userpanel/*',
-  USER_LOGIN: '/userpanel/login',
-  USER_REGISTER: '/userpanel/register',
-  USER_FORGOT_PASSWORD: '/userpanel/forgot-password',
+  USER_LOGIN: '/login',
+  USER_REGISTER: '/register',
+  USER_FORGOT_PASSWORD: '/forgot-password',
   USER_DASHBOARD: '/userpanel/dashboard',
   USER_PROFILE: '/userpanel/profile',
   USER_PROJECTS: '/userpanel/projects',

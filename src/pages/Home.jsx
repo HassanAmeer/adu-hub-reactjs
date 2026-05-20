@@ -6,6 +6,7 @@ import StateGrid from '../components/home/StateGrid';
 import { featuredCities } from '../data/mockData';
 import { ArrowRight, Star, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ROUTES } from '../config';
 
 import { motion } from 'framer-motion';
 
@@ -136,7 +137,7 @@ const Home = () => {
               Join 50,000+ homeowners using ADU Navi to navigate laws and find professionals.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-              <Link to="/signup" className="bg-secondary text-white px-10 py-4 rounded-xl font-bold hover:bg-emerald-500 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1 inline-block">Create Free Account</Link>
+              <Link to={ROUTES.USER_REGISTER} className="bg-secondary text-white px-10 py-4 rounded-xl font-bold hover:bg-emerald-500 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1 inline-block">Create Free Account</Link>
               <Link to="/directory" className="bg-white text-primary px-10 py-4 rounded-xl font-bold hover:bg-slate-50 transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1 inline-block">Find Professionals</Link>
             </div>
           </div>

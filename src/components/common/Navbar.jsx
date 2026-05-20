@@ -80,7 +80,7 @@ const Navbar = () => {
             ) : (
               <>
                 <Link to={ROUTES.LOGIN_REDIRECT} className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Log In</Link>
-                <Link to={ROUTES.SIGNUP_REDIRECT} className="btn-primary !py-2.5 !px-6 text-sm">Get Started</Link>
+                <Link to={ROUTES.USER_REGISTER} className="btn-primary !py-2.5 !px-6 text-sm">Get Started</Link>
               </>
             )}
           </div>
@@ -135,7 +135,7 @@ const Navbar = () => {
               ) : (
                 <>
                   <Link to={ROUTES.LOGIN_REDIRECT} onClick={() => setIsOpen(false)} className="btn-ghost w-full text-center border border-white/20">Log In</Link>
-                  <Link to={ROUTES.SIGNUP_REDIRECT} onClick={() => setIsOpen(false)} className="btn-primary w-full text-center">Get Started</Link>
+                  <Link to={ROUTES.USER_REGISTER} onClick={() => setIsOpen(false)} className="btn-primary w-full text-center">Get Started</Link>
                 </>
               )}
             </div>

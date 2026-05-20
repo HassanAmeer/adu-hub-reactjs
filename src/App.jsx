@@ -14,6 +14,9 @@ import AlertsPage from './pages/AlertsPage';
 import SuperApp from './super/superApp';
 import SuperLoginPage from './pages/SuperLoginPage';
 import UserRoutes from './userpanel';
+import Login from './userpanel/Login';
+import Register from './userpanel/Register';
+import ForgotPassword from './userpanel/ForgotPassword';
 import { ROUTES, COLLECTIONS } from './config';
 
 // New Pages
@@ -185,8 +188,9 @@ function App() {
         <Route path={ROUTES.TERMS} element={<MainLayout><TermsPage /></MainLayout>} />
 
         {/* Auth Pages & Redirection */}
-        <Route path={ROUTES.LOGIN_REDIRECT} element={<Navigate to={ROUTES.USER_LOGIN} replace />} />
-        <Route path={ROUTES.SIGNUP_REDIRECT} element={<Navigate to={ROUTES.USER_REGISTER} replace />} />
+        <Route path={ROUTES.USER_LOGIN} element={<Login />} />
+        <Route path={ROUTES.USER_REGISTER} element={<Register />} />
+        <Route path={ROUTES.USER_FORGOT_PASSWORD} element={<ForgotPassword />} />
         <Route path={ROUTES.SUPER_GATEWAY} element={<SuperLoginPage />} />
         <Route path={ROUTES.DASHBOARD_REDIRECT} element={<Navigate to={ROUTES.USER_DASHBOARD} replace />} />
 
