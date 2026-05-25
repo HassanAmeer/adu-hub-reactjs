@@ -26,6 +26,8 @@ import ContactPage from './pages/ContactPage';
 import FAQPage from './pages/FAQPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
+import DisclaimerPage from './pages/DisclaimerPage';
+import LandingPage from './pages/LandingPage';
 import SeedPage from './seed';
 import { dbService } from './services/dbService';
 
@@ -186,6 +188,8 @@ function App() {
         <Route path={ROUTES.FAQ} element={<MainLayout><FAQPage /></MainLayout>} />
         <Route path={ROUTES.PRIVACY} element={<MainLayout><PrivacyPage /></MainLayout>} />
         <Route path={ROUTES.TERMS} element={<MainLayout><TermsPage /></MainLayout>} />
+        <Route path={ROUTES.DISCLAIMER} element={<MainLayout><DisclaimerPage /></MainLayout>} />
+        <Route path={ROUTES.LANDING} element={<LandingPage />} />
 
         {/* Auth Pages & Redirection */}
         <Route path={ROUTES.USER_LOGIN} element={<Login />} />

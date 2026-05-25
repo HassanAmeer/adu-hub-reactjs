@@ -1,6 +1,8 @@
 export const ROUTES = {
   // Public Client Side Routes
   HOME: '/',
+  LANDING: '/landing',
+  DISCLAIMER: '/disclaimer',
   STATES: '/states',
   STATE_DETAIL: '/state/:stateName',
   CITY_DETAIL: '/state/:state/city/:cityName',

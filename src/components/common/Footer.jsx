@@ -60,7 +60,24 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* Legal Disclaimer Section */}
+        <div className="border-t border-slate-100 pt-8 mb-6">
+          <div className="bg-amber-50 border border-amber-100 rounded-xl px-5 py-4">
+            <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Disclaimer</p>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              ADUNavi provides informational content only. Laws and requirements vary by location and may change.
+              Users must verify all information independently. ADUNavi assumes no liability.{' '}
+              <Link
+                to={ROUTES.DISCLAIMER}
+                className="text-secondary hover:text-emerald-600 font-semibold underline underline-offset-2 transition-colors"
+              >
+                See full legal disclaimer →
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-100 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-slate-400">
             © {new Date().getFullYear()} {appConfig.name} Inc. All rights reserved.
           </p>

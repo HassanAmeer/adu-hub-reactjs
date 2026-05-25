@@ -1,9 +1,37 @@
-import React from 'react';
-import { ArrowRight, Play, CheckCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import React, { useState, useRef } from 'react';
+import { ArrowRight, Play, CheckCircle, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../config';
+
+const SUGGESTIONS = [
+  'Can I build an ADU in Los Angeles?',
+  'ADU rules in San Diego',
+  'How much does an ADU cost?',
+  'Detached ADU setback requirements',
+  'California ADU law 2024',
+];
 
 const Hero = () => {
+  const [query, setQuery] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const dest = query.trim()
+      ? `${ROUTES.PROPERTY_CHECKER}?q=${encodeURIComponent(query.trim())}`
+      : ROUTES.PROPERTY_CHECKER;
+    navigate(dest);
+  };
+
+  const handleSuggestion = (s) => {
+    setQuery(s);
+    setShowSuggestions(false);
+    inputRef.current?.focus();
+  };
+
   return (
     <div className="relative overflow-hidden bg-primary pt-32 pb-24 sm:pt-40 sm:pb-32 lg:pb-48">
       {/* Background patterns & blobs */}
@@ -32,11 +60,72 @@ const Hero = () => {
               Everything <span className="text-secondary">ADUs</span> — All in One Place.
             </h1>
             
-            <p className="text-lg sm:text-xl text-slate-300 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-lg sm:text-xl text-slate-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Stop digging through fragmented city PDFs and contractor blogs. 
               Find out if you can build an ADU, how to do it legally, and who can help you—instantly.
             </p>
 
+            {/* ── Search Bar ───────────────────────────────────────────── */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="relative mb-6"
+            >
+              <form onSubmit={handleSearch}>
+                <div className="flex items-center bg-white/95 backdrop-blur-xl border-2 border-white/20 rounded-2xl shadow-2xl shadow-black/30 overflow-hidden focus-within:border-secondary transition-colors duration-200">
+                  <Search className="w-5 h-5 text-slate-400 ml-5 flex-shrink-0" />
+                  <input
+                    ref={inputRef}
+                    id="hero-search"
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => setShowSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                    placeholder="Ask anything about ADUs…"
+                    className="flex-1 px-4 py-4 text-slate-800 text-base bg-transparent outline-none placeholder-slate-400 font-medium"
+                    autoComplete="off"
+                  />
+                  <button
+                    type="submit"
+                    className="m-2 bg-secondary hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 flex items-center gap-2 shadow-md shadow-secondary/30 active:scale-95 text-sm whitespace-nowrap"
+                  >
+                    Search
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </form>
+
+              {/* Suggestion Dropdown */}
+              <AnimatePresence>
+                {showSuggestions && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50"
+                  >
+                    <div className="p-2">
+                      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider px-3 py-2">Try asking…</p>
+                      {SUGGESTIONS.map((s, idx) => (
+                        <button
+                          key={idx}
+                          onMouseDown={() => handleSuggestion(s)}
+                          className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-slate-700 text-sm transition-colors"
+                        >
+                          <Search className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link to="/property-checker" className="btn-primary flex items-center justify-center gap-2">
                 Start Your ADU Journey
@@ -84,9 +173,12 @@ const Hero = () => {
                   </div>
                 </div>
                 
-                <button className="w-full mt-8 bg-secondary hover:bg-emerald-500 text-white font-bold py-4 rounded-xl transition-colors duration-200">
+                <Link
+                  to={ROUTES.PROPERTY_CHECKER}
+                  className="block w-full mt-8 bg-secondary hover:bg-emerald-500 text-white font-bold py-4 rounded-xl transition-colors duration-200 text-center"
+                >
                   View Full Report
-                </button>
+                </Link>
               </div>
               
               {/* Decorative elements behind card */}

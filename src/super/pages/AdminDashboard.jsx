@@ -31,7 +31,7 @@ const AdminDashboard = () => {
           <span className="text-[10px] font-bold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
             Control Center
           </span>
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mt-3">Welcome Back, Administrator 👋</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mt-3 text-secondary">Welcome Back, Administrator 👋</h1>
           <p className="text-slate-400 text-sm max-w-xl font-medium leading-relaxed">
             Monitor ADU Navi platform status, review zoning regulations databases, approve professional directory requests, and dispatch legislative alerts.
           </p>
