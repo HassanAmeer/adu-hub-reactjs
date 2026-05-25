@@ -9,7 +9,7 @@ const edges = [
     icon: BookOpen,
     color: 'text-emerald-500',
     bg: 'bg-emerald-500/10',
-    darkBg: false
+    darkBg: true
   },
   {
     title: 'Location-Specific Rules',
@@ -17,7 +17,7 @@ const edges = [
     icon: Map,
     color: 'text-amber-500',
     bg: 'bg-amber-500/10',
-    darkBg: true
+    darkBg: false
   },
   {
     title: 'Practical Building Guidance',
@@ -41,6 +41,14 @@ const edges = [
     icon: DollarSign,
     color: 'text-secondary',
     bg: 'bg-secondary/10',
+    darkBg: false
+  },
+  {
+    title: 'Time-Saving Tools',
+    desc: 'Calculators, property checkers, and alert systems designed to streamline your entire ADU project lifecycle.',
+    icon: Compass,
+    color: 'text-rose-500',
+    bg: 'bg-rose-500/10',
     darkBg: false
   }
 ];

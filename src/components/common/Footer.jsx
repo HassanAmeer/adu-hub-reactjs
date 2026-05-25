@@ -64,16 +64,16 @@ const Footer = () => {
         <div className="border-t border-slate-100 pt-8 mb-6">
           <div className="bg-amber-50 border border-amber-100 rounded-xl px-5 py-4">
             <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Disclaimer</p>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <span className="text-xs text-slate-500 leading-relaxed">
               ADUNavi provides informational content only. Laws and requirements vary by location and may change.
               Users must verify all information independently. ADUNavi assumes no liability.{' '}
-              <Link
-                to={ROUTES.DISCLAIMER}
-                className="text-secondary hover:text-emerald-600 font-semibold underline underline-offset-2 transition-colors"
-              >
-                See full legal disclaimer →
-              </Link>
-            </p>
+            </span>
+            <Link
+              to={ROUTES.DISCLAIMER}
+              className="text-xs text-secondary hover:text-emerald-600 font-semibold underline underline-offset-2 transition-colors"
+            >
+              See full legal disclaimer →
+            </Link>
           </div>
         </div>
 
