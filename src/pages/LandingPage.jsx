@@ -90,7 +90,7 @@ const roles = [
       {
         question: "What do you need most?",
         options: [
-          { label: 'Local requirements', route: ROUTES.LAW_TRACKER, icon: Building },
+          { label: 'Local requirements', route: ROUTES.STATES, icon: Building },
           { label: 'Find clients', route: ROUTES.DIRECTORY, icon: Briefcase },
           { label: 'Cost benchmarks', route: ROUTES.COSTS, icon: TrendingUp },
         ],
@@ -122,7 +122,7 @@ const roles = [
       {
         question: "What are you working on?",
         options: [
-          { label: 'Zoning research', route: ROUTES.LAW_TRACKER, icon: Scale },
+          { label: 'Zoning research', route: ROUTES.STATES, icon: Scale },
           { label: 'State laws', route: ROUTES.STATES, icon: Building },
           { label: 'Property check', route: ROUTES.PROPERTY_CHECKER, icon: Search },
         ],
@@ -139,7 +139,7 @@ const roles = [
         question: "What does your client need?",
         options: [
           { label: 'ADU feasibility check', route: ROUTES.PROPERTY_CHECKER, icon: Search },
-          { label: 'Legal overview', route: ROUTES.LAW_TRACKER, icon: Scale },
+          { label: 'Legal overview', route: ROUTES.STATES, icon: Scale },
           { label: 'Cost estimates', route: ROUTES.COSTS, icon: TrendingUp },
         ],
       },
@@ -201,13 +201,13 @@ const LandingPage = () => {
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-primary">
 
       {/* ── Floating ADU Shape Decorations ────────────────────────── */}
-      <FloatingShape type="house"   delay={0}   style={{ width: 90,  height: 90,  top: '8%',  left: '6%' }} />
-      <FloatingShape type="cottage" delay={1.2} style={{ width: 70,  height: 70,  top: '20%', right: '9%' }} />
-      <FloatingShape type="studio"  delay={0.5} style={{ width: 110, height: 110, bottom: '18%', left: '5%' }} />
-      <FloatingShape type="garage"  delay={2.1} style={{ width: 80,  height: 80,  bottom: '25%', right: '7%' }} />
-      <FloatingShape type="house"   delay={3}   style={{ width: 55,  height: 55,  top: '55%', left: '16%' }} />
-      <FloatingShape type="cottage" delay={1.8} style={{ width: 65,  height: 65,  top: '12%', left: '38%' }} />
-      <FloatingShape type="studio"  delay={2.5} style={{ width: 50,  height: 50,  bottom: '10%', right: '22%' }} />
+      <FloatingShape type="house" delay={0} style={{ width: 90, height: 90, top: '8%', left: '6%' }} />
+      <FloatingShape type="cottage" delay={1.2} style={{ width: 70, height: 70, top: '20%', right: '9%' }} />
+      <FloatingShape type="studio" delay={0.5} style={{ width: 110, height: 110, bottom: '18%', left: '5%' }} />
+      <FloatingShape type="garage" delay={2.1} style={{ width: 80, height: 80, bottom: '25%', right: '7%' }} />
+      <FloatingShape type="house" delay={3} style={{ width: 55, height: 55, top: '55%', left: '16%' }} />
+      <FloatingShape type="cottage" delay={1.8} style={{ width: 65, height: 65, top: '12%', left: '38%' }} />
+      <FloatingShape type="studio" delay={2.5} style={{ width: 50, height: 50, bottom: '10%', right: '22%' }} />
 
       {/* ── Glow blobs ──────────────────────────────────────────────── */}
       <div className="absolute top-1/4 right-0 w-1/2 h-1/2 bg-secondary/25 rounded-full blur-[140px] pointer-events-none" />
@@ -389,11 +389,10 @@ const LandingPage = () => {
                         onClick={() => handleFollowUpSelect(option)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.97 }}
-                        className={`flex items-center gap-2.5 px-6 py-3.5 border text-white rounded-2xl text-sm font-semibold backdrop-blur-sm transition-all duration-200 shadow-lg ${
-                          followUpAnswer?.label === option.label
-                            ? 'bg-secondary border-secondary shadow-secondary/40'
-                            : 'bg-white/10 hover:bg-white/20 border-white/20 hover:border-secondary/50'
-                        }`}
+                        className={`flex items-center gap-2.5 px-6 py-3.5 border text-white rounded-2xl text-sm font-semibold backdrop-blur-sm transition-all duration-200 shadow-lg ${followUpAnswer?.label === option.label
+                          ? 'bg-secondary border-secondary shadow-secondary/40'
+                          : 'bg-white/10 hover:bg-white/20 border-white/20 hover:border-secondary/50'
+                          }`}
                       >
                         {option.icon && <option.icon className="w-4 h-4" />}
                         {option.label}

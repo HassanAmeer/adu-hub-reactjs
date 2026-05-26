@@ -221,7 +221,6 @@ const UsersManager = () => {
               <select className="input-field" value={subscription} onChange={e => setSubscription(e.target.value)}>
                 <option value="free">Free Tier</option>
                 <option value="pro">Pro Tier</option>
-                <option value="expert">Expert Tier</option>
               </select>
             </div>
           </div>

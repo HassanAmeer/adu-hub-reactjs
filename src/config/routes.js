@@ -10,7 +10,6 @@ export const ROUTES = {
   HOW_TO_BUILD: '/how-to-build',
   DIRECTORY: '/directory',
   COSTS: '/costs',
-  LAW_TRACKER: '/law-tracker',
   ALERTS: '/alerts',
   BLOG: '/blog',
   ABOUT: '/about',
@@ -34,9 +33,9 @@ export const ROUTES = {
   SUPER_CHECKER: '/super/checker',
   SUPER_COSTS: '/super/costs',
   SUPER_DIRECTORY: '/super/directory',
-  SUPER_ALERTS: '/super/alerts',
   SUPER_USERS: '/super/users',
   SUPER_SUBSCRIPTIONS: '/super/subscriptions',
+  SUPER_DEPOSITS: '/super/deposits',
   SUPER_BLOGS: '/super/blogs',
   SUPER_SETTINGS: '/super/settings',
   SUPER_LOGS: '/super/logs',
@@ -52,11 +51,9 @@ export const ROUTES = {
   USER_PROJECTS: '/userpanel/projects',
   USER_CHECKS: '/userpanel/checks',
   USER_FAVORITES: '/userpanel/favorites',
-  USER_NOTIFICATIONS: '/userpanel/notifications',
   USER_SUBSCRIPTIONS: '/userpanel/subscriptions',
   USER_RESOURCES: '/userpanel/resources',
-  USER_PROFESSIONALS: '/userpanel/professionals',
-  USER_SETTINGS: '/userpanel/settings'
+  USER_PROFESSIONALS: '/userpanel/professionals'
 };
 
 export default ROUTES;

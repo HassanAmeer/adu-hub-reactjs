@@ -86,7 +86,7 @@ const Home = () => {
                       <CheckCircle className="w-6 h-6" />
                     </div>
                     <div>
-                      <h5 className="font-bold">Property Check</h5>
+                      <h5 className="font-bold text-white">Property Check</h5>
                       <p className="text-xs text-slate-400">San Diego, CA 92101</p>
                     </div>
                   </div>

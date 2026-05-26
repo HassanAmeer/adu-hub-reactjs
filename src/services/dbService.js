@@ -14,10 +14,12 @@ const DEFAULT_USERS = [
     email: 'admin@adunavi.com',
     role: 'admin',
     status: 'active',
-    subscription: 'expert',
+    subscription: 'pro',
     savedProperties: [],
     savedPros: [],
-    joinedDate: '2025-01-10'
+    joinedDate: '2025-01-10',
+    subscriptionActivatedDate: '2026-05-10',
+    subscriptionExpiresDate: '2026-06-09'
   },
   {
     id: 'user-homeowner-id',
@@ -47,7 +49,9 @@ const DEFAULT_USERS = [
       { id: 'lead-1', name: 'Mark Smith', email: 'mark@gmail.com', phone: '619-555-0129', property: '789 Pine Rd, San Diego, CA', message: 'Interested in building a detached 800 sq ft ADU.', date: '2026-05-18' },
       { id: 'lead-2', name: 'Sarah Connor', email: 'sarah@hotmail.com', phone: '858-555-0982', property: '456 Hill Ave, La Jolla, CA', message: 'Looking for a general estimate for garage conversion.', date: '2026-05-19' }
     ],
-    joinedDate: '2025-04-20'
+    joinedDate: '2025-04-20',
+    subscriptionActivatedDate: '2026-05-25',
+    subscriptionExpiresDate: '2026-06-24'
   }
 ];
 
@@ -178,13 +182,48 @@ const DEFAULT_SETTINGS = {
   metaDescription: 'Find state-by-state ADU laws, property checkers, cost estimation libraries, and professional directory lists for building ADUs.',
   enableEmailAlerts: true,
   enableSmsAlerts: false,
-  backupSchedule: 'weekly'
+  backupSchedule: 'weekly',
+  paymentTitle: 'Zelle & Bank Wire Transfer Details',
+  paymentAddress: 'Zelle: pay@adunavi.com | Bank: Wells Fargo A/C 987654321, Routing: 122000247',
+  paymentDescription: 'Please transfer the exact plan pricing amount to the address coordinates above. Once completed, upload a screenshot of your transaction confirmation. Our administrators will review the deposit and activate your subscription.'
 };
+
+const DEFAULT_DEPOSITS = [
+  {
+    id: 'dep-101',
+    userId: 'user1@gmail.com',
+    userName: 'Jane Smith',
+    userEmail: 'user1@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'approved',
+    screenshot: 'https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-20T14:35:00Z'
+  },
+  {
+    id: 'dep-102',
+    userId: 'user2@gmail.com',
+    userName: 'Robert Davis',
+    userEmail: 'user2@gmail.com',
+    planId: 'expert',
+    planName: 'Expert Builder Tier',
+    price: '$99',
+    status: 'pending',
+    screenshot: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-25T09:15:00Z'
+  }
+];
 
 const DEFAULT_LOGS = [
   { id: 'log-1', admin: 'Super Admin', action: 'Created California ADU Law ruleset', timestamp: '2026-05-19T09:30:00Z' },
   { id: 'log-2', admin: 'Super Admin', action: 'Approved listing "Coastal Design Studio"', timestamp: '2026-05-19T10:15:00Z' },
   { id: 'log-3', admin: 'Super Admin', action: 'Updated SMS delivery template settings', timestamp: '2026-05-19T11:00:00Z' }
+];
+
+const DEFAULT_PLANS = [
+  { id: 'free', name: 'Free Basic Tier', price: '$0', desc: 'Allows basic setback checking and laws queries for homeowners.', features: ['3 Property Checker run limit', 'Access to State level laws', 'Read directory reviews'] },
+  { id: 'pro', name: 'Standard Pro Tier', price: '$49', desc: 'Designed for professional contractors, consultants, and builders.', features: ['Direct lead acquisition queries', 'Featured directory placement badge', 'Comprehensive municipal details access'] }
 ];
 
 // Helper to load/save JSON from local storage
@@ -209,13 +248,31 @@ export const dbService = {
     const users = dbService.getUsers();
     const index = users.findIndex(u => u.id === userId);
     if (index !== -1) {
-      users[index] = { ...users[index], ...updatedFields };
+      const oldUser = users[index];
+      let fieldsToUpdate = { ...updatedFields };
+
+      // Calculate activation and expiration dates if subscription tier changes
+      if (updatedFields.subscription && updatedFields.subscription !== oldUser.subscription) {
+        if (updatedFields.subscription === 'free') {
+          fieldsToUpdate.subscriptionActivatedDate = null;
+          fieldsToUpdate.subscriptionExpiresDate = null;
+        } else {
+          const activatedDate = new Date().toISOString().split('T')[0];
+          const expires = new Date();
+          expires.setDate(expires.getDate() + 30);
+          const expiresDate = expires.toISOString().split('T')[0];
+          fieldsToUpdate.subscriptionActivatedDate = activatedDate;
+          fieldsToUpdate.subscriptionExpiresDate = expiresDate;
+        }
+      }
+
+      users[index] = { ...users[index], ...fieldsToUpdate };
       dbService.saveUsers(users);
 
       // Persist changes to Firestore user document
       try {
         const userRef = doc(db, COLLECTIONS.USERS, userId);
-        updateDoc(userRef, updatedFields);
+        updateDoc(userRef, fieldsToUpdate);
       } catch (err) {
         console.error("Firestore sync failed:", err);
       }
@@ -392,12 +449,6 @@ export const dbService = {
     alerts.push(newAlert);
     dbService.saveAlerts(alerts);
     dbService.addLog(`Created law tracker alert: "${alert.title}"`);
-    try {
-      const alertRef = doc(db, COLLECTIONS.ALERTS, newAlert.id);
-      setDoc(alertRef, newAlert);
-    } catch (err) {
-      console.error("Firestore alert add error:", err);
-    }
     return newAlert;
   },
   updateAlert: (alertId, updatedFields) => {
@@ -406,12 +457,6 @@ export const dbService = {
     if (idx !== -1) {
       alerts[idx] = { ...alerts[idx], ...updatedFields };
       dbService.saveAlerts(alerts);
-      try {
-        const alertRef = doc(db, COLLECTIONS.ALERTS, alertId);
-        setDoc(alertRef, updatedFields, { merge: true });
-      } catch (err) {
-        console.error("Firestore alert update error:", err);
-      }
       return alerts[idx];
     }
     return null;
@@ -419,12 +464,6 @@ export const dbService = {
   deleteAlert: (alertId) => {
     const alerts = dbService.getAlerts().filter(a => a.id !== alertId);
     dbService.saveAlerts(alerts);
-    try {
-      const alertRef = doc(db, COLLECTIONS.ALERTS, alertId);
-      deleteDoc(alertRef);
-    } catch (err) {
-      console.error("Firestore alert delete error:", err);
-    }
   },
 
   // --- COST LIBRARY ---
@@ -510,5 +549,101 @@ export const dbService = {
   },
   clearLogs: () => {
     saveCollection('adu-db-logs', []);
+  },
+  getPlans: () => {
+    const plans = loadCollection('adu-db-plans', DEFAULT_PLANS);
+    // Limit to Free and Pro plans only, filtering out legacy expert tiers
+    const filtered = plans.filter(p => p.id === 'free' || p.id === 'pro');
+    if (filtered.length !== plans.length) {
+      dbService.savePlans(filtered);
+      return filtered;
+    }
+    return plans;
+  },
+  savePlans: (plans) => {
+    saveCollection('adu-db-plans', plans);
+    plans.forEach(async (plan) => {
+      try {
+        const planRef = doc(db, COLLECTIONS.SUBSCRIPTIONS, plan.id);
+        await setDoc(planRef, plan, { merge: true });
+      } catch (err) {
+        console.error(`Firestore plans sync failed for ${plan.id}:`, err);
+      }
+    });
+  },
+  getDeposits: () => loadCollection('adu-db-deposits', DEFAULT_DEPOSITS),
+  saveDeposits: (deposits) => {
+    saveCollection('adu-db-deposits', deposits);
+    deposits.forEach(async (dep) => {
+      try {
+        const depRef = doc(db, COLLECTIONS.DEPOSITS, dep.id);
+        await setDoc(depRef, dep, { merge: true });
+      } catch (err) {
+        console.error(`Firestore deposits sync failed for ${dep.id}:`, err);
+      }
+    });
+  },
+  addDeposit: (deposit) => {
+    const deposits = dbService.getDeposits();
+    const newDep = {
+      id: deposit.id || 'dep-' + Date.now(),
+      userId: deposit.userId,
+      userName: deposit.userName || 'User',
+      userEmail: deposit.userEmail,
+      planId: deposit.planId,
+      planName: deposit.planName,
+      price: deposit.price,
+      screenshot: deposit.screenshot || '',
+      status: deposit.status || 'pending',
+      timestamp: deposit.timestamp || new Date().toISOString()
+    };
+    deposits.unshift(newDep);
+    dbService.saveDeposits(deposits);
+    dbService.addLog(`Submitted payment deposit of ${newDep.price} for plan ${newDep.planId.toUpperCase()} by user ${newDep.userEmail}`);
+    return newDep;
+  },
+  updateDeposit: (depositId, updatedFields) => {
+    const deposits = dbService.getDeposits();
+    const idx = deposits.findIndex(d => d.id === depositId);
+    if (idx !== -1) {
+      const oldDeposit = deposits[idx];
+      const updatedDeposit = { ...oldDeposit, ...updatedFields };
+      deposits[idx] = updatedDeposit;
+      dbService.saveDeposits(deposits);
+
+      // Status transition logic to automatically activate subscriptions
+      if (updatedFields.status === 'approved' && oldDeposit.status !== 'approved') {
+        dbService.updateUser(oldDeposit.userId, { subscription: oldDeposit.planId });
+        dbService.addLog(`Approved payment deposit for user ${oldDeposit.userEmail}. Subscription set to ${oldDeposit.planId.toUpperCase()}.`);
+      } else if (updatedFields.status === 'rejected' && oldDeposit.status === 'approved') {
+        dbService.updateUser(oldDeposit.userId, { subscription: 'free' });
+        dbService.addLog(`Reverted/Rejected payment deposit for user ${oldDeposit.userEmail}. Subscription reset to FREE.`);
+      } else if (updatedFields.status === 'pending' && oldDeposit.status === 'approved') {
+        dbService.updateUser(oldDeposit.userId, { subscription: 'free' });
+        dbService.addLog(`Set payment deposit for user ${oldDeposit.userEmail} back to pending. Subscription reset to FREE.`);
+      } else if (updatedFields.status === 'rejected' && oldDeposit.status !== 'rejected') {
+        dbService.addLog(`Rejected payment deposit for user ${oldDeposit.userEmail}.`);
+      }
+      return updatedDeposit;
+    }
+    return null;
+  },
+  deleteDeposit: (depositId) => {
+    const deposits = dbService.getDeposits();
+    const depositToDelete = deposits.find(d => d.id === depositId);
+    const filtered = deposits.filter(d => d.id !== depositId);
+    dbService.saveDeposits(filtered);
+    
+    // Delete from Firestore
+    try {
+      const depRef = doc(db, COLLECTIONS.DEPOSITS, depositId);
+      deleteDoc(depRef);
+    } catch (err) {
+      console.error("Firestore deposit delete error:", err);
+    }
+
+    if (depositToDelete) {
+      dbService.addLog(`Deleted deposit transaction receipt for user ${depositToDelete.userEmail}`);
+    }
   }
 };

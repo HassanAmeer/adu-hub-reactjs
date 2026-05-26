@@ -11,11 +11,9 @@ import Profile from './Profile/Profile';
 import Projects from './Projects/Projects';
 import Checks from './Checks/Checks';
 import Favorites from './Favorites/Favorites';
-import Notifications from './Notifications/Notifications';
 import Subscriptions from './Subscriptions/Subscriptions';
 import Resources from './Resources/Resources';
 import Professionals from './Professionals/Professionals';
-import Settings from './Settings/Settings';
 
 const UserRoutes = () => {
   return (
@@ -33,11 +31,9 @@ const UserRoutes = () => {
         <Route path="projects" element={<Projects />} />
         <Route path="checks" element={<Checks />} />
         <Route path="favorites" element={<Favorites />} />
-        <Route path="notifications" element={<Notifications />} />
         <Route path="subscriptions" element={<Subscriptions />} />
         <Route path="resources" element={<Resources />} />
         <Route path="professionals" element={<Professionals />} />
-        <Route path="settings" element={<Settings />} />
       </Route>
 
       {/* Fallback */}

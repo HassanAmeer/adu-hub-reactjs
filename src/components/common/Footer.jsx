@@ -35,7 +35,6 @@ const Footer = () => {
               <li><Link to={ROUTES.PROPERTY_CHECKER} className="hover:text-secondary">Property Checker</Link></li>
               <li><Link to={ROUTES.DIRECTORY} className="hover:text-secondary">Professionals Directory</Link></li>
               <li><Link to={ROUTES.COSTS} className="hover:text-secondary">Cost Library</Link></li>
-              <li><Link to={ROUTES.LAW_TRACKER} className="hover:text-secondary">Law Tracker</Link></li>
             </ul>
           </div>
 

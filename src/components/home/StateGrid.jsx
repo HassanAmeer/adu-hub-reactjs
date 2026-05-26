@@ -2,6 +2,7 @@ import React from 'react';
 import { states } from '../../data/mockData';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ROUTES } from '../../config';
 
 const StateGrid = () => {
   return (
@@ -14,7 +15,7 @@ const StateGrid = () => {
               Select your state to view specific ADU regulations, upcoming legislation changes, and local building guidelines.
             </p>
           </div>
-          <Link to="/law-tracker" className="text-secondary font-bold flex items-center gap-2 hover:gap-3 transition-all">
+          <Link to={ROUTES.STATES} className="text-secondary font-bold flex items-center gap-2 hover:gap-3 transition-all">
             View All States <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

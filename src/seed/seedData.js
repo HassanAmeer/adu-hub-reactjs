@@ -11,10 +11,12 @@ export const SEED_USERS = [
     password: '12345678',
     role: ROLES.SUPER_ADMIN,
     status: 'active',
-    subscription: 'expert',
+    subscription: 'pro',
     savedProperties: [],
     savedPros: [],
-    joinedDate: '2026-01-01'
+    joinedDate: '2026-01-01',
+    subscriptionActivatedDate: '2026-05-10',
+    subscriptionExpiresDate: '2026-06-09'
   },
   {
     id: 'user1@gmail.com',
@@ -38,10 +40,12 @@ export const SEED_USERS = [
     password: '12345678',
     role: ROLES.INVESTOR,
     status: 'active',
-    subscription: 'expert',
+    subscription: 'pro',
     savedProperties: [],
     savedPros: ['pro-precision-build'],
-    joinedDate: '2026-03-10'
+    joinedDate: '2026-03-10',
+    subscriptionActivatedDate: '2026-05-20',
+    subscriptionExpiresDate: '2026-06-19'
   },
   {
     id: 'pro1@gmail.com',
@@ -57,7 +61,9 @@ export const SEED_USERS = [
     leads: [
       { id: 'lead-1', name: 'John Doe', email: 'johndoe@gmail.com', phone: '619-555-0987', property: '789 Pacific St, San Diego, CA', message: 'Looking to build a 2-bedroom detached ADU.', date: '2026-05-18' }
     ],
-    joinedDate: '2026-04-01'
+    joinedDate: '2026-04-01',
+    subscriptionActivatedDate: '2026-05-25',
+    subscriptionExpiresDate: '2026-06-24'
   }
 ];
 
@@ -287,7 +293,7 @@ export const SEED_NOTIFICATIONS = [
   {
     id: 'template-default',
     title: 'Zoning Change Log',
-    body: 'Zoning regulations in {{location}} have changed. Review updated setback and size limitations in the Law Tracker.',
+    body: 'Zoning regulations in {{location}} have changed. Review updated setback and size limitations in the State Laws.',
     type: 'system',
     createdAt: '2026-05-19T00:00:00Z'
   }
@@ -295,25 +301,18 @@ export const SEED_NOTIFICATIONS = [
 
 export const SEED_SUBSCRIPTIONS = [
   {
-    id: 'sub-package-free',
-    name: 'Free Starter Plan',
-    price: 0,
-    period: 'lifetime',
-    features: ['1 Zoning Property Check', 'Basic Law Tracker Access', 'Directory Searches']
+    id: 'free',
+    name: 'Free Basic Tier',
+    price: '$0',
+    desc: 'Allows basic setback checking and laws queries for homeowners.',
+    features: ['3 Property Checker run limit', 'Access to State level laws', 'Read directory reviews']
   },
   {
-    id: 'sub-package-pro',
-    name: 'Professional Tier',
-    price: 49,
-    period: 'monthly',
-    features: ['Unlimited Zoning Property Checks', 'Detailed Cost Estimation Breakdown', 'Full Pro Partner Directory Listing']
-  },
-  {
-    id: 'sub-package-expert',
-    name: 'Enterprise Builder',
-    price: 199,
-    period: 'annual',
-    features: ['Unlimited Access', 'Priority Lead Notifications', 'Deed Restriction Compliance Helper', 'API Property Zoning Access']
+    id: 'pro',
+    name: 'Standard Pro Tier',
+    price: '$49',
+    desc: 'Designed for professional contractors, consultants, and builders.',
+    features: ['Direct lead acquisition queries', 'Featured directory placement badge', 'Comprehensive municipal details access']
   }
 ];
 
@@ -367,7 +366,7 @@ export const SEED_SETTINGS = [
     backupSchedule: 'weekly',
     themeColor: '#059669',
     siteName: 'ADU Navi',
-    contactEmail: 'support@adunavi.com',
+    contactEmail: 'contact@adunavi.com',
     contactPhone: '+1 (800) 555-0142',
     logoUrl: '',
     maintenanceMode: false,
@@ -382,7 +381,37 @@ export const SEED_SETTINGS = [
     smtpUser: '',
     smtpPass: '',
     fromEmail: 'noreply@adunavi.com',
-    fromName: 'ADU Navi Alerts'
+    fromName: 'ADU Navi Alerts',
+    paymentTitle: 'Zelle & Bank Wire Transfer Details',
+    paymentAddress: 'Zelle: pay@adunavi.com | Bank: Wells Fargo A/C 987654321, Routing: 122000247',
+    paymentDescription: 'Please transfer the exact plan pricing amount to the address coordinates above. Once completed, upload a screenshot of your transaction confirmation. Our administrators will review the deposit and activate your subscription.'
+  }
+];
+
+export const SEED_DEPOSITS = [
+  {
+    id: 'dep-101',
+    userId: 'user1@gmail.com',
+    userName: 'Jane Smith',
+    userEmail: 'user1@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'approved',
+    screenshot: 'https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-20T14:35:00Z'
+  },
+  {
+    id: 'dep-102',
+    userId: 'user2@gmail.com',
+    userName: 'Robert Davis',
+    userEmail: 'user2@gmail.com',
+    planId: 'expert',
+    planName: 'Expert Builder Tier',
+    price: '$99',
+    status: 'pending',
+    screenshot: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-25T09:15:00Z'
   }
 ];
 

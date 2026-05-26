@@ -4,14 +4,14 @@ import {
   Plus, 
   MapPin, 
   Users, 
-  Bell, 
   Compass, 
   Check, 
   Briefcase, 
   FileText,
   TrendingUp,
   ShieldCheck,
-  Download
+  Download,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
@@ -21,7 +21,6 @@ const UserDashboard = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
-  const [alerts, setAlerts] = useState([]);
   const [savedPros, setSavedPros] = useState([]);
   const [projects, setProjects] = useState([]);
 
@@ -35,7 +34,6 @@ const UserDashboard = () => {
         { id: 'proj-2', name: 'Garage Conversion Studio', type: 'Attached', status: 'Permit Review', progress: 60 }
       ]);
     }
-    setAlerts(dbService.getAlerts().slice(0, 3));
   }, [currentUser]);
 
   const isPro = currentUser?.role === 'professional';
@@ -64,12 +62,11 @@ const UserDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {[
           { label: 'Active Projects', value: projects.length, icon: Briefcase, bg: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' },
           { label: 'Saved Checks', value: properties.length, icon: MapPin, bg: 'bg-indigo-50 text-indigo-600', border: 'border-indigo-100' },
-          { label: 'Saved Professionals', value: savedPros.length, icon: Users, bg: 'bg-amber-50 text-amber-500', border: 'border-amber-100' },
-          { label: 'Unread Alerts', value: alerts.length, icon: Bell, bg: 'bg-rose-50 text-rose-500', border: 'border-rose-100' }
+          { label: 'Saved Professionals', value: savedPros.length, icon: Users, bg: 'bg-amber-50 text-amber-500', border: 'border-amber-100' }
         ].map((stat, idx) => (
           <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
             <div className="flex items-center gap-4">
@@ -85,90 +82,77 @@ const UserDashboard = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Main Area: Active Project Progress */}
-        <div className="xl:col-span-2 space-y-6">
-          <div className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-primary mb-4 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-secondary" />
-              Your Active ADU Builds
-            </h3>
-            {projects.length === 0 ? (
-              <p className="text-slate-400 text-sm py-4">No active builds. Go to "My ADU Projects" to create one.</p>
-            ) : (
-              <div className="space-y-6">
-                {projects.map((proj) => (
-                  <div key={proj.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-bold text-slate-800 text-sm">{proj.name}</h4>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase">{proj.type} ADU • {proj.status}</p>
-                      </div>
-                      <span className="text-xs font-black text-secondary">{proj.progress}% Done</span>
+      <div className="space-y-6">
+        <div className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-secondary" />
+            Your Active ADU Builds
+          </h3>
+          {projects.length === 0 ? (
+            <p className="text-slate-400 text-sm py-4">No active builds. Go to "My ADU Projects" to create one.</p>
+          ) : (
+            <div className="space-y-6">
+              {projects.map((proj) => (
+                <div key={proj.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm">{proj.name}</h4>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">{proj.type} ADU • {proj.status}</p>
                     </div>
-                    <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                      <div className="bg-secondary h-full transition-all duration-500" style={{ width: `${proj.progress}%` }}></div>
-                    </div>
+                    <span className="text-xs font-black text-secondary">{proj.progress}% Done</span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Quick Access Grid */}
-          <div className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-primary mb-4">Quick Tools</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <button 
-                onClick={() => navigate(ROUTES.USER_PROFILE)}
-                className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
-              >
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
-                  <User className="w-5 h-5" />
-                </div>
-                <p className="text-xs font-bold text-slate-700">Update Profile</p>
-              </button>
-
-              <button 
-                onClick={() => navigate(ROUTES.USER_RESOURCES)}
-                className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
-              >
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
-                  <Download className="w-5 h-5" />
-                </div>
-                <p className="text-xs font-bold text-slate-700">Get Checklists</p>
-              </button>
-
-              <button 
-                onClick={() => navigate(ROUTES.USER_SETTINGS)}
-                className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
-              >
-                <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
-                  <Settings className="w-5 h-5" />
-                </div>
-                <p className="text-xs font-bold text-slate-700">Notification Setup</p>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mini Alerts Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-primary mb-4 flex items-center gap-2">
-              <Bell className="w-4 h-4 text-secondary" />
-              Zoning Alerts
-            </h3>
-            <div className="space-y-4">
-              {alerts.map((a) => (
-                <div key={a.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer relative overflow-hidden group">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
-                  <h4 className="text-xs font-bold text-slate-800 mb-1">{a.title}</h4>
-                  <p className="text-[10px] text-slate-500 line-clamp-2">{a.desc}</p>
+                  <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                    <div className="bg-secondary h-full transition-all duration-500" style={{ width: `${proj.progress}%` }}></div>
+                  </div>
                 </div>
               ))}
             </div>
-            <button onClick={() => navigate(ROUTES.USER_NOTIFICATIONS)} className="w-full text-center mt-4 text-xs font-bold text-secondary hover:underline">View All Alerts</button>
+          )}
+        </div>
+
+        {/* Quick Access Grid */}
+        <div className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-primary mb-4">Quick Tools</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <button 
+              onClick={() => navigate(ROUTES.USER_PROFILE)}
+              className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
+            >
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
+                <User className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-bold text-slate-700">Update Profile</p>
+            </button>
+
+            <button 
+              onClick={() => navigate(ROUTES.USER_RESOURCES)}
+              className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
+            >
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
+                <Download className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-bold text-slate-700">Get Checklists</p>
+            </button>
+
+            <button 
+              onClick={() => navigate(ROUTES.USER_PROJECTS)}
+              className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
+            >
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
+                <Briefcase className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-bold text-slate-700">Manage Projects</p>
+            </button>
+
+            <button 
+              onClick={() => navigate(ROUTES.USER_CHECKS)}
+              className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
+            >
+              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center mx-auto group-hover:bg-emerald-50 text-slate-600 group-hover:text-emerald-600">
+                <Compass className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-bold text-slate-700">Zoning Checker</p>
+            </button>
           </div>
         </div>
       </div>

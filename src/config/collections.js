@@ -6,13 +6,12 @@ export const COLLECTIONS = {
   PROPERTY_CHECKS: 'propertyChecks',
   PROFESSIONALS: 'professionals',
   COSTS: 'costs',
-  LAW_UPDATES: 'lawUpdates',
   NOTIFICATIONS: 'notifications',
   SUBSCRIPTIONS: 'subscriptions',
-  ALERTS: 'alerts',
   LOGS: 'logs',
   CONTACT_US: 'contactus',
-  SETTINGS: 'settings'
+  SETTINGS: 'settings',
+  DEPOSITS: 'deposits'
 };
 
 export default COLLECTIONS;

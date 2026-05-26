@@ -1,24 +1,15 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
-import { Bell, Lock, CheckCircle2, ShieldCheck, Key, Loader2 } from 'lucide-react';
+import { Lock, CheckCircle2, ShieldCheck, Key, Loader2 } from 'lucide-react';
 
 const Settings = () => {
   const { currentUser, refreshUser } = useAuth();
-  const [legislativeAlerts, setLegislativeAlerts] = useState(true);
-  const [newsletter, setNewsletter] = useState(false);
-  const [leadInquiries, setLeadInquiries] = useState(true);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-
-  const handleSaveNotifications = (e) => {
-    e.preventDefault();
-    setSuccess('Notification preferences updated!');
-    setTimeout(() => setSuccess(''), 3000);
-  };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -59,7 +50,7 @@ const Settings = () => {
     <div className="space-y-8 max-w-3xl">
       <div>
         <h3 className="text-xl font-bold text-primary">Settings</h3>
-        <p className="text-xs text-slate-400 mt-1">Configure account access, security parameters, and email subscriptions.</p>
+        <p className="text-xs text-slate-400 mt-1">Configure account access and security parameters.</p>
       </div>
 
       {success && (
@@ -74,59 +65,6 @@ const Settings = () => {
         </div>
       )}
 
-      {/* Notifications form */}
-      <div className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm space-y-6">
-        <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
-          <Bell className="w-4.5 h-4.5 text-secondary" />
-          Notification Preferences
-        </h4>
-
-        <form onSubmit={handleSaveNotifications} className="space-y-4">
-          <div className="flex justify-between items-center p-4 border border-slate-100 rounded-xl bg-slate-50/50">
-            <div>
-              <p className="text-xs font-bold text-slate-800">Legislative Zoning Updates</p>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Receive immediate notifications on ADU laws revision.</p>
-            </div>
-            <input 
-              type="checkbox" 
-              className="w-4.5 h-4.5 accent-secondary"
-              checked={legislativeAlerts} 
-              onChange={e => setLegislativeAlerts(e.target.checked)} 
-            />
-          </div>
-
-          <div className="flex justify-between items-center p-4 border border-slate-100 rounded-xl bg-slate-50/50">
-            <div>
-              <p className="text-xs font-bold text-slate-800">Monthly Builder digest</p>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Newsletter on recent pricing estimates and market data.</p>
-            </div>
-            <input 
-              type="checkbox" 
-              className="w-4.5 h-4.5 accent-secondary"
-              checked={newsletter} 
-              onChange={e => setNewsletter(e.target.checked)} 
-            />
-          </div>
-
-          {currentUser?.role === 'professional' && (
-            <div className="flex justify-between items-center p-4 border border-slate-100 rounded-xl bg-slate-50/50">
-              <div>
-                <p className="text-xs font-bold text-slate-800">Customer leads alerts</p>
-                <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">Email triggers when new properties request professional services.</p>
-              </div>
-              <input 
-                type="checkbox" 
-                className="w-4.5 h-4.5 accent-secondary"
-                checked={leadInquiries} 
-                onChange={e => setLeadInquiries(e.target.checked)} 
-              />
-            </div>
-          )}
-
-          <button type="submit" className="btn-primary !py-2.5 text-xs">Save Preferences</button>
-        </form>
-      </div>
-
       {/* Security credentials form */}
       <div className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm space-y-6">
         <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
@@ -137,9 +75,9 @@ const Settings = () => {
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Current Password</label>
-            <input 
-              type="password" 
-              className="input-field" 
+            <input
+              type="password"
+              className="input-field"
               placeholder="••••••••"
               value={oldPassword}
               onChange={e => setOldPassword(e.target.value)}
@@ -149,9 +87,9 @@ const Settings = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">New Password</label>
-            <input 
-              type="password" 
-              className="input-field" 
+            <input
+              type="password"
+              className="input-field"
               placeholder="••••••••"
               value={newPassword}
               onChange={e => setNewPassword(e.target.value)}
@@ -160,8 +98,8 @@ const Settings = () => {
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-primary !py-2.5 text-xs flex items-center justify-center gap-2"
             disabled={loading}
           >

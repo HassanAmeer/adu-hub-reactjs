@@ -9,7 +9,6 @@ import PropertyCheckerPage from './pages/PropertyCheckerPage';
 import HowToBuildPage from './pages/HowToBuildPage';
 import DirectoryPage from './pages/DirectoryPage';
 import CostLibraryPage from './pages/CostLibraryPage';
-import LawTrackerPage from './pages/LawTrackerPage';
 import AlertsPage from './pages/AlertsPage';
 import SuperApp from './super/superApp';
 import SuperLoginPage from './pages/SuperLoginPage';
@@ -132,7 +131,6 @@ function App() {
           syncCollection(COLLECTIONS.STATES, 'adu-db-states'),
           syncCollection(COLLECTIONS.COSTS, 'adu-db-costs'),
           syncCollection(COLLECTIONS.PROFESSIONALS, 'adu-db-directory'),
-          syncCollection(COLLECTIONS.ALERTS, 'adu-db-alerts'),
           syncCollection(COLLECTIONS.USERS, 'adu-db-users'),
           syncCollection(COLLECTIONS.LOGS, 'adu-db-logs')
         ]);
@@ -180,7 +178,6 @@ function App() {
         <Route path={ROUTES.HOW_TO_BUILD} element={<MainLayout><HowToBuildPage /></MainLayout>} />
         <Route path={ROUTES.DIRECTORY} element={<MainLayout><DirectoryPage /></MainLayout>} />
         <Route path={ROUTES.COSTS} element={<MainLayout><CostLibraryPage /></MainLayout>} />
-        <Route path={ROUTES.LAW_TRACKER} element={<MainLayout><LawTrackerPage /></MainLayout>} />
         <Route path={ROUTES.ALERTS} element={<MainLayout><AlertsPage /></MainLayout>} />
         <Route path={ROUTES.BLOG} element={<MainLayout><BlogPage /></MainLayout>} />
         <Route path={ROUTES.ABOUT} element={<MainLayout><AboutPage /></MainLayout>} />

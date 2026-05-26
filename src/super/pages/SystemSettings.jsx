@@ -36,7 +36,7 @@ const SystemSettings = () => {
 
   // General Settings State
   const [siteName, setSiteName] = useState('ADU Navi');
-  const [contactEmail, setContactEmail] = useState('support@adunavi.com');
+  const [contactEmail, setContactEmail] = useState('contact@adunavi.com');
   const [contactPhone, setContactPhone] = useState('+1 (800) 555-0142');
   const [logoUrl, setLogoUrl] = useState('');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
@@ -92,7 +92,7 @@ const SystemSettings = () => {
 
       // General
       setSiteName(settings.siteName || 'ADU Navi');
-      setContactEmail(settings.contactEmail || 'support@adunavi.com');
+      setContactEmail(settings.contactEmail || 'contact@adunavi.com');
       setContactPhone(settings.contactPhone || '+1 (800) 555-0142');
       setLogoUrl(settings.logoUrl || '');
       setMaintenanceMode(settings.maintenanceMode !== undefined ? settings.maintenanceMode : false);

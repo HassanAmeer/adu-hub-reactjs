@@ -13,9 +13,9 @@ import ADULaws from './pages/ADULaws';
 import PropertyChecker from './pages/PropertyChecker';
 import CostLibrary from './pages/CostLibrary';
 import Professionals from './pages/Professionals';
-import LawTracker from './pages/LawTracker';
 import UsersManager from './pages/UsersManager';
 import Subscriptions from './pages/Subscriptions';
+import Deposits from './pages/Deposits';
 import BlogManager from './pages/BlogManager';
 import SystemSettings from './pages/SystemSettings';
 import ActivityLogs from './pages/ActivityLogs';
@@ -60,8 +60,8 @@ const SuperApp = () => {
             </p>
           </div>
           <div className="pt-2">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="btn-secondary !py-2.5 !px-5 text-xs font-bold flex items-center justify-center gap-2 text-white border-slate-700 bg-slate-800 hover:bg-slate-700 hover:border-slate-600 w-full"
             >
               <ArrowLeft className="w-4 h-4" /> Return to Home Page
@@ -94,7 +94,7 @@ const SuperApp = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               to="/"
               className="text-xs text-slate-500 hover:text-slate-850 font-bold border border-slate-200 bg-white px-3 py-1.5 rounded-xl hover:bg-slate-50 transition-all flex items-center gap-1.5"
             >
@@ -114,9 +114,9 @@ const SuperApp = () => {
               <Route path="checker" element={<PropertyChecker />} />
               <Route path="costs" element={<CostLibrary />} />
               <Route path="directory" element={<Professionals />} />
-              <Route path="alerts" element={<LawTracker />} />
               <Route path="users" element={<UsersManager />} />
               <Route path="subscriptions" element={<Subscriptions />} />
+              <Route path="deposits" element={<Deposits />} />
               <Route path="blogs" element={<BlogManager />} />
               <Route path="settings" element={<SystemSettings />} />
               <Route path="logs" element={<ActivityLogs />} />
