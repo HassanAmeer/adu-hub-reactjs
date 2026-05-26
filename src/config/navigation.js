@@ -23,14 +23,14 @@ import {
 
 export const ADMIN_NAV_ITEMS = [
   { to: '/super/dashboard', icon: LayoutDashboard, label: 'Dashboard', end: true },
+  { to: '/super/users', icon: Users, label: 'Users Management' },
   { to: '/super/states', icon: Globe, label: 'States & Cities' },
   { to: '/super/laws', icon: FileText, label: 'ADU Laws DB' },
   { to: '/super/checker', icon: Compass, label: 'Property Checker' },
   { to: '/super/costs', icon: CreditCard, label: 'Cost Library' },
   { to: '/super/directory', icon: Building, label: 'Professionals' },
-  { to: '/super/users', icon: Users, label: 'Users Management' },
   { 
-    label: 'Payments', 
+    label: 'Subscriptions', 
     icon: PieChart,
     children: [
       { to: '/super/subscriptions', label: 'Plans' },
@@ -43,6 +43,7 @@ export const ADMIN_NAV_ITEMS = [
   { to: '/super/contactus', icon: Mail, label: 'Contact Messages' },
   { to: '/seed', icon: Database, label: 'Database Seeder' },
 ];
+
 
 export const getUserNavItems = (isProfessional) => [
   { to: '/userpanel/dashboard', icon: LayoutDashboard, label: 'Dashboard', end: true },

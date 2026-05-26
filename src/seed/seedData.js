@@ -64,6 +64,72 @@ export const SEED_USERS = [
     joinedDate: '2026-04-01',
     subscriptionActivatedDate: '2026-05-25',
     subscriptionExpiresDate: '2026-06-24'
+  },
+  {
+    id: 'user3@gmail.com',
+    name: 'Emily Nguyen',
+    email: 'user3@gmail.com',
+    password: '12345678',
+    role: ROLES.HOMEOWNER,
+    status: 'active',
+    subscription: 'free',
+    savedProperties: [],
+    savedPros: [],
+    joinedDate: '2026-04-12'
+  },
+  {
+    id: 'user4@gmail.com',
+    name: 'Carlos Mendez',
+    email: 'user4@gmail.com',
+    password: '12345678',
+    role: ROLES.INVESTOR,
+    status: 'active',
+    subscription: 'pro',
+    savedProperties: [],
+    savedPros: ['pro-urban-dwelling'],
+    joinedDate: '2026-04-18',
+    subscriptionActivatedDate: '2026-05-01',
+    subscriptionExpiresDate: '2026-05-31'
+  },
+  {
+    id: 'user5@gmail.com',
+    name: 'Priya Patel',
+    email: 'user5@gmail.com',
+    password: '12345678',
+    role: ROLES.HOMEOWNER,
+    status: 'active',
+    subscription: 'free',
+    savedProperties: [],
+    savedPros: [],
+    joinedDate: '2026-05-05'
+  },
+  {
+    id: 'user6@gmail.com',
+    name: 'Mark Thompson',
+    email: 'user6@gmail.com',
+    password: '12345678',
+    role: ROLES.INVESTOR,
+    status: 'suspended',
+    subscription: 'free',
+    savedProperties: [],
+    savedPros: [],
+    joinedDate: '2026-05-12'
+  },
+  {
+    id: 'user7@gmail.com',
+    name: 'Lisa Hernandez',
+    email: 'user7@gmail.com',
+    password: '12345678',
+    role: ROLES.PROFESSIONAL,
+    status: 'active',
+    subscription: 'pro',
+    savedProperties: [],
+    savedPros: [],
+    proListingId: 'pro-precision-build',
+    leads: [],
+    joinedDate: '2026-05-15',
+    subscriptionActivatedDate: '2026-05-22',
+    subscriptionExpiresDate: '2026-06-21'
   }
 ];
 
@@ -304,15 +370,27 @@ export const SEED_SUBSCRIPTIONS = [
     id: 'free',
     name: 'Free Basic Tier',
     price: '$0',
-    desc: 'Allows basic setback checking and laws queries for homeowners.',
-    features: ['3 Property Checker run limit', 'Access to State level laws', 'Read directory reviews']
+    desc: 'Get started with core ADU tools at no cost. Perfect for homeowners exploring options.',
+    features: [
+      '3 Property Checker runs per month',
+      'Access to state-level ADU laws',
+      'Browse professional directory',
+      'Basic cost estimator access'
+    ]
   },
   {
     id: 'pro',
     name: 'Standard Pro Tier',
     price: '$49',
-    desc: 'Designed for professional contractors, consultants, and builders.',
-    features: ['Direct lead acquisition queries', 'Featured directory placement badge', 'Comprehensive municipal details access']
+    desc: 'Full-access plan for contractors, consultants, and serious investors.',
+    features: [
+      'Unlimited Property Checker runs',
+      'Full municipal & city-level law access',
+      'Direct lead acquisition queries',
+      'Featured directory placement badge',
+      'Priority admin support',
+      'Download cost reports as PDF'
+    ]
   }
 ];
 
@@ -391,9 +469,9 @@ export const SEED_SETTINGS = [
 export const SEED_DEPOSITS = [
   {
     id: 'dep-101',
-    userId: 'user1@gmail.com',
-    userName: 'Jane Smith',
-    userEmail: 'user1@gmail.com',
+    userId: 'user2@gmail.com',
+    userName: 'Robert Davis',
+    userEmail: 'user2@gmail.com',
     planId: 'pro',
     planName: 'Standard Pro Tier',
     price: '$49',
@@ -403,15 +481,104 @@ export const SEED_DEPOSITS = [
   },
   {
     id: 'dep-102',
-    userId: 'user2@gmail.com',
-    userName: 'Robert Davis',
-    userEmail: 'user2@gmail.com',
-    planId: 'expert',
-    planName: 'Expert Builder Tier',
-    price: '$99',
-    status: 'pending',
+    userId: 'pro1@gmail.com',
+    userName: 'Sarah Connor',
+    userEmail: 'pro1@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'approved',
     screenshot: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=400&auto=format&fit=crop',
     timestamp: '2026-05-25T09:15:00Z'
+  },
+  {
+    id: 'dep-103',
+    userId: 'user4@gmail.com',
+    userName: 'Carlos Mendez',
+    userEmail: 'user4@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'approved',
+    screenshot: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-01T11:00:00Z'
+  },
+  {
+    id: 'dep-104',
+    userId: 'user7@gmail.com',
+    userName: 'Lisa Hernandez',
+    userEmail: 'user7@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'approved',
+    screenshot: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-22T08:45:00Z'
+  },
+  {
+    id: 'dep-105',
+    userId: 'user1@gmail.com',
+    userName: 'Jane Smith',
+    userEmail: 'user1@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'pending',
+    screenshot: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-26T10:20:00Z'
+  },
+  {
+    id: 'dep-106',
+    userId: 'user5@gmail.com',
+    userName: 'Priya Patel',
+    userEmail: 'user5@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'pending',
+    screenshot: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-26T13:55:00Z'
+  },
+  {
+    id: 'dep-107',
+    userId: 'user3@gmail.com',
+    userName: 'Emily Nguyen',
+    userEmail: 'user3@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'rejected',
+    screenshot: 'https://images.unsplash.com/photo-1565336163952-84958cbaddd0?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-18T16:30:00Z'
+  },
+  {
+    id: 'dep-108',
+    userId: 'user6@gmail.com',
+    userName: 'Mark Thompson',
+    userEmail: 'user6@gmail.com',
+    planId: 'pro',
+    planName: 'Standard Pro Tier',
+    price: '$49',
+    status: 'rejected',
+    screenshot: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?q=80&w=400&auto=format&fit=crop',
+    timestamp: '2026-05-14T09:00:00Z'
   }
 ];
 
+
+export const SEED_PLAN_LIMITS = {
+  free: {
+    propertyCheckerLimit: 3,
+    directoryPlacementBadge: false,
+    technicalSupport: false,
+    canUploadDirectory: false,
+    canUploadADUProjects: false
+  },
+  pro: {
+    propertyCheckerLimit: -1,
+    directoryPlacementBadge: true,
+    technicalSupport: true,
+    canUploadDirectory: true,
+    canUploadADUProjects: true
+  }
+};

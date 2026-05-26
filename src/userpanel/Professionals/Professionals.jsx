@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
-import { Building, Mail, Users, Check, X, ShieldCheck, Edit3 } from 'lucide-react';
+import { usePlanLimits } from '../hooks/usePlanLimits';
+import { Building, Mail, Users, Check, X, ShieldCheck, Edit3, Lock, Zap, BadgeCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Professionals = () => {
   const { currentUser, refreshUser } = useAuth();
+  const limits = usePlanLimits(currentUser);
+  const navigate = useNavigate();
+
   const [name, setName] = useState(currentUser?.name || '');
   const [category, setCategory] = useState(currentUser?.category || 'General Contractor');
   const [location, setLocation] = useState(currentUser?.location || 'Los Angeles, CA');
@@ -41,12 +46,36 @@ const Professionals = () => {
     setLeads(leads.map(l => l.id === id ? { ...l, status: newStatus } : l));
   };
 
+  const canUpload = limits.canUploadDirectory;
+  const hasBadge = limits.directoryPlacementBadge;
+
   return (
     <div className="space-y-8">
       <div>
         <h3 className="text-xl font-bold text-primary">Pro Partner Portal</h3>
         <p className="text-xs text-slate-400 mt-1">Manage your service listing, accept customer leads, and edit rates.</p>
       </div>
+
+      {/* Upgrade wall for free users */}
+      {!canUpload && (
+        <div className="bg-white border border-amber-200 rounded-2xl p-8 text-center space-y-3 shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center mx-auto">
+            <Lock className="w-7 h-7 text-amber-400" />
+          </div>
+          <h4 className="font-bold text-slate-800 text-base">Directory Listing — Pro Feature</h4>
+          <p className="text-sm text-slate-500 max-w-sm mx-auto">
+            Your <span className="font-bold text-slate-700">Free Plan</span> doesn't include adding or managing a professional directory listing.
+            Upgrade to <span className="text-emerald-600 font-bold">Pro</span> to get listed and receive homeowner leads.
+          </p>
+          <button
+            onClick={() => navigate('/userpanel/subscriptions')}
+            className="mt-2 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
+          >
+            <Zap className="w-4 h-4" />
+            Upgrade to Pro
+          </button>
+        </div>
+      )}
 
       {savedSuccess && (
         <div className="bg-emerald-50 text-emerald-700 p-3 rounded-xl border border-emerald-100 text-sm font-semibold flex items-center gap-2">
@@ -125,6 +154,12 @@ const Professionals = () => {
                 </div>
                 <h5 className="font-bold text-slate-800 text-base">{name}</h5>
                 <p className="text-xs text-secondary font-bold">{category}</p>
+                {hasBadge && (
+                  <span className="inline-flex items-center gap-1 mt-2 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                    <BadgeCheck className="w-3 h-3" />
+                    Featured
+                  </span>
+                )}
               </div>
 
               <div className="space-y-3 text-xs font-semibold text-slate-600">

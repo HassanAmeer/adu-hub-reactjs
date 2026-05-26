@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
-import { Plus, Trash2, MapPin, CheckCircle2, ShieldCheck, Compass, Info } from 'lucide-react';
+import { usePlanLimits } from '../hooks/usePlanLimits';
+import { Plus, Trash2, CheckCircle2, Compass, Lock, Zap } from 'lucide-react';
 import Skeleton from '../../components/common/Skeleton';
+import { useNavigate } from 'react-router-dom';
 
 const Checks = () => {
   const { currentUser, refreshUser } = useAuth();
+  const limits = usePlanLimits(currentUser);
+  const navigate = useNavigate();
+
   const [properties, setProperties] = useState([]);
   const [newAddress, setNewAddress] = useState('');
   const [showAdd, setShowAdd] = useState(false);
@@ -19,15 +24,21 @@ const Checks = () => {
     }
   }, [currentUser]);
 
+  // How many checks has user already saved
+  const usedChecks = properties.length;
+  const maxChecks = limits.propertyCheckerLimit; // -1 = unlimited
+  const isAtLimit = maxChecks !== -1 && usedChecks >= maxChecks;
+  const isPro = currentUser?.subscription === 'pro';
+
   const handleSimulate = (e) => {
     e.preventDefault();
     if (!newAddress) return;
+    if (isAtLimit) return;
 
     setSimulating(true);
     setFeasibilityReport(null);
 
     setTimeout(() => {
-      // Create a mock rich zoning check report based on address
       const reports = [
         {
           address: newAddress,
@@ -53,7 +64,6 @@ const Checks = () => {
         }
       ];
 
-      // Pick randomly
       const report = reports[Math.floor(Math.random() * reports.length)];
       setFeasibilityReport(report);
       setSimulating(false);
@@ -74,7 +84,7 @@ const Checks = () => {
     const updatedProperties = [...properties, item];
     dbService.updateUser(currentUser.id, { savedProperties: updatedProperties });
     setProperties(updatedProperties);
-    
+
     setFeasibilityReport(null);
     setNewAddress('');
     setShowAdd(false);
@@ -95,21 +105,76 @@ const Checks = () => {
           <h3 className="text-xl font-bold text-primary">Property Checker History</h3>
           <p className="text-xs text-slate-400 mt-1">Review saved sites or run a new zoning check.</p>
         </div>
-        <button 
+
+        {/* Run Check button — disabled if at limit */}
+        <button
           onClick={() => {
+            if (isAtLimit) return;
             setShowAdd(!showAdd);
             setFeasibilityReport(null);
-          }} 
-          className="btn-primary flex items-center gap-2"
+          }}
+          disabled={isAtLimit}
+          title={isAtLimit ? 'Upgrade to Pro for unlimited checks' : ''}
+          className={`flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-xl transition-all ${
+            isAtLimit
+              ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+              : 'btn-primary'
+          }`}
         >
           {showAdd ? 'Close Checker' : <><Plus className="w-4 h-4" /> Run Zoning Check</>}
         </button>
       </div>
 
-      {showAdd && (
+      {/* ── Usage indicator for free users ── */}
+      {maxChecks !== -1 && (
+        <div className={`flex items-center justify-between px-5 py-3 rounded-xl border text-sm ${
+          isAtLimit
+            ? 'bg-rose-50 border-rose-200 text-rose-700'
+            : 'bg-amber-50 border-amber-200 text-amber-700'
+        }`}>
+          <div className="flex items-center gap-2.5">
+            <Compass className="w-4 h-4 shrink-0" />
+            <span className="font-semibold">
+              Property Checks: <strong>{usedChecks} / {maxChecks}</strong> used
+            </span>
+          </div>
+          {isAtLimit && (
+            <button
+              onClick={() => navigate('/userpanel/subscriptions')}
+              className="flex items-center gap-1.5 text-xs font-bold bg-rose-600 text-white px-3 py-1.5 rounded-lg hover:bg-rose-700 transition-colors cursor-pointer"
+            >
+              <Zap className="w-3.5 h-3.5" />
+              Upgrade to Pro
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Limit reached wall */}
+      {isAtLimit && (
+        <div className="bg-white border border-rose-200 rounded-2xl p-8 text-center space-y-3 shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center mx-auto">
+            <Lock className="w-7 h-7 text-rose-400" />
+          </div>
+          <h4 className="font-bold text-slate-800 text-base">Property Check Limit Reached</h4>
+          <p className="text-sm text-slate-500 max-w-sm mx-auto">
+            Your <span className="font-bold text-slate-700">Free Plan</span> allows up to <strong>{maxChecks}</strong> property checks.
+            Upgrade to <span className="text-emerald-600 font-bold">Pro</span> for unlimited access.
+          </p>
+          <button
+            onClick={() => navigate('/userpanel/subscriptions')}
+            className="mt-2 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
+          >
+            <Zap className="w-4 h-4" />
+            View Upgrade Options
+          </button>
+        </div>
+      )}
+
+      {showAdd && !isAtLimit && (
         <div className="bg-white p-8 rounded-[24px] border border-slate-200 shadow-sm space-y-6 max-w-2xl">
           <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Run Zoning Checker Simulator</h4>
-          
+
           <form onSubmit={handleSimulate} className="flex gap-4">
             <input
               type="text"
@@ -120,8 +185,8 @@ const Checks = () => {
               required
               disabled={simulating}
             />
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn-primary whitespace-nowrap text-sm"
               disabled={simulating}
             >
@@ -176,7 +241,7 @@ const Checks = () => {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={handleSaveReport}
                 className="w-full btn-primary !py-3 text-xs flex items-center justify-center gap-2"
               >
@@ -187,7 +252,7 @@ const Checks = () => {
         </div>
       )}
 
-      {properties.length === 0 ? (
+      {properties.length === 0 && !isAtLimit ? (
         <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center">
           <p className="text-slate-500 font-medium">You haven't saved any property checks yet.</p>
           <p className="text-xs text-slate-400 mt-1">Use the Zoning Check button to run a local compliance check.</p>

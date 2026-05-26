@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
-import { Plus, Briefcase, Trash2, Edit2, CheckCircle2, ChevronRight } from 'lucide-react';
+import { usePlanLimits } from '../hooks/usePlanLimits';
+import { Plus, Briefcase, Trash2, CheckCircle2, Lock, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Projects = () => {
   const { currentUser, refreshUser } = useAuth();
+  const limits = usePlanLimits(currentUser);
+  const navigate = useNavigate();
+
   const [projects, setProjects] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [name, setName] = useState('');
@@ -13,12 +18,13 @@ const Projects = () => {
   const [progress, setProgress] = useState(10);
   const [successMsg, setSuccessMsg] = useState('');
 
+  const canUpload = limits.canUploadADUProjects;
+
   useEffect(() => {
     const freshUser = dbService.getUsers().find(u => u.id === currentUser.id);
     if (freshUser && freshUser.projects) {
       setProjects(freshUser.projects);
     } else {
-      // Default placeholder data
       const defaultProjects = [
         { id: 'proj-1', name: 'Backyard Rental ADU', type: 'Detached', status: 'Design Phase', progress: 25 },
         { id: 'proj-2', name: 'Garage Conversion Studio', type: 'Attached', status: 'Permit Review', progress: 60 }
@@ -29,7 +35,7 @@ const Projects = () => {
 
   const handleAddProject = (e) => {
     e.preventDefault();
-    if (!name) return;
+    if (!name || !canUpload) return;
 
     const newProject = {
       id: 'proj-' + Date.now(),
@@ -42,7 +48,7 @@ const Projects = () => {
     const updatedProjects = [...projects, newProject];
     dbService.updateUser(currentUser.id, { projects: updatedProjects });
     setProjects(updatedProjects);
-    
+
     setName('');
     setType('Detached');
     setStatus('Design Phase');
@@ -67,13 +73,46 @@ const Projects = () => {
           <h3 className="text-xl font-bold text-primary">My ADU Projects</h3>
           <p className="text-xs text-slate-400 mt-1">Add and track milestones for your ADU builds.</p>
         </div>
-        <button 
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="btn-primary flex items-center gap-2"
-        >
-          {showAddForm ? 'Cancel' : <><Plus className="w-4 h-4" /> Add Project</>}
-        </button>
+
+        {canUpload ? (
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="btn-primary flex items-center gap-2"
+          >
+            {showAddForm ? 'Cancel' : <><Plus className="w-4 h-4" /> Add Project</>}
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate('/userpanel/subscriptions')}
+            className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 cursor-pointer hover:bg-amber-50 hover:border-amber-200 hover:text-amber-600 transition-all"
+            title="Upgrade to Pro to upload projects"
+          >
+            <Lock className="w-4 h-4" />
+            Pro Feature
+          </button>
+        )}
       </div>
+
+      {/* Upgrade wall for free users */}
+      {!canUpload && (
+        <div className="bg-white border border-amber-200 rounded-2xl p-8 text-center space-y-3 shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center mx-auto">
+            <Lock className="w-7 h-7 text-amber-400" />
+          </div>
+          <h4 className="font-bold text-slate-800 text-base">ADU Projects Upload — Pro Feature</h4>
+          <p className="text-sm text-slate-500 max-w-sm mx-auto">
+            Your <span className="font-bold text-slate-700">Free Plan</span> doesn't include project portfolio management.
+            Upgrade to <span className="text-emerald-600 font-bold">Pro</span> to create and track your ADU builds.
+          </p>
+          <button
+            onClick={() => navigate('/userpanel/subscriptions')}
+            className="mt-2 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-colors cursor-pointer"
+          >
+            <Zap className="w-4 h-4" />
+            Upgrade to Pro
+          </button>
+        </div>
+      )}
 
       {successMsg && (
         <div className="bg-emerald-50 text-emerald-700 p-3 rounded-xl border border-emerald-100 text-sm font-semibold flex items-center gap-2">
@@ -81,15 +120,15 @@ const Projects = () => {
         </div>
       )}
 
-      {showAddForm && (
+      {showAddForm && canUpload && (
         <form onSubmit={handleAddProject} className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm max-w-xl space-y-4">
           <h4 className="font-bold text-primary text-sm uppercase tracking-wider mb-2">New ADU Project Details</h4>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Project Name</label>
-            <input 
-              type="text" 
-              className="input-field" 
-              placeholder="e.g. Backyard Granny Flat" 
+            <input
+              type="text"
+              className="input-field"
+              placeholder="e.g. Backyard Granny Flat"
               value={name}
               onChange={e => setName(e.target.value)}
               required
@@ -118,10 +157,10 @@ const Projects = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Overall Progress ({progress}%)</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="100" 
+            <input
+              type="range"
+              min="0"
+              max="100"
               className="w-full accent-secondary"
               value={progress}
               onChange={e => setProgress(e.target.value)}
@@ -131,7 +170,7 @@ const Projects = () => {
         </form>
       )}
 
-      {projects.length === 0 ? (
+      {projects.length === 0 && canUpload ? (
         <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center">
           <p className="text-slate-500 font-medium">You haven't added any ADU projects yet.</p>
           <p className="text-xs text-slate-400 mt-1">Track architectural plans, compliance filings, and build steps here.</p>
@@ -139,7 +178,7 @@ const Projects = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects.map((proj) => (
-            <div key={proj.id} className="bg-white rounded-[24px] p-6 border border-slate-200 shadow-sm space-y-4">
+            <div key={proj.id} className={`bg-white rounded-[24px] p-6 border border-slate-200 shadow-sm space-y-4 ${!canUpload ? 'opacity-50 pointer-events-none select-none blur-[1px]' : ''}`}>
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-primary">
@@ -150,12 +189,14 @@ const Projects = () => {
                     <p className="text-[10px] text-slate-400 font-bold uppercase">{proj.type} ADU</p>
                   </div>
                 </div>
-                <button 
-                  onClick={() => handleDeleteProject(proj.id)}
-                  className="p-2 border border-slate-100 hover:border-rose-100 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50/30"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {canUpload && (
+                  <button
+                    onClick={() => handleDeleteProject(proj.id)}
+                    className="p-2 border border-slate-100 hover:border-rose-100 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50/30"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
               <div className="space-y-2">

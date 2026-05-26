@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LogOut, 
-  X,
-  ChevronDown,
-  ChevronUp
+  X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ADMIN_NAV_ITEMS, ROUTES } from '../../config';
@@ -12,34 +10,7 @@ import { ADMIN_NAV_ITEMS, ROUTES } from '../../config';
 const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
   const { logout, currentUser } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const currentPath = location.pathname;
   
-  const [openSubmenus, setOpenSubmenus] = useState({ Payments: true });
-
-  useEffect(() => {
-    // Automatically open submenus containing the active path on load/route change
-    const path = location.pathname;
-    ADMIN_NAV_ITEMS.forEach(item => {
-      if (item.children) {
-        const hasActiveChild = item.children.some(child => path === child.to);
-        if (hasActiveChild) {
-          setOpenSubmenus(prev => ({
-            ...prev,
-            [item.label]: true
-          }));
-        }
-      }
-    });
-  }, [location.pathname]);
-
-  const toggleSubmenu = (label) => {
-    setOpenSubmenus(prev => ({
-      ...prev,
-      [label]: !prev[label]
-    }));
-  };
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -75,50 +46,35 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
       <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
         {navItems.map((item) => {
           if (item.children) {
-            const isOpen = !!openSubmenus[item.label];
-            const hasActiveChild = item.children.some(child => currentPath === child.to);
             return (
-              <div key={item.label} className="space-y-1">
-                <button
-                  onClick={() => toggleSubmenu(item.label)}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-205 cursor-pointer text-left ${
-                    hasActiveChild 
-                      ? 'text-white bg-slate-800/40 font-bold border-l-2 border-secondary pl-3.5' 
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <item.icon className={`w-4.5 h-4.5 shrink-0 ${hasActiveChild ? 'text-secondary' : 'text-slate-400'}`} />
-                    <span>{item.label}</span>
-                  </div>
-                  {isOpen ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
-                </button>
+              <div key={item.label} className="pt-2 pb-1">
+                <div className="px-4 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  {item.label}
+                </div>
                 
-                {isOpen && (
-                  <div className="pl-4 space-y-1 border-l border-slate-800 ml-6 my-1">
-                    {item.children.map((child) => (
-                      <NavLink
-                        key={child.to}
-                        to={child.to}
-                        onClick={() => setMobileOpen(false)}
-                        className={({ isActive }) => 
-                          `flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                            isActive 
-                              ? 'text-white bg-slate-800 shadow-sm font-bold border-r border-slate-700' 
-                              : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/20'
-                          }`
-                        }
-                      >
-                        {({ isActive }) => (
-                          <>
-                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-200 ${isActive ? 'bg-secondary' : 'bg-slate-600'}`} />
-                            <span>{child.label}</span>
-                          </>
-                        )}
-                      </NavLink>
-                    ))}
-                  </div>
-                )}
+                <div className="pl-4 space-y-1 border-l border-slate-800 ml-6 my-1">
+                  {item.children.map((child) => (
+                    <NavLink
+                      key={child.to}
+                      to={child.to}
+                      onClick={() => setMobileOpen(false)}
+                      className={({ isActive }) => 
+                        `flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                          isActive 
+                            ? 'text-white bg-slate-800 shadow-sm font-bold border-r border-slate-700' 
+                            : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/20'
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-200 ${isActive ? 'bg-secondary' : 'bg-slate-600'}`} />
+                          <span>{child.label}</span>
+                        </>
+                      )}
+                    </NavLink>
+                  ))}
+                </div>
               </div>
             );
           }

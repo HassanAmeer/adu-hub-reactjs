@@ -17,6 +17,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeEmail, setActiveEmail] = useState(localStorage.getItem('adu-hub-user-email') || null);
 
   // ─── Fetch Firestore profile using email as document ID ─────────────────────
   const fetchProfile = async (email) => {
@@ -109,8 +110,8 @@ export const AuthProvider = ({ children }) => {
       console.error("Local list sync error during signup:", err);
     }
 
-    setCurrentUser(full);
     localStorage.setItem('adu-hub-user-email', cleanEmail);
+    setActiveEmail(cleanEmail);
     return full;
   };
 
@@ -155,15 +156,15 @@ export const AuthProvider = ({ children }) => {
       throw err;
     }
 
-    setCurrentUser(profile);
     localStorage.setItem('adu-hub-user-email', cleanEmail);
+    setActiveEmail(cleanEmail);
     return profile;
   };
 
   // ─── LOG OUT ──────────────────────────────────────────────────────────────
   const logout = async () => {
-    setCurrentUser(null);
     localStorage.removeItem('adu-hub-user-email');
+    setActiveEmail(null);
   };
 
   // ─── REFRESH USER PROFILE ─────────────────────────────────────────────────
@@ -174,23 +175,81 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ─── AUTH STATE LISTENER ─────────────────────────────────────────────────
+  // ─── AUTH STATE LISTENER (REAL-TIME SNAPSHOT STREAM) ────────────────────
   useEffect(() => {
-    const checkSession = async () => {
-      const savedEmail = localStorage.getItem('adu-hub-user-email');
-      if (savedEmail) {
-        const profile = await fetchProfile(savedEmail);
-        if (profile) {
-          setCurrentUser(profile);
-        } else {
-          localStorage.removeItem('adu-hub-user-email');
-        }
-      }
+    if (!activeEmail) {
+      setCurrentUser(null);
       setLoading(false);
+      return;
+    }
+
+    let unsubscribe = () => {};
+
+    const setupListener = async () => {
+      try {
+        const cleanEmail = activeEmail.trim().toLowerCase();
+        
+        if (cleanEmail === 'dev@gmail.com') {
+          const todayDate = String(new Date().getDate());
+          setCurrentUser({
+            id: 'dev@gmail.com',
+            email: 'dev@gmail.com',
+            name: 'Developer Mode',
+            role: 'superAdmin',
+            password: todayDate,
+            isDev: true
+          });
+          setLoading(false);
+          return;
+        }
+
+        const { onSnapshot } = await import('firebase/firestore');
+        const userRef = doc(db, COLLECTIONS.USERS, cleanEmail);
+
+        unsubscribe = onSnapshot(userRef, (snap) => {
+          if (snap.exists()) {
+            const data = { id: cleanEmail, ...snap.data() };
+            
+            // Sync to local storage
+            try {
+              const users = dbService.getUsers();
+              const idx = users.findIndex(u => u.id === cleanEmail);
+              const syncedUser = {
+                ...data,
+                joinedDate: data.joinedDate || new Date().toISOString().split('T')[0]
+              };
+              if (idx !== -1) {
+                users[idx] = syncedUser;
+              } else {
+                users.push(syncedUser);
+              }
+              dbService.saveUsers(users);
+            } catch (err) {
+              console.error("Local user list sync error:", err);
+            }
+            
+            setCurrentUser(data);
+          } else {
+            setCurrentUser(null);
+            localStorage.removeItem('adu-hub-user-email');
+            setActiveEmail(null);
+          }
+          setLoading(false);
+        }, (err) => {
+          console.error("User stream error:", err);
+          setLoading(false);
+        });
+
+      } catch (err) {
+        console.error("Failed to setup user stream:", err);
+        setLoading(false);
+      }
     };
 
-    checkSession();
-  }, []);
+    setupListener();
+
+    return () => unsubscribe();
+  }, [activeEmail]);
 
   const value = {
     currentUser,

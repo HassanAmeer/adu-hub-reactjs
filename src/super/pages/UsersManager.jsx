@@ -15,6 +15,8 @@ const UsersManager = () => {
   const [role, setRole] = useState('homeowner');
   const [status, setStatus] = useState('active');
   const [subscription, setSubscription] = useState('free');
+  const [subActivatedDate, setSubActivatedDate] = useState('');
+  const [subExpiresDate, setSubExpiresDate] = useState('');
 
   useEffect(() => {
     setUsers(dbService.getUsers());
@@ -26,6 +28,8 @@ const UsersManager = () => {
     setRole(user.role);
     setStatus(user.status || 'active');
     setSubscription(user.subscription || 'free');
+    setSubActivatedDate(user.subscriptionActivatedDate || '');
+    setSubExpiresDate(user.subscriptionExpiresDate || '');
     setIsModalOpen(true);
   };
 
@@ -36,7 +40,9 @@ const UsersManager = () => {
     const payload = {
       role,
       status,
-      subscription
+      subscription,
+      subscriptionActivatedDate: subscription === 'free' ? null : subActivatedDate,
+      subscriptionExpiresDate: subscription === 'free' ? null : subExpiresDate
     };
 
     const updated = dbService.updateUser(editingUser.id, payload);
@@ -147,9 +153,20 @@ const UsersManager = () => {
               </span>
             </td>
             <td className="px-6 py-4">
-              <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                {user.subscription || 'free'}
-              </span>
+              <div>
+                <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                  user.subscription === 'pro' 
+                    ? 'bg-amber-100 text-amber-850 border border-amber-250 shadow-xs' 
+                    : 'bg-slate-100 text-slate-600 border border-slate-200'
+                }`}>
+                  {user.subscription || 'free'}
+                </span>
+                {user.subscription === 'pro' && user.subscriptionExpiresDate && (
+                  <span className="text-[10px] text-slate-400 font-semibold block mt-1.5 whitespace-nowrap">
+                    Expires: {user.subscriptionExpiresDate}
+                  </span>
+                )}
+              </div>
             </td>
             <td className="px-6 py-4 text-slate-400 text-xs font-semibold">
               {user.joinedDate || '2025-01-10'}
@@ -223,6 +240,29 @@ const UsersManager = () => {
                 <option value="pro">Pro Tier</option>
               </select>
             </div>
+
+            {subscription !== 'free' && (
+              <div className="grid grid-cols-2 gap-4 animate-in fade-in duration-200">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Activated Date</label>
+                  <input
+                    type="date"
+                    className="input-field"
+                    value={subActivatedDate}
+                    onChange={e => setSubActivatedDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Expiration Date</label>
+                  <input
+                    type="date"
+                    className="input-field"
+                    value={subExpiresDate}
+                    onChange={e => setSubExpiresDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">

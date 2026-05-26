@@ -247,38 +247,52 @@ export const dbService = {
   updateUser: (userId, updatedFields) => {
     const users = dbService.getUsers();
     const index = users.findIndex(u => u.id === userId);
-    if (index !== -1) {
-      const oldUser = users[index];
-      let fieldsToUpdate = { ...updatedFields };
+    let fieldsToUpdate = { ...updatedFields };
 
-      // Calculate activation and expiration dates if subscription tier changes
-      if (updatedFields.subscription && updatedFields.subscription !== oldUser.subscription) {
-        if (updatedFields.subscription === 'free') {
-          fieldsToUpdate.subscriptionActivatedDate = null;
-          fieldsToUpdate.subscriptionExpiresDate = null;
-        } else {
-          const activatedDate = new Date().toISOString().split('T')[0];
-          const expires = new Date();
-          expires.setDate(expires.getDate() + 30);
-          const expiresDate = expires.toISOString().split('T')[0];
-          fieldsToUpdate.subscriptionActivatedDate = activatedDate;
-          fieldsToUpdate.subscriptionExpiresDate = expiresDate;
-        }
+    const oldSubscription = index !== -1 ? users[index].subscription : 'free';
+
+    // Calculate activation and expiration dates if subscription tier changes
+    if (updatedFields.subscription && updatedFields.subscription !== oldSubscription) {
+      if (updatedFields.subscription === 'free') {
+        fieldsToUpdate.subscriptionActivatedDate = null;
+        fieldsToUpdate.subscriptionExpiresDate = null;
+      } else {
+        const activatedDate = new Date().toISOString().split('T')[0];
+        const expires = new Date();
+        expires.setDate(expires.getDate() + 30);
+        const expiresDate = expires.toISOString().split('T')[0];
+        fieldsToUpdate.subscriptionActivatedDate = activatedDate;
+        fieldsToUpdate.subscriptionExpiresDate = expiresDate;
       }
-
-      users[index] = { ...users[index], ...fieldsToUpdate };
-      dbService.saveUsers(users);
-
-      // Persist changes to Firestore user document
-      try {
-        const userRef = doc(db, COLLECTIONS.USERS, userId);
-        updateDoc(userRef, fieldsToUpdate);
-      } catch (err) {
-        console.error("Firestore sync failed:", err);
-      }
-      return users[index];
     }
-    return null;
+
+    if (index !== -1) {
+      users[index] = { ...users[index], ...fieldsToUpdate };
+    } else {
+      // Syncing new user locally
+      users.push({
+        id: userId,
+        email: userId,
+        name: userId.split('@')[0],
+        subscription: 'free',
+        savedProperties: [],
+        savedPros: [],
+        joinedDate: new Date().toISOString().split('T')[0],
+        ...fieldsToUpdate
+      });
+    }
+    dbService.saveUsers(users);
+
+    // Persist changes to Firestore user document
+    try {
+      const userRef = doc(db, COLLECTIONS.USERS, userId);
+      updateDoc(userRef, fieldsToUpdate);
+    } catch (err) {
+      console.error("Firestore sync failed:", err);
+    }
+
+    const updatedUsers = dbService.getUsers();
+    return updatedUsers.find(u => u.id === userId) || null;
   },
   deleteUser: (userId) => {
     const users = dbService.getUsers().filter(u => u.id !== userId);
@@ -622,7 +636,8 @@ export const dbService = {
         dbService.updateUser(oldDeposit.userId, { subscription: 'free' });
         dbService.addLog(`Set payment deposit for user ${oldDeposit.userEmail} back to pending. Subscription reset to FREE.`);
       } else if (updatedFields.status === 'rejected' && oldDeposit.status !== 'rejected') {
-        dbService.addLog(`Rejected payment deposit for user ${oldDeposit.userEmail}.`);
+        dbService.updateUser(oldDeposit.userId, { subscription: 'free' });
+        dbService.addLog(`Rejected payment deposit for user ${oldDeposit.userEmail}. Subscription reset/kept as FREE.`);
       }
       return updatedDeposit;
     }

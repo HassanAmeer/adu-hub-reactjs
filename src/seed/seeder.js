@@ -3,11 +3,11 @@
 // Also synchronizes seeded data with localStorage to ensure seamless local operation.
 
 import { db } from '../services/firebase';
-import { 
-  collection, 
-  getDocs, 
-  writeBatch, 
-  doc, 
+import {
+  collection,
+  getDocs,
+  writeBatch,
+  doc,
   setDoc,
   deleteDoc
 } from 'firebase/firestore';
@@ -24,7 +24,8 @@ import {
   SEED_LOGS,
   SEED_INQUIRIES,
   SEED_SETTINGS,
-  SEED_DEPOSITS
+  SEED_DEPOSITS,
+  SEED_PLAN_LIMITS
 } from './seedData';
 
 // Map collections to seed data arrays
@@ -72,11 +73,11 @@ const chunkArray = (array, size) => {
 export const deleteCollection = async (collectionName) => {
   const colRef = collection(db, collectionName);
   const snapshot = await getDocs(colRef);
-  
+
   if (snapshot.empty) return;
 
   const chunks = chunkArray(snapshot.docs, 400); // 400 to stay safely below 500 batch limit
-  
+
   for (const chunk of chunks) {
     const batch = writeBatch(db);
     chunk.forEach((docSnap) => {
@@ -108,7 +109,7 @@ export const addCollectionData = async (collectionName, dataArray) => {
       // If item has a specific string ID, use it, else let Firestore auto-generate
       const docId = item.id ? String(item.id) : undefined;
       const docRef = docId ? doc(db, collectionName, docId) : doc(collection(db, collectionName));
-      
+
       const { id, ...dataToSave } = item;
       // Keep ID in document for easier querying
       batch.set(docRef, { id: docId || docRef.id, ...dataToSave });
@@ -205,4 +206,13 @@ export const seedCollection = async (collectionName, action) => {
     default:
       throw new Error(`Unsupported seeding action: ${action}`);
   }
+};
+
+/**
+ * Seeds plan limits directly into localStorage.
+ * Call to reset admin plan limits to seeded defaults.
+ */
+export const seedPlanLimits = () => {
+  localStorage.setItem("adu-plan-limits", JSON.stringify(SEED_PLAN_LIMITS));
+  console.log("Plan limits seeded:", SEED_PLAN_LIMITS);
 };
