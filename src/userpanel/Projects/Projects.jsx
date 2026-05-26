@@ -36,6 +36,14 @@ const Projects = () => {
   const [budget, setBudget] = useState('150000');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Dynamic zoning states & city
+  const [statesList, setStatesList] = useState([]);
+  const [selectedStateId, setSelectedStateId] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [size, setSize] = useState('650');
+  const [location, setLocation] = useState('');
+  const [purpose, setPurpose] = useState('Rental Income');
+
   // Project expansion states
   const [expandedProjectId, setExpandedProjectId] = useState(null);
   const [activeTab, setActiveTab] = useState('tasks'); // 'tasks' | 'budget' | 'logs' | 'edit'
@@ -51,6 +59,11 @@ const Projects = () => {
   const [editType, setEditType] = useState('Detached');
   const [editStatus, setEditStatus] = useState('Design Phase');
   const [editBudget, setEditBudget] = useState('150000');
+  const [editStateId, setEditStateId] = useState('');
+  const [editCity, setEditCity] = useState('');
+  const [editSize, setEditSize] = useState('650');
+  const [editLocation, setEditLocation] = useState('');
+  const [editPurpose, setEditPurpose] = useState('Rental Income');
 
   const canUpload = limits.canUploadADUProjects;
 
@@ -91,6 +104,12 @@ const Projects = () => {
           status: 'Design Phase',
           budget: 180000,
           progress: 25,
+          stateId: 'ca',
+          city: 'San Diego',
+          size: 800,
+          location: '123 Ocean Blvd, San Diego, CA 92109',
+          purpose: 'Rental Income',
+          zoningStatus: 'Allowed',
           tasks: [
             { id: 't-1', text: 'Zoning setback feasibility check', completed: true },
             { id: 't-2', text: 'Finalize architectural blueprints', completed: true },
@@ -117,6 +136,12 @@ const Projects = () => {
           status: 'Permit Review',
           budget: 75000,
           progress: 60,
+          stateId: 'ca',
+          city: 'San Francisco',
+          size: 400,
+          location: '456 Market St, San Francisco, CA 94105',
+          purpose: 'Family Guest House',
+          zoningStatus: 'Allowed',
           tasks: [
             { id: 't-1', text: 'Garage structural framing check', completed: true },
             { id: 't-2', text: 'Submit city conversion permits', completed: true },
@@ -137,6 +162,38 @@ const Projects = () => {
       setProjects(defaultProjects);
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    const list = dbService.getStates() || [];
+    setStatesList(list);
+    if (list.length > 0) {
+      setSelectedStateId(list[0].id);
+      if (list[0].cities && list[0].cities.length > 0) {
+        setSelectedCity(list[0].cities[0]);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedStateId && statesList.length > 0) {
+      const match = statesList.find(s => s.id === selectedStateId);
+      if (match && match.cities && match.cities.length > 0) {
+        setSelectedCity(match.cities[0]);
+      } else {
+        setSelectedCity('');
+      }
+    }
+  }, [selectedStateId, statesList]);
+
+  const handleEditStateChange = (stateVal) => {
+    setEditStateId(stateVal);
+    const match = statesList.find(s => s.id === stateVal);
+    if (match && match.cities && match.cities.length > 0) {
+      setEditCity(match.cities[0]);
+    } else {
+      setEditCity('');
+    }
+  };
 
   // Unified helper to save state updates for a specific project
   const saveProjectChange = (projectId, updater) => {
@@ -167,6 +224,11 @@ const Projects = () => {
       setEditType(proj.type);
       setEditStatus(proj.status);
       setEditBudget(String(proj.budget || 100000));
+      setEditStateId(proj.stateId || 'ca');
+      setEditCity(proj.city || '');
+      setEditSize(String(proj.size || 650));
+      setEditLocation(proj.location || '');
+      setEditPurpose(proj.purpose || 'Rental Income');
       // clear detail form inputs
       setNewTaskText('');
       setExpenseTitle('');
@@ -179,6 +241,12 @@ const Projects = () => {
     e.preventDefault();
     if (!name || !canUpload) return;
 
+    const selectedStateObj = statesList.find(s => s.id === selectedStateId);
+    if (selectedStateObj && selectedStateObj.status === 'Restricted') {
+      alert("Cannot create a project in a Restricted zoning location.");
+      return;
+    }
+
     const newProject = {
       id: 'proj-' + Date.now(),
       name,
@@ -186,6 +254,12 @@ const Projects = () => {
       status,
       budget: parseFloat(budget) || 100000,
       progress: 0,
+      stateId: selectedStateId,
+      city: selectedCity,
+      size: parseInt(size) || 650,
+      location: location.trim(),
+      purpose: purpose,
+      zoningStatus: selectedStateObj ? selectedStateObj.status : 'Allowed',
       tasks: getDefaultTasks(type),
       expenses: [],
       logs: [
@@ -201,6 +275,15 @@ const Projects = () => {
     setType('Detached');
     setStatus('Design Phase');
     setBudget('150000');
+    if (statesList.length > 0) {
+      setSelectedStateId(statesList[0].id);
+      if (statesList[0].cities && statesList[0].cities.length > 0) {
+        setSelectedCity(statesList[0].cities[0]);
+      }
+    }
+    setSize('650');
+    setLocation('');
+    setPurpose('Rental Income');
     setShowAddForm(false);
     setSuccessMsg('Project added successfully!');
     refreshUser();
@@ -361,6 +444,7 @@ const Projects = () => {
       {showAddForm && canUpload && (
         <form onSubmit={handleAddProject} className="bg-white p-6 rounded-[24px] border border-slate-200 shadow-sm max-w-xl space-y-4">
           <h4 className="font-bold text-primary text-sm uppercase tracking-wider mb-2">New ADU Project Details</h4>
+          
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2 sm:col-span-1">
               <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Project Name</label>
@@ -385,6 +469,7 @@ const Projects = () => {
               />
             </div>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase mb-1">ADU Type</label>
@@ -406,7 +491,105 @@ const Projects = () => {
               </select>
             </div>
           </div>
-          <button type="submit" className="btn-primary w-full text-sm">Add to Build List</button>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">State</label>
+              <select 
+                className="input-field" 
+                value={selectedStateId} 
+                onChange={e => setSelectedStateId(e.target.value)}
+                required
+              >
+                {statesList.map(s => (
+                  <option key={s.id} value={s.id}>{s.name} ({s.status})</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">City</label>
+              <select 
+                className="input-field" 
+                value={selectedCity} 
+                onChange={e => setSelectedCity(e.target.value)}
+                required
+                disabled={!selectedStateId}
+              >
+                {(statesList.find(s => s.id === selectedStateId)?.cities || []).map((city, idx) => (
+                  <option key={idx} value={city}>{city}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Size (Sq Ft)</label>
+              <input
+                type="number"
+                className="input-field"
+                placeholder="e.g. 650"
+                value={size}
+                onChange={e => setSize(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Project Purpose</label>
+              <select 
+                className="input-field" 
+                value={purpose} 
+                onChange={e => setPurpose(e.target.value)}
+                required
+              >
+                <option>Rental Income</option>
+                <option>Family Guest House</option>
+                <option>Home Office</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Location Address</label>
+            <input
+              type="text"
+              className="input-field"
+              placeholder="e.g. 123 Ocean Blvd, San Diego, CA 92109"
+              value={location}
+              onChange={e => setLocation(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="pt-2">
+            <div className="flex items-center justify-between p-3 rounded-xl border bg-slate-50/50">
+              <span className="text-xs font-bold text-slate-500">ZONING COMPLIANCE CHECK</span>
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                statesList.find(s => s.id === selectedStateId)?.status === 'Allowed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+              }`}>
+                {statesList.find(s => s.id === selectedStateId)?.status || 'Allowed'}
+              </span>
+            </div>
+            
+            {statesList.find(s => s.id === selectedStateId)?.status === 'Restricted' && (
+              <div className="mt-3 bg-rose-50 border border-rose-200 text-rose-700 p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-extrabold">Zoning Restrictions Exist</p>
+                  <p className="text-slate-500 mt-0.5">Accessory Dwelling Units are restricted or prohibited in this state/city combination under current zoning rules. You cannot create new projects here.</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button 
+            type="submit" 
+            className="btn-primary w-full text-sm"
+            disabled={statesList.find(s => s.id === selectedStateId)?.status === 'Restricted'}
+          >
+            Add to Build List
+          </button>
         </form>
       )}
 
@@ -447,8 +630,29 @@ const Projects = () => {
                     </div>
                     <div>
                       <h4 className="font-extrabold text-slate-800 text-base">{proj.name}</h4>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                        {proj.type} ADU • {totalTasks} Tasks ({completedTasks} Done)
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 flex flex-wrap items-center gap-1.5">
+                        <span>{proj.type} ADU</span>
+                        <span>•</span>
+                        <span>{totalTasks} Tasks ({completedTasks} Done)</span>
+                        {proj.city && proj.stateId && (
+                          <>
+                            <span>•</span>
+                            <span>{proj.city}, {proj.stateId.toUpperCase()}</span>
+                          </>
+                        )}
+                        {proj.size && (
+                          <>
+                            <span>•</span>
+                            <span>{proj.size} SQ FT</span>
+                          </>
+                        )}
+                        {proj.zoningStatus && (
+                          <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                            proj.zoningStatus === 'Allowed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+                          }`}>
+                            {proj.zoningStatus}
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -498,6 +702,33 @@ const Projects = () => {
                 {/* Expanded Project Workspace Panel */}
                 {isExpanded && (
                   <div className="p-6 bg-white space-y-6">
+                    {/* Project Specifications Summary Row */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-slate-50/50 rounded-2xl border border-slate-100 text-xs">
+                      <div>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Location</p>
+                        <p className="font-extrabold text-slate-800 mt-0.5 truncate" title={proj.location}>{proj.location || 'Not specified'}</p>
+                        {proj.city && proj.stateId && (
+                          <p className="text-slate-400 font-bold mt-0.5">{proj.city}, {proj.stateId.toUpperCase()}</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Zoning Status</p>
+                        <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                          proj.zoningStatus === 'Allowed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+                        }`}>
+                          {proj.zoningStatus || 'Allowed'}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">ADU Size</p>
+                        <p className="font-extrabold text-slate-800 mt-0.5">{proj.size || 'N/A'} SQ FT</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Project Purpose</p>
+                        <p className="font-extrabold text-slate-800 mt-0.5">{proj.purpose || 'Not specified'}</p>
+                      </div>
+                    </div>
+
                     {/* Progress Indicator */}
                     <div className="space-y-1">
                       <div className="flex justify-between items-center text-xs font-bold text-slate-600">
@@ -802,19 +1033,125 @@ const Projects = () => {
                               </select>
                             </div>
                           </div>
+
+                          {/* New Edit Fields */}
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">State</label>
+                              <select 
+                                className="input-field py-2.5 text-xs rounded-xl" 
+                                value={editStateId} 
+                                onChange={e => handleEditStateChange(e.target.value)}
+                                required
+                              >
+                                {statesList.map(s => (
+                                  <option key={s.id} value={s.id}>{s.name} ({s.status})</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">City</label>
+                              <select 
+                                className="input-field py-2.5 text-xs rounded-xl" 
+                                value={editCity} 
+                                onChange={e => setEditCity(e.target.value)}
+                                required
+                                disabled={!editStateId}
+                              >
+                                {(statesList.find(s => s.id === editStateId)?.cities || []).map((city, idx) => (
+                                  <option key={idx} value={city}>{city}</option>
+                                ))}
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Size (Sq Ft)</label>
+                              <input
+                                type="number"
+                                className="input-field py-2.5 text-xs rounded-xl"
+                                placeholder="e.g. 650"
+                                value={editSize}
+                                onChange={e => setEditSize(e.target.value)}
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Project Purpose</label>
+                              <select 
+                                className="input-field py-2.5 text-xs rounded-xl" 
+                                value={editPurpose} 
+                                onChange={e => setEditPurpose(e.target.value)}
+                                required
+                              >
+                                <option>Rental Income</option>
+                                <option>Family Guest House</option>
+                                <option>Home Office</option>
+                                <option>Other</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Location Address</label>
+                            <input
+                              type="text"
+                              className="input-field py-2.5 text-xs rounded-xl"
+                              placeholder="e.g. 123 Ocean Blvd, San Diego, CA 92109"
+                              value={editLocation}
+                              onChange={e => setEditLocation(e.target.value)}
+                              required
+                            />
+                          </div>
+
+                          {/* Zoning Status display & Warnings for Editing */}
+                          <div className="pt-2">
+                            <div className="flex items-center justify-between p-3 rounded-xl border bg-slate-50/50">
+                              <span className="text-xs font-bold text-slate-500">ZONING COMPLIANCE CHECK</span>
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                                statesList.find(s => s.id === editStateId)?.status === 'Allowed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+                              }`}>
+                                {statesList.find(s => s.id === editStateId)?.status || 'Allowed'}
+                              </span>
+                            </div>
+                            
+                            {statesList.find(s => s.id === editStateId)?.status === 'Restricted' && (
+                              <div className="mt-3 bg-rose-50 border border-rose-200 text-rose-700 p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2">
+                                <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                                <div>
+                                  <p className="font-extrabold">Zoning Restrictions Exist</p>
+                                  <p className="text-slate-500 mt-0.5">Accessory Dwelling Units are restricted or prohibited in this state/city combination under current zoning rules. You cannot save details changes here.</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
                           <div className="flex gap-3 pt-2">
                             <button 
                               onClick={() => {
+                                const editStateObj = statesList.find(s => s.id === editStateId);
+                                if (editStateObj && editStateObj.status === 'Restricted') {
+                                  alert("Cannot save project in a Restricted zoning location.");
+                                  return;
+                                }
                                 saveProjectChange(proj.id, (p) => {
                                   p.name = editName.trim();
                                   p.type = editType;
                                   p.status = editStatus;
                                   p.budget = parseFloat(editBudget) || 100000;
+                                  p.stateId = editStateId;
+                                  p.city = editCity;
+                                  p.size = parseInt(editSize) || 650;
+                                  p.location = editLocation.trim();
+                                  p.purpose = editPurpose;
+                                  p.zoningStatus = editStateObj ? editStateObj.status : 'Allowed';
                                 });
                                 setSuccessMsg('Project updated successfully!');
                                 setTimeout(() => setSuccessMsg(''), 3000);
                               }}
                               className="btn-primary flex-grow text-xs py-2.5 rounded-xl cursor-pointer"
+                              disabled={statesList.find(s => s.id === editStateId)?.status === 'Restricted'}
                             >
                               Save Details Changes
                             </button>

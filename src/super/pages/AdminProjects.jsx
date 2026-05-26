@@ -214,8 +214,13 @@ const AdminProjects = () => {
                   <span className="text-[11px] text-slate-400 font-semibold block">{project.ownerEmail}</span>
                 </div>
               </td>
-              <td className="px-6 py-4 font-bold text-slate-800 text-sm">
-                {project.name}
+              <td className="px-6 py-4">
+                <div className="font-bold text-slate-800 text-sm">{project.name}</div>
+                {project.city && project.stateId && (
+                  <div className="text-[11px] text-slate-400 font-semibold mt-0.5">
+                    {project.city}, {project.stateId.toUpperCase()} • {project.size || 'N/A'} sq ft
+                  </div>
+                )}
               </td>
               <td className="px-6 py-4">
                 <span className="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
@@ -267,16 +272,46 @@ const AdminProjects = () => {
           {selectedProject && (
             <div className="space-y-6">
               {/* Meta information */}
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-2 gap-4 text-xs">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Project Owner</p>
                   <p className="font-extrabold text-slate-800 text-sm mt-0.5">{selectedProject.ownerName}</p>
-                  <p className="text-slate-450 block font-semibold">{selectedProject.ownerEmail}</p>
+                  <p className="text-slate-500 block font-semibold mt-0.5">{selectedProject.ownerEmail}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ADU Classification</p>
                   <p className="font-extrabold text-slate-800 text-sm mt-0.5">{selectedProject.type} ADU</p>
-                  <p className="text-slate-450 block font-semibold">{selectedProject.status}</p>
+                  <p className="text-slate-500 block font-semibold mt-0.5">{selectedProject.status}</p>
+                </div>
+              </div>
+
+              {/* Location & Zoning Specifications */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">State & City</p>
+                  <p className="font-extrabold text-slate-800 mt-0.5">
+                    {selectedProject.city || 'N/A'}, {selectedProject.stateId ? selectedProject.stateId.toUpperCase() : 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Zoning Policy</p>
+                  <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                    selectedProject.zoningStatus === 'Allowed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+                  }`}>
+                    {selectedProject.zoningStatus || 'Allowed'}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ADU Size</p>
+                  <p className="font-extrabold text-slate-800 mt-0.5">{selectedProject.size || 'N/A'} SQ FT</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Purpose</p>
+                  <p className="font-extrabold text-slate-800 mt-0.5">{selectedProject.purpose || 'N/A'}</p>
+                </div>
+                <div className="col-span-2 sm:col-span-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Full Address</p>
+                  <p className="font-extrabold text-slate-800 mt-0.5">{selectedProject.location || 'Not specified'}</p>
                 </div>
               </div>
 

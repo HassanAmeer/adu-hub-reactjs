@@ -7,7 +7,6 @@ import {
   Building,
   Bell,
   Users,
-  PieChart,
   BookOpen,
   Settings,
   Activity,
@@ -27,7 +26,9 @@ export const ADMIN_NAV_ITEMS = [
     icon: Users,
     children: [
       { to: '/super/users', label: 'Accounts' },
-      { to: '/super/projects', label: 'ADU Projects' }
+      { to: '/super/projects', label: 'ADU Projects' },
+      { to: '/super/subscriptions', label: 'Plans' },
+      { to: '/super/deposits', label: 'Deposits' }
     ]
   },
   { to: '/super/states', icon: Globe, label: 'States & Cities' },
@@ -35,14 +36,6 @@ export const ADMIN_NAV_ITEMS = [
   { to: '/super/checker', icon: Compass, label: 'Property Checker' },
   { to: '/super/costs', icon: CreditCard, label: 'Cost Library' },
   { to: '/super/directory', icon: Building, label: 'Professionals' },
-  { 
-    label: 'Subscriptions', 
-    icon: PieChart,
-    children: [
-      { to: '/super/subscriptions', label: 'Plans' },
-      { to: '/super/deposits', label: 'Deposits' }
-    ]
-  },
   { to: '/super/blogs', icon: BookOpen, label: 'Blog / News' },
   { to: '/super/resources', icon: Download, label: 'Resources Manager' },
   { to: '/super/settings', icon: Settings, label: 'Settings' },

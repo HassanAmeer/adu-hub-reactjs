@@ -32,8 +32,8 @@ const UserDashboard = () => {
       setProperties(freshUser.savedProperties || []);
       setSavedPros(freshUser.savedPros || []);
       setProjects(freshUser.projects || [
-        { id: 'proj-1', name: 'Backyard Rental ADU', type: 'Detached', status: 'Design Phase', progress: 25 },
-        { id: 'proj-2', name: 'Garage Conversion Studio', type: 'Attached', status: 'Permit Review', progress: 60 }
+        { id: 'proj-1', name: 'Backyard Rental ADU', type: 'Detached', status: 'Design Phase', progress: 25, stateId: 'ca', city: 'San Diego', size: 800, location: '123 Ocean Blvd, San Diego, CA 92109', purpose: 'Rental Income', zoningStatus: 'Allowed' },
+        { id: 'proj-2', name: 'Garage Conversion Studio', type: 'Garage Conversion', status: 'Permit Review', progress: 60, stateId: 'ca', city: 'Los Angeles', size: 450, location: '789 Sunset Blvd, Los Angeles, CA 90028', purpose: 'Home Office', zoningStatus: 'Allowed' }
       ]);
     }
   }, [currentUser]);
@@ -123,7 +123,17 @@ const UserDashboard = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <h4 className="font-bold text-slate-800 text-sm">{proj.name}</h4>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase">{proj.type} ADU • {proj.status}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">
+                        {proj.type} ADU • {proj.status}
+                        {proj.city && proj.stateId && ` • ${proj.city}, ${proj.stateId.toUpperCase()}`}
+                        {proj.size && ` • ${proj.size} sq ft`}
+                        {proj.zoningStatus && (
+                          <span className={`ml-2 px-1.5 py-0.5 rounded text-[8px] font-extrabold tracking-wider ${proj.zoningStatus === 'Allowed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'
+                            }`}>
+                            {proj.zoningStatus}
+                          </span>
+                        )}
+                      </p>
                     </div>
                     <span className="text-xs font-black text-secondary">{proj.progress}% Done</span>
                   </div>
