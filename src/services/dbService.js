@@ -2,7 +2,7 @@
 // Provides CRUD capabilities for Super Admin and User dashboards
 // Falls back to localStorage and loads default mock data if not initialized.
 
-import { states as initialStates, aduRules as initialRules } from '../data/mockData';
+import { states as initialStates, aduRules as initialRules, buildSteps as initialBuildSteps } from '../data/mockData';
 import { doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { COLLECTIONS } from '../config';
@@ -748,6 +748,54 @@ export const dbService = {
       dbService.addLog(`Deleted deposit transaction receipt for user ${depositToDelete.userEmail}`);
     }
   },
+  // --- BUILD STEPS ---
+  getBuildSteps: () => {
+    const steps = loadCollection('adu-db-steps', initialBuildSteps);
+    // Auto-migrate old data: if steps don't match current default titles, reset
+    if (steps.length > 0 && steps[0].title === 'Feasibility') {
+      saveCollection('adu-db-steps', initialBuildSteps);
+      return initialBuildSteps;
+    }
+    return steps;
+  },
+  saveBuildSteps: (steps) => saveCollection('adu-db-steps', steps),
+  addBuildStep: (step) => {
+    const steps = dbService.getBuildSteps();
+    const newStep = {
+      id: step.id || Date.now(),
+      title: step.title,
+      description: step.description || '',
+      typicalTimeline: step.typicalTimeline || '',
+      checklist: step.checklist || [],
+      commonRejectionReasons: step.commonRejectionReasons || []
+    };
+    steps.push(newStep);
+    dbService.saveBuildSteps(steps);
+    dbService.addLog(`Created build step: "${newStep.title}"`);
+    return newStep;
+  },
+  updateBuildStep: (stepId, updatedFields) => {
+    const steps = dbService.getBuildSteps();
+    const idx = steps.findIndex(s => s.id === Number(stepId));
+    if (idx !== -1) {
+      const updated = { ...steps[idx], ...updatedFields };
+      steps[idx] = updated;
+      dbService.saveBuildSteps(steps);
+      dbService.addLog(`Updated build step: "${updated.title}"`);
+      return updated;
+    }
+    return null;
+  },
+  deleteBuildStep: (stepId) => {
+    const steps = dbService.getBuildSteps();
+    const stepToDelete = steps.find(s => s.id === Number(stepId));
+    const filtered = steps.filter(s => s.id !== Number(stepId));
+    dbService.saveBuildSteps(filtered);
+    if (stepToDelete) {
+      dbService.addLog(`Deleted build step: "${stepToDelete.title}"`);
+    }
+  },
+
   // --- RESOURCES ---
   getResources: () => loadCollection('adu-db-resources', SEED_RESOURCES),
   saveResources: (resources) => {

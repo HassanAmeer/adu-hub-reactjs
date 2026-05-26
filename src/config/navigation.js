@@ -16,7 +16,8 @@ import {
   Download,
   Building2,
   Database,
-  Mail
+  Mail,
+  Hammer
 } from 'lucide-react';
 
 export const ADMIN_NAV_ITEMS = [
@@ -31,14 +32,28 @@ export const ADMIN_NAV_ITEMS = [
       { to: '/super/deposits', label: 'Deposits' }
     ]
   },
-  { to: '/super/states', icon: Globe, label: 'States & Cities' },
-  { to: '/super/laws', icon: FileText, label: 'ADU Laws DB' },
-  { to: '/super/checker', icon: Compass, label: 'Property Checker' },
-  { to: '/super/costs', icon: CreditCard, label: 'Cost Library' },
+  {
+    label: 'ADU Laws',
+    icon: FileText,
+    children: [
+      { to: '/super/states', label: 'States & Cities' },
+      { to: '/super/laws', label: 'ADU Laws DB' }
+    ]
+  },
+  {
+    label: 'Resources',
+    icon: Download,
+    children: [
+      { to: '/super/costs', label: 'Cost Library' },
+      { to: '/super/checker', label: 'Property Checker' },
+      { to: '/super/steps', label: 'How to Build' },
+      { to: '/super/resources', label: 'Resources Manager' }
+    ]
+  },
   { to: '/super/directory', icon: Building, label: 'Professionals' },
-  { to: '/super/blogs', icon: BookOpen, label: 'Blog / News' },
-  { to: '/super/resources', icon: Download, label: 'Resources Manager' },
+  { divider: true },
   { to: '/super/settings', icon: Settings, label: 'Settings' },
+  { to: '/super/blogs', icon: BookOpen, label: 'Blog / News' },
   { to: '/super/logs', icon: Activity, label: 'System Logs' },
   { to: '/super/contactus', icon: Mail, label: 'Contact Messages' },
   { to: '/seed', icon: Database, label: 'Database Seeder' },

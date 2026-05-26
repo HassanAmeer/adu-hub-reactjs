@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, ArrowRight, Home, Hammer, TrendingUp, PenTool, Briefcase, Building, ChevronRight, X, Scale } from 'lucide-react';
+import { Search, ArrowRight, Home, Hammer, TrendingUp, PenTool, Briefcase, Building, ChevronRight, X, Scale, CheckCircle, Clock, ListChecks, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ROUTES } from '../config';
+import { dbService } from '../services/dbService';
 
 // ─── Floating ADU Shape SVGs ─────────────────────────────────────────────────
 const FloatingShape = ({ style, delay = 0, type = 'house' }) => {
@@ -164,6 +165,12 @@ const LandingPage = () => {
   const [followUpAnswer, setFollowUpAnswer] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef(null);
+
+  const [buildSteps, setBuildSteps] = useState([]);
+
+  useEffect(() => {
+    setBuildSteps(dbService.getBuildSteps());
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -405,6 +412,83 @@ const LandingPage = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* ── How to Build Steps ────────────────────────────────────── */}
+        {buildSteps.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="mt-20 pt-16 border-t border-white/10"
+          >
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">
+              How to Build an <span className="text-secondary">ADU</span>
+            </h3>
+            <p className="text-slate-400 text-sm mb-10 max-w-xl mx-auto">
+              Your step-by-step guide to navigating the ADU process.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-left max-w-5xl mx-auto">
+              {buildSteps.map((step, idx) => (
+                <motion.div
+                  key={step.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.8 + idx * 0.1 }}
+                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-secondary/30 transition-all duration-300 group"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-secondary/20 border border-secondary/30 flex items-center justify-center text-sm font-bold text-secondary shrink-0">
+                      {String(idx + 1).padStart(2, '0')}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white text-base">{step.title}</h4>
+                      {step.typicalTimeline && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 font-semibold">
+                          <Clock className="w-3 h-3" /> {step.typicalTimeline}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-slate-400 text-sm leading-relaxed mb-4">{step.description}</p>
+
+                  <div className="space-y-3">
+                    {step.checklist?.length > 0 && (
+                      <div>
+                        <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                          <ListChecks className="w-3 h-3" /> Checklist
+                        </p>
+                        <ul className="space-y-1">
+                          {step.checklist.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-xs text-slate-400">
+                              <CheckCircle className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {step.commonRejectionReasons?.length > 0 && (
+                      <div>
+                        <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" /> Common Rejection Reasons
+                        </p>
+                        <ul className="space-y-1">
+                          {step.commonRejectionReasons.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-xs text-slate-400">
+                              <span className="w-1 h-1 rounded-full bg-amber-500 shrink-0 mt-1.5" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

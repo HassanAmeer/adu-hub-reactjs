@@ -106,8 +106,8 @@ const StatePage = () => {
               <button
                 onClick={handleDownloadPdf}
                 className={`btn-secondary flex items-center justify-center gap-2 !py-3 transition-all ${stateData?.pdfUrl
-                    ? '!bg-white/10 !text-white hover:!bg-white/20 border border-white/20 cursor-pointer'
-                    : '!bg-white/5 !text-white/30 border border-white/10 cursor-not-allowed opacity-40'
+                  ? '!bg-white/10 !text-white hover:!bg-white/20 border border-white/20 cursor-pointer'
+                  : '!bg-white/5 !text-white/30 border border-white/10 cursor-not-allowed opacity-40'
                   }`}
                 title={stateData?.pdfUrl ? "Download Reference PDF Handbook" : "No PDF reference handbook uploaded"}
               >

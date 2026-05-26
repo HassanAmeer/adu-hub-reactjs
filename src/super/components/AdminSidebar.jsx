@@ -1,11 +1,60 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { 
   LogOut, 
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ADMIN_NAV_ITEMS, ROUTES } from '../../config';
+
+const SidebarGroup = ({ item, onNav }) => {
+  const location = useLocation();
+  const isActive = item.children.some(c => location.pathname === c.to);
+  const [open, setOpen] = useState(isActive);
+
+  return (
+    <div className="pt-1.5">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+          isActive
+            ? 'bg-secondary/10 text-secondary'
+            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+        }`}
+      >
+        <item.icon className="w-4.5 h-4.5 shrink-0" />
+        <span className="flex-1 text-left font-bold tracking-wide">{item.label}</span>
+        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${open ? 'rotate-0' : '-rotate-90'}`} />
+      </button>
+      <div className={`overflow-hidden transition-all duration-200 ${open ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+        <div className="ml-3 pl-3 border-l-2 border-slate-700/60 space-y-0.5">
+          {item.children.map((child) => (
+            <NavLink
+              key={child.to}
+              to={child.to}
+              onClick={onNav}
+              className={({ isActive }) => 
+                `flex items-center gap-2.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                  isActive 
+                    ? 'text-white bg-slate-800/80 shadow-sm border-l-2 -ml-[14px] pl-[14px] border-secondary' 
+                    : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800/20'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-200 ${isActive ? 'bg-secondary shadow-sm shadow-secondary/50' : 'bg-slate-600'}`} />
+                  <span>{child.label}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
   const { logout, currentUser } = useAuth();
@@ -26,11 +75,10 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 text-slate-300">
-      {/* Brand Header */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-slate-800">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-          <div className="w-9 h-9 bg-secondary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">A</div>
-          <span className="text-lg font-bold tracking-tight text-white">ADU<span className="text-secondary">Navi</span> <span className="text-[10px] bg-secondary/10 text-secondary px-1.5 py-0.5 rounded ml-1">Admin</span></span>
+          <div className="w-9 h-9 bg-secondary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-secondary/20">A</div>
+          <span className="text-lg font-bold tracking-tight text-white">ADU<span className="text-secondary">Navi</span></span>
         </div>
         {mobileOpen && (
           <button 
@@ -42,40 +90,19 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
         )}
       </div>
 
-      {/* Navigation List */}
-      <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
-        {navItems.map((item) => {
+      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+        {navItems.map((item, idx) => {
+          if (item.divider) {
+            return <div key={`divider-${idx}`} className="border-t border-slate-800 my-2" />;
+          }
+
           if (item.children) {
             return (
-              <div key={item.label} className="pt-2 pb-1">
-                <div className="px-4 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  {item.label}
-                </div>
-                
-                <div className="pl-4 space-y-1 border-l border-slate-800 ml-6 my-1">
-                  {item.children.map((child) => (
-                    <NavLink
-                      key={child.to}
-                      to={child.to}
-                      onClick={() => setMobileOpen(false)}
-                      className={({ isActive }) => 
-                        `flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                          isActive 
-                            ? 'text-white bg-slate-800 shadow-sm font-bold border-r border-slate-700' 
-                            : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/20'
-                        }`
-                      }
-                    >
-                      {({ isActive }) => (
-                        <>
-                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-200 ${isActive ? 'bg-secondary' : 'bg-slate-600'}`} />
-                          <span>{child.label}</span>
-                        </>
-                      )}
-                    </NavLink>
-                  ))}
-                </div>
-              </div>
+              <SidebarGroup
+                key={item.label}
+                item={item}
+                onNav={() => setMobileOpen(false)}
+              />
             );
           }
 
@@ -100,7 +127,6 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
         })}
       </nav>
 
-      {/* User Footer Profile & Logout */}
       <div className="p-4 border-t border-slate-800 bg-slate-950/40">
         <div className="flex items-center gap-3 mb-4 px-2">
           <div className="w-9 h-9 rounded-full bg-secondary/20 border border-secondary/30 flex items-center justify-center text-secondary font-bold text-sm">
@@ -125,20 +151,16 @@ const AdminSidebar = ({ mobileOpen, setMobileOpen }) => {
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <aside className="hidden lg:block w-64 h-screen shrink-0 border-r border-slate-800 shadow-xl z-20">
         {sidebarContent}
       </aside>
 
-      {/* Mobile Drawer Overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
-          {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileOpen(false)}
           />
-          {/* Sidebar Drawer */}
           <div className="relative flex flex-col w-72 max-w-xs h-full bg-slate-900 shadow-2xl animate-slide-in">
             {sidebarContent}
           </div>

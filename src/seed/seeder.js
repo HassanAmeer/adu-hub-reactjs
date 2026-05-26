@@ -26,6 +26,7 @@ import {
   SEED_SETTINGS,
   SEED_DEPOSITS,
   SEED_PLAN_LIMITS,
+  SEED_BUILD_STEPS,
   SEED_RESOURCES
 } from './seedData';
 
@@ -43,7 +44,8 @@ export const SEED_DATA_MAP = {
   [COLLECTIONS.CONTACT_US]: SEED_INQUIRIES,
   [COLLECTIONS.SETTINGS]: SEED_SETTINGS,
   [COLLECTIONS.DEPOSITS]: SEED_DEPOSITS,
-  [COLLECTIONS.RESOURCES]: SEED_RESOURCES
+  [COLLECTIONS.RESOURCES]: SEED_RESOURCES,
+  [COLLECTIONS.STEPS]: SEED_BUILD_STEPS
 };
 
 // Map collections to LocalStorage sync keys
@@ -57,7 +59,8 @@ const LOCAL_STORAGE_SYNC_MAP = {
   [COLLECTIONS.SETTINGS]: 'adu-db-settings',
   [COLLECTIONS.SUBSCRIPTIONS]: 'adu-db-plans',
   [COLLECTIONS.DEPOSITS]: 'adu-db-deposits',
-  [COLLECTIONS.RESOURCES]: 'adu-db-resources'
+  [COLLECTIONS.RESOURCES]: 'adu-db-resources',
+  [COLLECTIONS.STEPS]: 'adu-db-steps'
 };
 
 // Helper to chunk array
@@ -74,6 +77,12 @@ const chunkArray = (array, size) => {
  * @param {string} collectionName 
  */
 export const deleteCollection = async (collectionName) => {
+  // Always clear LocalStorage first (before Firestore)
+  const lsKey = LOCAL_STORAGE_SYNC_MAP[collectionName];
+  if (lsKey) {
+    localStorage.setItem(lsKey, JSON.stringify([]));
+  }
+
   const colRef = collection(db, collectionName);
   const snapshot = await getDocs(colRef);
 
@@ -88,12 +97,6 @@ export const deleteCollection = async (collectionName) => {
     });
     await batch.commit();
   }
-
-  // Clear LocalStorage equivalent if it exists
-  const lsKey = LOCAL_STORAGE_SYNC_MAP[collectionName];
-  if (lsKey) {
-    localStorage.setItem(lsKey, JSON.stringify([]));
-  }
 };
 
 /**
@@ -103,6 +106,20 @@ export const deleteCollection = async (collectionName) => {
  */
 export const addCollectionData = async (collectionName, dataArray) => {
   if (!dataArray || dataArray.length === 0) return;
+
+  // Always sync to LocalStorage first (before Firestore)
+  const lsKey = LOCAL_STORAGE_SYNC_MAP[collectionName];
+  if (lsKey) {
+    const existingStr = localStorage.getItem(lsKey);
+    let existing = [];
+    try {
+      existing = existingStr ? JSON.parse(existingStr) : [];
+    } catch {
+      existing = [];
+    }
+    const updated = [...existing, ...dataArray];
+    localStorage.setItem(lsKey, JSON.stringify(updated));
+  }
 
   const chunks = chunkArray(dataArray, 400);
 
@@ -119,20 +136,6 @@ export const addCollectionData = async (collectionName, dataArray) => {
     });
     await batch.commit();
   }
-
-  // Sync to LocalStorage if supported
-  const lsKey = LOCAL_STORAGE_SYNC_MAP[collectionName];
-  if (lsKey) {
-    const existingStr = localStorage.getItem(lsKey);
-    let existing = [];
-    try {
-      existing = existingStr ? JSON.parse(existingStr) : [];
-    } catch {
-      existing = [];
-    }
-    const updated = [...existing, ...dataArray];
-    localStorage.setItem(lsKey, JSON.stringify(updated));
-  }
 };
 
 /**
@@ -143,25 +146,7 @@ export const addCollectionData = async (collectionName, dataArray) => {
 export const updateCollectionData = async (collectionName, dataArray) => {
   if (!dataArray || dataArray.length === 0) return;
 
-  const chunks = chunkArray(dataArray, 400);
-
-  for (const chunk of chunks) {
-    const batch = writeBatch(db);
-    chunk.forEach((item) => {
-      if (!item.id) {
-        // No ID specified, create a new document
-        const docRef = doc(collection(db, collectionName));
-        batch.set(docRef, { id: docRef.id, ...item });
-      } else {
-        const docRef = doc(db, collectionName, String(item.id));
-        // Use merge option to update matching fields or create if not exists
-        batch.set(docRef, item, { merge: true });
-      }
-    });
-    await batch.commit();
-  }
-
-  // Sync LocalStorage
+  // Always sync LocalStorage first (before Firestore)
   const lsKey = LOCAL_STORAGE_SYNC_MAP[collectionName];
   if (lsKey) {
     const existingStr = localStorage.getItem(lsKey);
@@ -181,6 +166,24 @@ export const updateCollectionData = async (collectionName, dataArray) => {
       }
     });
     localStorage.setItem(lsKey, JSON.stringify(existing));
+  }
+
+  const chunks = chunkArray(dataArray, 400);
+
+  for (const chunk of chunks) {
+    const batch = writeBatch(db);
+    chunk.forEach((item) => {
+      if (!item.id) {
+        // No ID specified, create a new document
+        const docRef = doc(collection(db, collectionName));
+        batch.set(docRef, { id: docRef.id, ...item });
+      } else {
+        const docRef = doc(db, collectionName, String(item.id));
+        // Use merge option to update matching fields or create if not exists
+        batch.set(docRef, item, { merge: true });
+      }
+    });
+    await batch.commit();
   }
 };
 

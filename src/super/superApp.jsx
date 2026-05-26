@@ -22,6 +22,7 @@ import SystemSettings from './pages/SystemSettings';
 import ActivityLogs from './pages/ActivityLogs';
 import ContactUsManager from './pages/ContactUsManager';
 import ResourcesManager from './pages/ResourcesManager';
+import StepsManager from './pages/StepsManager';
 
 const SuperApp = () => {
   const { currentUser, loading } = useAuth();
@@ -122,6 +123,7 @@ const SuperApp = () => {
               <Route path="deposits" element={<Deposits />} />
               <Route path="blogs" element={<BlogManager />} />
               <Route path="resources" element={<ResourcesManager />} />
+              <Route path="steps" element={<StepsManager />} />
               <Route path="settings" element={<SystemSettings />} />
               <Route path="logs" element={<ActivityLogs />} />
               <Route path="contactus" element={<ContactUsManager />} />
