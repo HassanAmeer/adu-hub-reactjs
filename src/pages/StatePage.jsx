@@ -329,22 +329,22 @@ const StatePage = () => {
               </h4>
               <ul className="space-y-4">
                 <li>
-                  <a href="#" className="flex items-center justify-between text-sm font-semibold text-slate-600 hover:text-secondary group">
+                  <button type="button" className="w-full flex items-center justify-between text-sm font-semibold text-slate-600 hover:text-secondary group cursor-pointer">
                     Official State Handbook
                     <Download className="w-4 h-4 text-slate-300 group-hover:text-secondary" />
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="flex items-center justify-between text-sm font-semibold text-slate-600 hover:text-secondary group">
+                  <button type="button" className="w-full flex items-center justify-between text-sm font-semibold text-slate-600 hover:text-secondary group cursor-pointer">
                     State Zoning Map Tool
                     <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-secondary group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="flex items-center justify-between text-sm font-semibold text-slate-600 hover:text-secondary group">
+                  <button type="button" className="w-full flex items-center justify-between text-sm font-semibold text-slate-600 hover:text-secondary group cursor-pointer">
                     Permit Fee Calculator
                     <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-secondary group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>

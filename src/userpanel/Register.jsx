@@ -209,7 +209,7 @@ const Register = () => {
             disabled={loading}
           />
           <label htmlFor="terms" className="text-xs text-slate-500 leading-relaxed cursor-pointer">
-            I agree to the <a href="#" className="text-secondary font-bold hover:underline">Terms of Service</a> and <a href="#" className="text-secondary font-bold hover:underline">Privacy Policy</a>.
+            I agree to the <Link to={ROUTES.TERMS} className="text-secondary font-bold hover:underline">Terms of Service</Link> and <Link to={ROUTES.PRIVACY} className="text-secondary font-bold hover:underline">Privacy Policy</Link>.
           </label>
         </div>
 
