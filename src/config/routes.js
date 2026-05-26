@@ -34,6 +34,7 @@ export const ROUTES = {
   SUPER_COSTS: '/super/costs',
   SUPER_DIRECTORY: '/super/directory',
   SUPER_USERS: '/super/users',
+  SUPER_PROJECTS: '/super/projects',
   SUPER_SUBSCRIPTIONS: '/super/subscriptions',
   SUPER_DEPOSITS: '/super/deposits',
   SUPER_BLOGS: '/super/blogs',
@@ -50,7 +51,6 @@ export const ROUTES = {
   USER_PROFILE: '/userpanel/profile',
   USER_PROJECTS: '/userpanel/projects',
   USER_CHECKS: '/userpanel/checks',
-  USER_FAVORITES: '/userpanel/favorites',
   USER_SUBSCRIPTIONS: '/userpanel/subscriptions',
   USER_RESOURCES: '/userpanel/resources',
   USER_PROFESSIONALS: '/userpanel/professionals'

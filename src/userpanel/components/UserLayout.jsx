@@ -39,7 +39,6 @@ const UserLayout = () => {
     if (path.includes('/profile')) return 'My Profile';
     if (path.includes('/projects')) return 'My ADU Projects';
     if (path.includes('/checks')) return 'Property Checks';
-    if (path.includes('/favorites')) return 'Saved & Favorites';
     if (path.includes('/notifications')) return 'Notifications';
     if (path.includes('/subscriptions')) return 'Subscriptions';
     if (path.includes('/resources')) return 'Downloads & Resources';

@@ -14,7 +14,6 @@ import {
   User,
   Briefcase,
   MapPin,
-  Heart,
   Download,
   Building2,
   Database,
@@ -23,7 +22,14 @@ import {
 
 export const ADMIN_NAV_ITEMS = [
   { to: '/super/dashboard', icon: LayoutDashboard, label: 'Dashboard', end: true },
-  { to: '/super/users', icon: Users, label: 'Users Management' },
+  { 
+    label: 'Users', 
+    icon: Users,
+    children: [
+      { to: '/super/users', label: 'Accounts' },
+      { to: '/super/projects', label: 'ADU Projects' }
+    ]
+  },
   { to: '/super/states', icon: Globe, label: 'States & Cities' },
   { to: '/super/laws', icon: FileText, label: 'ADU Laws DB' },
   { to: '/super/checker', icon: Compass, label: 'Property Checker' },
@@ -38,6 +44,7 @@ export const ADMIN_NAV_ITEMS = [
     ]
   },
   { to: '/super/blogs', icon: BookOpen, label: 'Blog / News' },
+  { to: '/super/resources', icon: Download, label: 'Resources Manager' },
   { to: '/super/settings', icon: Settings, label: 'Settings' },
   { to: '/super/logs', icon: Activity, label: 'System Logs' },
   { to: '/super/contactus', icon: Mail, label: 'Contact Messages' },
@@ -52,7 +59,6 @@ export const getUserNavItems = (isProfessional) => [
   ] : []),
   { to: '/userpanel/projects', icon: Briefcase, label: 'My ADU Projects' },
   { to: '/userpanel/checks', icon: MapPin, label: 'Property Checks' },
-  { to: '/userpanel/favorites', icon: Heart, label: 'Saved & Favorites' },
   { to: '/userpanel/subscriptions', icon: CreditCard, label: 'Subscriptions' },
   { to: '/userpanel/resources', icon: Download, label: 'Resources' },
   { to: '/userpanel/profile', icon: User, label: 'My Profile' }

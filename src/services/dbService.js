@@ -6,6 +6,7 @@ import { states as initialStates, aduRules as initialRules } from '../data/mockD
 import { doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { COLLECTIONS } from '../config';
+import { SEED_RESOURCES } from '../seed/seedData';
 
 const DEFAULT_USERS = [
   {
@@ -659,6 +660,65 @@ export const dbService = {
 
     if (depositToDelete) {
       dbService.addLog(`Deleted deposit transaction receipt for user ${depositToDelete.userEmail}`);
+    }
+  },
+  // --- RESOURCES ---
+  getResources: () => loadCollection('adu-db-resources', SEED_RESOURCES),
+  saveResources: (resources) => {
+    saveCollection('adu-db-resources', resources);
+    resources.forEach(async (res) => {
+      try {
+        const resRef = doc(db, COLLECTIONS.RESOURCES, res.id);
+        await setDoc(resRef, res, { merge: true });
+      } catch (err) {
+        console.error(`Firestore resources sync failed for ${res.id}:`, err);
+      }
+    });
+  },
+  addResource: (res) => {
+    const resources = dbService.getResources();
+    const newRes = {
+      id: res.id || 'res-' + Date.now(),
+      title: res.title,
+      type: res.type || 'PDF Document',
+      size: res.size || '1.0 MB',
+      desc: res.desc || '',
+      fileUrl: res.fileUrl || '',
+      access: res.access || 'all'
+    };
+    resources.unshift(newRes);
+    dbService.saveResources(resources);
+    dbService.addLog(`Created new download resource: "${newRes.title}"`);
+    return newRes;
+  },
+  updateResource: (resId, updatedFields) => {
+    const resources = dbService.getResources();
+    const idx = resources.findIndex(r => r.id === resId);
+    if (idx !== -1) {
+      const updated = { ...resources[idx], ...updatedFields };
+      resources[idx] = updated;
+      dbService.saveResources(resources);
+      dbService.addLog(`Updated download resource: "${updated.title}"`);
+      return updated;
+    }
+    return null;
+  },
+  deleteResource: (resId) => {
+    const resources = dbService.getResources();
+    const resToDelete = resources.find(r => r.id === resId);
+    const filtered = resources.filter(r => r.id !== resId);
+    dbService.saveResources(filtered);
+    
+    // Delete from Firestore
+    try {
+      const resRef = doc(db, COLLECTIONS.RESOURCES, resId);
+      deleteDoc(resRef);
+    } catch (err) {
+      console.error("Firestore resource delete error:", err);
+    }
+
+    if (resToDelete) {
+      dbService.addLog(`Deleted download resource: "${resToDelete.title}"`);
     }
   }
 };

@@ -83,3 +83,58 @@
     @apply bg-red-100 text-red-800 border border-red-300;
   }
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-card-pro {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-card-pro::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(245, 158, 11, 0) 0%,
+    rgba(245, 158, 11, 0.18) 50%,
+    rgba(245, 158, 11, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite linear;
+  pointer-events: none;
+}
+
+.shimmer-card-free {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-card-free::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0) 0%,
+    rgba(148, 163, 184, 0.12) 50%,
+    rgba(148, 163, 184, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3.5s infinite linear;
+  pointer-events: none;
+}

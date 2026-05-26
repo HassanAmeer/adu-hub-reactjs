@@ -14,12 +14,14 @@ import PropertyChecker from './pages/PropertyChecker';
 import CostLibrary from './pages/CostLibrary';
 import Professionals from './pages/Professionals';
 import UsersManager from './pages/UsersManager';
+import AdminProjects from './pages/AdminProjects';
 import Subscriptions from './pages/Subscriptions';
 import Deposits from './pages/Deposits';
 import BlogManager from './pages/BlogManager';
 import SystemSettings from './pages/SystemSettings';
 import ActivityLogs from './pages/ActivityLogs';
 import ContactUsManager from './pages/ContactUsManager';
+import ResourcesManager from './pages/ResourcesManager';
 
 const SuperApp = () => {
   const { currentUser, loading } = useAuth();
@@ -115,9 +117,11 @@ const SuperApp = () => {
               <Route path="costs" element={<CostLibrary />} />
               <Route path="directory" element={<Professionals />} />
               <Route path="users" element={<UsersManager />} />
+              <Route path="projects" element={<AdminProjects />} />
               <Route path="subscriptions" element={<Subscriptions />} />
               <Route path="deposits" element={<Deposits />} />
               <Route path="blogs" element={<BlogManager />} />
+              <Route path="resources" element={<ResourcesManager />} />
               <Route path="settings" element={<SystemSettings />} />
               <Route path="logs" element={<ActivityLogs />} />
               <Route path="contactus" element={<ContactUsManager />} />

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Plus, 
-  MapPin, 
-  Users, 
-  Compass, 
-  Check, 
-  Briefcase, 
+import {
+  Plus,
+  MapPin,
+  Users,
+  Compass,
+  Check,
+  Briefcase,
   FileText,
   TrendingUp,
   ShieldCheck,
@@ -16,9 +16,11 @@ import {
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
 import { ROUTES } from '../../config';
+import { usePlanLimits } from '../hooks/usePlanLimits';
 
 const UserDashboard = () => {
   const { currentUser } = useAuth();
+  const limits = usePlanLimits(currentUser);
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [savedPros, setSavedPros] = useState([]);
@@ -45,15 +47,15 @@ const UserDashboard = () => {
         <div>
           <h1 className="text-3xl font-bold text-primary mb-2">Hello, {currentUser?.name || 'ADU Member'}! 👋</h1>
           <p className="text-slate-500 font-medium">
-            {isPro 
+            {isPro
               ? 'Manage your professional business listing, monitor incoming homeowner leads, and update services.'
               : 'Explore local regulations, run property checks, track your ADU builds, and connect with pros.'
             }
           </p>
         </div>
         <div className="flex gap-3">
-          <button 
-            onClick={() => navigate(ROUTES.USER_CHECKS)} 
+          <button
+            onClick={() => navigate(ROUTES.USER_CHECKS)}
             className="btn-primary flex items-center gap-2"
           >
             <Compass className="w-5 h-5" /> Start Zoning Check
@@ -64,22 +66,46 @@ const UserDashboard = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {[
-          { label: 'Active Projects', value: projects.length, icon: Briefcase, bg: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' },
-          { label: 'Saved Checks', value: properties.length, icon: MapPin, bg: 'bg-indigo-50 text-indigo-600', border: 'border-indigo-100' },
-          { label: 'Saved Professionals', value: savedPros.length, icon: Users, bg: 'bg-amber-50 text-amber-500', border: 'border-amber-100' }
-        ].map((stat, idx) => (
-          <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}>
-                <stat.icon className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
-                <p className="text-3xl font-extrabold text-primary">{stat.value}</p>
+          {
+            label: 'ADU Projects',
+            value: projects.length,
+            icon: Briefcase,
+            bg: 'bg-emerald-50 text-emerald-600',
+            border: 'border-emerald-100'
+          },
+          {
+            label: 'Zoning Checks Run',
+            value: `${properties.length} / ${limits.propertyCheckerLimit === -1 ? '∞' : limits.propertyCheckerLimit}`,
+            icon: Compass,
+            bg: 'bg-indigo-50 text-indigo-600',
+            border: 'border-indigo-100'
+          },
+          {
+            label: 'Active Subscription',
+            value: currentUser?.subscription === 'pro' ? 'Pro Plan' : 'Free Tier',
+            icon: ShieldCheck,
+            bg: currentUser?.subscription === 'pro' ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-500',
+            border: currentUser?.subscription === 'pro' ? 'border-amber-100' : 'border-slate-200'
+          }
+        ].map((stat, idx) => {
+          const isSubCard = stat.label === 'Active Subscription';
+          const shimmerClass = isSubCard
+            ? (currentUser?.subscription === 'pro' ? 'shimmer-card-pro' : 'shimmer-card-free')
+            : '';
+          return (
+            <div key={idx} className={`bg-white rounded-2xl p-6 border ${stat.border} shadow-sm ${shimmerClass}`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}>
+                  <stat.icon className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                  <p className="text-2xl sm:text-3xl font-extrabold text-primary">{stat.value}</p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="space-y-6">
@@ -114,7 +140,7 @@ const UserDashboard = () => {
         <div className="bg-white rounded-[24px] border border-slate-200 p-6 shadow-sm">
           <h3 className="text-lg font-bold text-primary mb-4">Quick Tools</h3>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <button 
+            <button
               onClick={() => navigate(ROUTES.USER_PROFILE)}
               className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
             >
@@ -124,7 +150,7 @@ const UserDashboard = () => {
               <p className="text-xs font-bold text-slate-700">Update Profile</p>
             </button>
 
-            <button 
+            <button
               onClick={() => navigate(ROUTES.USER_RESOURCES)}
               className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
             >
@@ -134,7 +160,7 @@ const UserDashboard = () => {
               <p className="text-xs font-bold text-slate-700">Get Checklists</p>
             </button>
 
-            <button 
+            <button
               onClick={() => navigate(ROUTES.USER_PROJECTS)}
               className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
             >
@@ -144,7 +170,7 @@ const UserDashboard = () => {
               <p className="text-xs font-bold text-slate-700">Manage Projects</p>
             </button>
 
-            <button 
+            <button
               onClick={() => navigate(ROUTES.USER_CHECKS)}
               className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-600 transition-all text-center space-y-2 group"
             >

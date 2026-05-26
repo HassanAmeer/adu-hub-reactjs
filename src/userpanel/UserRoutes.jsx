@@ -10,7 +10,6 @@ import UserDashboard from './Dashboard/UserDashboard';
 import Profile from './Profile/Profile';
 import Projects from './Projects/Projects';
 import Checks from './Checks/Checks';
-import Favorites from './Favorites/Favorites';
 import Subscriptions from './Subscriptions/Subscriptions';
 import Resources from './Resources/Resources';
 import Professionals from './Professionals/Professionals';
@@ -30,7 +29,6 @@ const UserRoutes = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="projects" element={<Projects />} />
         <Route path="checks" element={<Checks />} />
-        <Route path="favorites" element={<Favorites />} />
         <Route path="subscriptions" element={<Subscriptions />} />
         <Route path="resources" element={<Resources />} />
         <Route path="professionals" element={<Professionals />} />

@@ -132,7 +132,8 @@ function App() {
           syncCollection(COLLECTIONS.COSTS, 'adu-db-costs'),
           syncCollection(COLLECTIONS.PROFESSIONALS, 'adu-db-directory'),
           syncCollection(COLLECTIONS.USERS, 'adu-db-users'),
-          syncCollection(COLLECTIONS.LOGS, 'adu-db-logs')
+          syncCollection(COLLECTIONS.LOGS, 'adu-db-logs'),
+          syncCollection(COLLECTIONS.RESOURCES, 'adu-db-resources')
         ]);
       } catch (err) {
         console.error("Firestore collections sync error:", err);

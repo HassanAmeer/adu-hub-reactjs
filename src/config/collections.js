@@ -11,7 +11,8 @@ export const COLLECTIONS = {
   LOGS: 'logs',
   CONTACT_US: 'contactus',
   SETTINGS: 'settings',
-  DEPOSITS: 'deposits'
+  DEPOSITS: 'deposits',
+  RESOURCES: 'resources'
 };
 
 export default COLLECTIONS;

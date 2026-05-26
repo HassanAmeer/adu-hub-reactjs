@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Edit2, Trash2, ShieldAlert, CheckCircle2, User, UserX, UserCheck, Shield } from 'lucide-react';
+import { Edit2, Trash2, ShieldAlert, CheckCircle2, User, UserX, UserCheck, Shield, Briefcase } from 'lucide-react';
 import AdminTable from '../components/AdminTable';
 import AdminModal from '../components/AdminModal';
 import { dbService } from '../../services/dbService';
+import { useNavigate } from 'react-router-dom';
 
 const UsersManager = () => {
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [roleFilter, setRoleFilter] = useState('all');
+  const navigate = useNavigate();
 
   // Form Fields
   const [name, setName] = useState('');
@@ -183,6 +185,20 @@ const UsersManager = () => {
                   title={user.status === 'suspended' ? "Unblock Access" : "Block Access"}
                 >
                   {user.status === 'suspended' ? <UserCheck className="w-4 h-4" /> : <UserX className="w-4 h-4" />}
+                </button>
+              )}
+              {user.role !== 'admin' && (
+                <button 
+                  onClick={() => navigate(`/super/projects?search=${user.email}`)}
+                  className="p-1.5 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-lg hover:text-slate-800 transition-colors flex items-center gap-1 shrink-0"
+                  title="View User ADU Projects"
+                >
+                  <Briefcase className="w-4 h-4 text-secondary shrink-0" />
+                  {user.projects?.length > 0 && (
+                    <span className="text-[10px] font-bold px-1.5 bg-emerald-50 text-emerald-600 rounded">
+                      {user.projects.length}
+                    </span>
+                  )}
                 </button>
               )}
               <button 

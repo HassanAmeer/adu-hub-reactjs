@@ -43,6 +43,56 @@ export const SEED_USERS = [
     subscription: 'pro',
     savedProperties: [],
     savedPros: ['pro-precision-build'],
+    projects: [
+      {
+        id: 'proj-1',
+        name: 'San Diego Rental ADU',
+        type: 'Detached',
+        status: 'Design Phase',
+        budget: 200000,
+        progress: 40,
+        tasks: [
+          { id: 't-1', text: 'Site setback feasibility check', completed: true },
+          { id: 't-2', text: 'Finalize blueprint architectural design', completed: true },
+          { id: 't-3', text: 'Submit zoning application to municipal board', completed: false },
+          { id: 't-4', text: 'Hire verified general contractor', completed: false },
+          { id: 't-5', text: 'Excavation and foundation concrete pour', completed: false }
+        ],
+        expenses: [
+          { id: 'exp-1', title: 'Surveyor and Soil Analysis', amount: 3500, date: '2026-05-21' },
+          { id: 'exp-2', title: 'Architectural Blueprint Design', amount: 5000, date: '2026-05-24' }
+        ],
+        logs: [
+          { id: 'log-1', note: 'Project conceptualized and soil tests ordered.', date: '2026-05-20' },
+          { id: 'log-2', note: 'Initial design drawings finished by Coastal Design.', date: '2026-05-24' }
+        ]
+      },
+      {
+        id: 'proj-2',
+        name: 'Garage Conversion Studio',
+        type: 'Garage Conversion',
+        status: 'Construction',
+        budget: 95000,
+        progress: 80,
+        tasks: [
+          { id: 't-1', text: 'Clear garage and run checks', completed: true },
+          { id: 't-2', text: 'Permit application approval', completed: true },
+          { id: 't-3', text: 'Utility and sewer connection line hookup', completed: true },
+          { id: 't-4', text: 'Drywall framing and insulation', completed: true },
+          { id: 't-5', text: 'Install plumbing fixtures and painting', completed: false }
+        ],
+        expenses: [
+          { id: 'exp-1', title: 'Permit Fees', amount: 2800, date: '2026-05-15' },
+          { id: 'exp-2', title: 'Framing & Lumber Material', amount: 15400, date: '2026-05-18' },
+          { id: 'exp-3', title: 'Plumbing Rough-in', amount: 6200, date: '2026-05-22' }
+        ],
+        logs: [
+          { id: 'log-1', note: 'Garage cleanout completed.', date: '2026-05-10' },
+          { id: 'log-2', note: 'City permits approved under HOME initiative!', date: '2026-05-15' },
+          { id: 'log-3', note: 'Drywall and insulation passed rough inspection.', date: '2026-05-23' }
+        ]
+      }
+    ],
     joinedDate: '2026-03-10',
     subscriptionActivatedDate: '2026-05-20',
     subscriptionExpiresDate: '2026-06-19'
@@ -582,3 +632,42 @@ export const SEED_PLAN_LIMITS = {
     canUploadADUProjects: true
   }
 };
+
+export const SEED_RESOURCES = [
+  {
+    id: 'res-1',
+    title: 'ADU Planning & Feasibility Guidebook',
+    type: 'PDF Document',
+    size: '4.8 MB',
+    desc: 'A step-by-step primer covering site setbacks, utilities, floorplan optimization, and cost modeling.',
+    fileUrl: 'https://example.com/adu-planning-guide.pdf',
+    access: 'all'
+  },
+  {
+    id: 'res-2',
+    title: 'Standard Detached ADU Blueprint Template',
+    type: 'CAD / PDF Drawing',
+    size: '12.4 MB',
+    desc: 'Sample pre-approved structural layout drawings for a 2-bedroom detached accessory unit.',
+    fileUrl: 'https://example.com/adu-detached-blueprint.zip',
+    access: 'pro'
+  },
+  {
+    id: 'res-3',
+    title: 'Municipal Permit Checklist & Ordinance Tracker',
+    type: 'Excel Spreadsheet',
+    size: '1.2 MB',
+    desc: 'Excel tracker sheet to compute structural fee items, impact fees, and fire hazard zone variables.',
+    fileUrl: 'https://example.com/adu-permit-checklist.xlsx',
+    access: 'all'
+  },
+  {
+    id: 'res-4',
+    title: 'Builder & General Contractor Agreement Template',
+    type: 'Word Template',
+    size: '250 KB',
+    desc: 'A vetted standard contract structure to manage build phases, milestones, and payment schedule.',
+    fileUrl: 'https://example.com/builder-agreement-template.docx',
+    access: 'pro'
+  }
+];
