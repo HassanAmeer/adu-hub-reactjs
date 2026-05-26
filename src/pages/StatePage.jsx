@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
 import { dbService } from '../services/dbService';
+import { COLLECTIONS } from '../config';
+import { useAuth } from '../context/AuthContext';
 import {
   CheckCircle2,
   Info,
@@ -18,9 +22,12 @@ import {
   Layers,
   Zap,
   Flame,
-  ShieldAlert
+  ShieldAlert,
+  X,
+  Send,
+  CheckCircle
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { DetailPageSkeleton } from '../components/common/Skeleton';
 
 const StatePage = () => {
@@ -36,6 +43,14 @@ const StatePage = () => {
     }
     setLoading(false);
   }, [stateName]);
+
+  const { currentUser } = useAuth();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [modalEmail, setModalEmail] = useState('');
+  const [modalName, setModalName] = useState('');
+  const [modalSent, setModalSent] = useState(false);
+  const [modalSending, setModalSending] = useState(false);
 
   if (loading) {
     return <DetailPageSkeleton />;
@@ -59,7 +74,6 @@ const StatePage = () => {
       alert("No PDF handbook is uploaded for this state yet.");
       return;
     }
-
     if (url.startsWith('data:application/pdf;base64,')) {
       const link = document.createElement('a');
       link.href = url;
@@ -72,6 +86,45 @@ const StatePage = () => {
     }
   };
 
+  const openModal = (type) => {
+    setModalType(type);
+    setModalEmail(currentUser?.email || '');
+    setModalName(currentUser?.name || '');
+    setModalSent(false);
+    setModalOpen(true);
+  };
+
+  const handleModalSubmit = async (e) => {
+    e.preventDefault();
+    if (!modalEmail || !modalName) return;
+    setModalSending(true);
+    try {
+      const inqId = 'inq-' + Date.now();
+      const inqRef = doc(db, COLLECTIONS.CONTACT_US, inqId);
+      const msg = `[${modalType}] - ${formattedState}\n\nName: ${modalName.trim()}\nEmail: ${modalEmail.trim().toLowerCase()}\nRequest: ${modalType === 'Book Free Consult' ? 'User requested a free consultation for ADU laws in ' + formattedState : 'User wants to be alerted on law changes in ' + formattedState}`;
+      await setDoc(inqRef, {
+        id: inqId,
+        name: modalName.trim(),
+        email: modalEmail.trim().toLowerCase(),
+        message: msg,
+        timestamp: new Date().toISOString(),
+        status: 'unread'
+      });
+      try {
+        const existingStr = localStorage.getItem('adu-db-contactus');
+        let existing = [];
+        try { existing = existingStr ? JSON.parse(existingStr) : []; } catch { existing = []; }
+        existing.unshift({ id: inqId, name: modalName.trim(), email: modalEmail.trim().toLowerCase(), message: msg, timestamp: new Date().toISOString(), status: 'unread' });
+        localStorage.setItem('adu-db-contactus', JSON.stringify(existing));
+      } catch (err) { console.error("Local storage sync failed:", err); }
+      setModalSent(true);
+    } catch (err) {
+      console.error("Error submitting:", err);
+      alert("Error submitting: " + err.message);
+    } finally {
+      setModalSending(false);
+    }
+  };
 
   return (
     <motion.div
@@ -114,7 +167,7 @@ const StatePage = () => {
                 <Download className="w-4 h-4" />
                 Download PDF
               </button>
-              <button className="btn-secondary flex items-center justify-center gap-2 !py-3">
+              <button onClick={() => openModal('Get Alerted on Changes')} className="btn-secondary flex items-center justify-center gap-2 !py-3">
                 Get Alerted on Changes
               </button>
             </div>
@@ -265,7 +318,7 @@ const StatePage = () => {
               <p className="text-slate-300 text-sm mb-8 leading-relaxed relative z-10">
                 Our ADU experts can help you navigate the complex laws in {formattedState}.
               </p>
-              <button className="w-full btn-secondary block text-center !py-3 relative z-10 mb-4">Book Free Consult</button>
+              <button onClick={() => openModal('Book Free Consult')} className="w-full btn-secondary block text-center !py-3 relative z-10 mb-4">Book Free Consult</button>
               <p className="text-xs text-center text-slate-400 relative z-10 font-medium">Average response time: 2 hours</p>
             </div>
 
@@ -310,6 +363,92 @@ const StatePage = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {modalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => !modalSending && setModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-[24px] w-full max-w-md p-8 shadow-2xl relative"
+            >
+              <button
+                onClick={() => setModalOpen(false)}
+                className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {modalSent ? (
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-primary mb-2">Request Sent!</h3>
+                  <p className="text-sm text-slate-500">Your request for <strong>{modalType}</strong> in <strong>{formattedState}</strong> has been submitted. We'll get back to you shortly.</p>
+                  <button onClick={() => setModalOpen(false)} className="btn-primary mt-6 !px-8">Done</button>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-2xl font-bold text-primary mb-2">{modalType}</h3>
+                  <p className="text-sm text-slate-500 mb-6">Fill in your details and we'll reach out regarding {formattedState}.</p>
+
+                  <form onSubmit={handleModalSubmit} className="space-y-5">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Your Name</label>
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder="John Doe"
+                        value={modalName}
+                        onChange={e => setModalName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Email Address</label>
+                      <input
+                        type="email"
+                        className="input-field"
+                        placeholder="john@example.com"
+                        value={modalEmail}
+                        onChange={e => setModalEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={modalSending}
+                      className="btn-primary w-full flex items-center justify-center gap-2 !py-3"
+                    >
+                      {modalSending ? (
+                        <span className="flex items-center gap-2">
+                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Sending...
+                        </span>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          Submit Request
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

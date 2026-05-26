@@ -144,7 +144,7 @@ const Professionals = () => {
         searchPlaceholder="Search contractor name or location..."
         searchField="name"
         renderRow={(pro) => (
-          <tr key={pro.id} className="hover:bg-slate-50/50">
+          <tr key={pro?.id || Math.random()} className="hover:bg-slate-50/50">
             <td className="px-6 py-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-bold shrink-0 border border-slate-200">

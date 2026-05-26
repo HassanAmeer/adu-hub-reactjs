@@ -16,6 +16,10 @@ const StatesPage = () => {
     state.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalCities = states.reduce((sum, s) => sum + (s.cities?.length || 0), 0);
+  const now = new Date();
+  const lastUpdated = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -91,9 +95,9 @@ const StatesPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { label: 'States Tracked', value: '50+', icon: MapPin, color: 'text-emerald-500' },
-              { label: 'City Codes', value: '12,482', icon: Building2, color: 'text-blue-500' },
-              { label: 'Last Updated', value: 'Today', icon: ShieldCheck, color: 'text-secondary' },
+              { label: 'States Tracked', value: states.length, icon: MapPin, color: 'text-emerald-500' },
+              { label: 'City Codes', value: totalCities.toLocaleString(), icon: Building2, color: 'text-blue-500' },
+              { label: 'Last Updated', value: lastUpdated, icon: ShieldCheck, color: 'text-secondary' },
             ].map((stat, i) => (
               <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xl flex items-center gap-5">
                 <div className={`w-14 h-14 rounded-xl flex items-center justify-center bg-slate-50 ${stat.color}`}>

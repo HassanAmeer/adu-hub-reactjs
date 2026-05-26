@@ -27,11 +27,31 @@ const PropertyCheckerPage = () => {
   const [showResult, setShowResult] = useState(false);
 
   // Form input states
+  const [states, setStates] = useState([]);
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
   const [address, setAddress] = useState('');
   const [zoning, setZoning] = useState('Single Family (R-1)');
   const [lotSize, setLotSize] = useState('5,000 – 7,500 sq ft');
   const [selectedStructures, setSelectedStructures] = useState([]);
   const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    const loaded = dbService.getStates();
+    setStates(loaded);
+    if (loaded.length > 0) {
+      setSelectedState(loaded[0].id);
+      if (loaded[0].cities?.length > 0) {
+        setSelectedCity(loaded[0].cities[0]);
+      }
+    }
+  }, []);
+
+  const currentState = states.find(s => s.id === selectedState) || null;
+  const cities = currentState?.cities || [];
+  const stateRules = currentState?.rules || [];
+  const citySlug = selectedCity?.toLowerCase().replace(/\s+/g, '-') || '';
+  const currentCityDetails = currentState?.cityDetails?.[citySlug] || null;
 
   const handleStructureToggle = (item) => {
     setSelectedStructures(prev =>
@@ -49,7 +69,7 @@ const PropertyCheckerPage = () => {
     setTimeout(() => {
       setLoading(false);
       setShowResult(true);
-      dbService.addLog(`Ran property feasibility checker for: ${address}`);
+      dbService.addLog(`Ran property feasibility checker for: ${address}, ${selectedCity}, ${currentState?.name}`);
     }, 1800);
   };
 
@@ -63,10 +83,13 @@ const PropertyCheckerPage = () => {
       return;
     }
 
+    const fullAddress = [address, selectedCity, currentState?.name].filter(Boolean).join(', ');
     const newProp = {
       id: 'prop-' + Date.now(),
-      address: address || '123 Main St, San Diego, CA',
-      status: 'Feasible',
+      address: fullAddress || '123 Main St',
+      stateId: selectedState,
+      city: selectedCity,
+      status: currentState?.status === 'Restricted' ? 'Conditional' : 'Feasible',
       img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=400&auto=format&fit=crop',
       tags: [zoning, lotSize, ...selectedStructures]
     };
@@ -123,13 +146,58 @@ const PropertyCheckerPage = () => {
               <div className="p-8 sm:p-12 bg-white">
                 {step === 1 && (
                   <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                    {currentState?.status === 'Restricted' && (
+                      <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                        <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-amber-800">{currentState.name} is currently Restricted</p>
+                          <p className="text-xs text-amber-700 mt-0.5">ADU laws in this state have significant limitations. Results may show conditional approval with extra requirements.</p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-3">State</label>
+                        <div className="relative">
+                          <select
+                            className="input-field appearance-none !py-4 text-lg cursor-pointer"
+                            value={selectedState}
+                            onChange={e => {
+                              setSelectedState(e.target.value);
+                              setSelectedCity('');
+                            }}
+                          >
+                            {states.map(s => (
+                              <option key={s.id} value={s.id}>{s.name}</option>
+                            ))}
+                          </select>
+                          <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 rotate-90" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-3">City</label>
+                        <div className="relative">
+                          <select
+                            className="input-field appearance-none !py-4 text-lg cursor-pointer"
+                            value={selectedCity}
+                            onChange={e => setSelectedCity(e.target.value)}
+                          >
+                            {cities.map(c => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </select>
+                          <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 rotate-90" />
+                        </div>
+                      </div>
+                    </div>
                     <div>
                       <label className="block text-sm font-bold text-slate-700 mb-3">Street Address</label>
                       <div className="relative">
                         <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6" />
                         <input
                           type="text"
-                          placeholder="123 Main St, San Diego, CA"
+                          placeholder="123 Main St"
                           className="input-field !pl-14 !py-4 text-lg"
                           value={address}
                           onChange={e => setAddress(e.target.value)}
@@ -256,17 +324,41 @@ const PropertyCheckerPage = () => {
               className="space-y-8"
             >
               {/* Result Header */}
-              <div className="bg-white rounded-[24px] border-2 border-emerald-500/30 p-8 relative overflow-hidden shadow-xl">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full -mr-4 -mt-4"></div>
+              <div className={`bg-white rounded-[24px] border-2 p-8 relative overflow-hidden shadow-xl ${
+                currentState?.status === 'Restricted' ? 'border-amber-500/30' : 'border-emerald-500/30'
+              }`}>
+                <div className={`absolute top-0 right-0 w-32 h-32 rounded-bl-full -mr-4 -mt-4 ${
+                  currentState?.status === 'Restricted' ? 'bg-amber-500/10' : 'bg-emerald-500/10'
+                }`}></div>
                 <div className="flex items-center gap-5 mb-8">
-                  <div className="w-14 h-14 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-                    <CheckCircle2 className="w-8 h-8" />
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg ${
+                    currentState?.status === 'Restricted'
+                      ? 'bg-amber-500 shadow-amber-500/30'
+                      : 'bg-emerald-500 shadow-emerald-500/30'
+                  }`}>
+                    {currentState?.status === 'Restricted' ? <XCircle className="w-8 h-8" /> : <CheckCircle2 className="w-8 h-8" />}
                   </div>
                   <div>
                     <div className="flex items-center gap-3 mb-1">
-                      <span className="badge badge-allowed !bg-emerald-100 !text-emerald-700 !border-emerald-300 !px-4 !py-1.5">Yes, Allowed</span>
+                      {currentState?.status === 'Restricted' ? (
+                        <span className="badge !bg-amber-100 !text-amber-700 !border-amber-300 !px-4 !py-1.5">Check Restrictions</span>
+                      ) : (
+                        <span className="badge !bg-emerald-100 !text-emerald-700 !border-emerald-300 !px-4 !py-1.5">Yes, Allowed</span>
+                      )}
                     </div>
-                    <p className="text-slate-500 font-medium">{address || '123 Main St, San Diego, CA'}</p>
+                    <p className="text-slate-500 font-medium">{[address, selectedCity, currentState?.name].filter(Boolean).join(', ') || 'Enter an address'}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      {currentState && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 text-xs font-bold text-slate-600">
+                          <MapPin className="w-3 h-3" /> {currentState.name}
+                        </span>
+                      )}
+                      {selectedCity && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 text-xs font-bold text-slate-600">
+                          <Building2 className="w-3 h-3" /> {selectedCity}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -274,12 +366,22 @@ const PropertyCheckerPage = () => {
                   <div className="space-y-6">
                     <div>
                       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Max ADU Size</p>
-                      <p className="text-2xl font-extrabold text-primary">1,200 sq ft</p>
+                      <p className="text-2xl font-extrabold text-primary">
+                        {stateRules.find(r => r.title === 'Maximum Size')?.value || '1,200 sq ft'}
+                      </p>
                     </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Estimated Approval Difficulty</p>
-                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-md border border-emerald-200 font-bold text-sm">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Easy
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Permit Timeline</p>
+                        <p className="text-lg font-extrabold text-primary">
+                          {currentCityDetails?.permitTime || currentState?.permitTime || '2 - 6 Months'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Impact Fees</p>
+                        <p className="text-lg font-extrabold text-primary">
+                          {currentCityDetails?.impactFees || 'Varies'}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -289,18 +391,27 @@ const PropertyCheckerPage = () => {
                       <AlertTriangle className="w-4 h-4 text-amber-500" /> Likely Constraints
                     </h4>
                     <ul className="space-y-2">
-                      <li className="flex items-start gap-2 text-sm text-slate-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 flex-shrink-0"></div>
-                        <span>4ft rear and side setbacks required.</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm text-slate-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 flex-shrink-0"></div>
-                        <span>Existing structures limit placement options.</span>
-                      </li>
-                      <li className="flex items-start gap-2 text-sm text-slate-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 flex-shrink-0"></div>
-                        <span>Must match primary house roof pitch.</span>
-                      </li>
+                      {stateRules.length > 0 ? stateRules.slice(0, 4).map((rule, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                          <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 flex-shrink-0"></div>
+                          <span><strong>{rule.title}:</strong> {rule.description}</span>
+                        </li>
+                      )) : (
+                        <>
+                          <li className="flex items-start gap-2 text-sm text-slate-600">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 flex-shrink-0"></div>
+                            <span>4ft rear and side setbacks required.</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm text-slate-600">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 flex-shrink-0"></div>
+                            <span>Existing structures limit placement options.</span>
+                          </li>
+                          <li className="flex items-start gap-2 text-sm text-slate-600">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 flex-shrink-0"></div>
+                            <span>Must match primary house roof pitch.</span>
+                          </li>
+                        </>
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -316,8 +427,8 @@ const PropertyCheckerPage = () => {
                 </div>
 
                 <div className="mb-8">
-                  <p className="text-3xl font-extrabold text-primary">$180k – $320k</p>
-                  <p className="text-slate-500 text-sm mt-1">Estimated total project cost based on regional averages.</p>
+                  <p className="text-3xl font-extrabold text-primary">{currentState?.avgCost || '$180k – $320k'}</p>
+                  <p className="text-slate-500 text-sm mt-1">Estimated total project cost based on {currentState?.name || 'regional'} averages.</p>
                 </div>
 
                 <div className="space-y-5">

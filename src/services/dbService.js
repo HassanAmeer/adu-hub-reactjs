@@ -170,10 +170,10 @@ const DEFAULT_ALERTS = [
 ];
 
 const DEFAULT_COSTS = [
-  { id: 'cost-1', state: 'California', type: 'Detached', minSize: 500, maxSize: 800, avgCost: 245000, pricePerSqFt: 385, designCost: 18000, permitCost: 8000, constructionCost: 219000 },
-  { id: 'cost-2', state: 'Washington', type: 'Detached', minSize: 500, maxSize: 800, avgCost: 220000, pricePerSqFt: 340, designCost: 15000, permitCost: 6000, constructionCost: 199000 },
-  { id: 'cost-3', state: 'Texas', type: 'Garage Conversion', minSize: 300, maxSize: 500, avgCost: 120000, pricePerSqFt: 280, designCost: 8000, permitCost: 3000, constructionCost: 109000 },
-  { id: 'cost-4', state: 'Oregon', type: 'Attached', minSize: 400, maxSize: 700, avgCost: 175000, pricePerSqFt: 310, designCost: 12000, permitCost: 5000, constructionCost: 158000 }
+  { id: 'cost-1', state: 'California', type: 'Detached', minSize: 500, maxSize: 800, avgCost: 245000, pricePerSqFt: 385, designCost: 18000, permitCost: 8000, constructionCost: 219000, utilityCost: 7500, impactCost: 4500 },
+  { id: 'cost-2', state: 'Washington', type: 'Detached', minSize: 500, maxSize: 800, avgCost: 220000, pricePerSqFt: 340, designCost: 15000, permitCost: 6000, constructionCost: 199000, utilityCost: 6000, impactCost: 3500 },
+  { id: 'cost-3', state: 'Texas', type: 'Garage Conversion', minSize: 300, maxSize: 500, avgCost: 120000, pricePerSqFt: 280, designCost: 8000, permitCost: 3000, constructionCost: 109000, utilityCost: 4000, impactCost: 2000 },
+  { id: 'cost-4', state: 'Oregon', type: 'Attached', minSize: 400, maxSize: 700, avgCost: 175000, pricePerSqFt: 310, designCost: 12000, permitCost: 5000, constructionCost: 158000, utilityCost: 5000, impactCost: 2500 }
 ];
 
 const DEFAULT_SETTINGS = {
@@ -506,7 +506,7 @@ export const dbService = {
   },
   updatePro: (proId, updatedFields) => {
     const dir = dbService.getDirectory();
-    const idx = dir.findIndex(p => p.id === Number(proId));
+    const idx = dir.findIndex(p => String(p.id) === String(proId));
     if (idx !== -1) {
       dir[idx] = { ...dir[idx], ...updatedFields };
       dbService.saveDirectory(dir);
@@ -521,7 +521,7 @@ export const dbService = {
     return null;
   },
   deletePro: (proId) => {
-    const dir = dbService.getDirectory().filter(p => p.id !== Number(proId));
+    const dir = dbService.getDirectory().filter(p => String(p.id) !== String(proId));
     dbService.saveDirectory(dir);
     try {
       const proRef = doc(db, COLLECTIONS.PROFESSIONALS, String(proId));
@@ -582,7 +582,9 @@ export const dbService = {
       pricePerSqFt: Number(cost.pricePerSqFt) || 300,
       designCost: Number(cost.designCost) || 12000,
       permitCost: Number(cost.permitCost) || 5000,
-      constructionCost: Number(cost.constructionCost) || 183000
+      constructionCost: Number(cost.constructionCost) || 183000,
+      utilityCost: Number(cost.utilityCost) || 5000,
+      impactCost: Number(cost.impactCost) || 2500
     };
     costs.push(newCost);
     dbService.saveCosts(costs);

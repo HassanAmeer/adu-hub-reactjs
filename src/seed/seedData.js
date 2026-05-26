@@ -498,10 +498,10 @@ export const SEED_PROFESSIONALS = [
 ];
 
 export const SEED_COSTS = [
-  { id: 'cost-ca-detached', stateId: 'ca', type: 'Detached', minSize: 500, maxSize: 800, avgCost: 245000, pricePerSqFt: 385, designCost: 18000, permitCost: 8000, constructionCost: 219000 },
-  { id: 'cost-wa-detached', stateId: 'wa', type: 'Detached', minSize: 500, maxSize: 800, avgCost: 220000, pricePerSqFt: 340, designCost: 15000, permitCost: 6000, constructionCost: 199000 },
-  { id: 'cost-tx-conversion', stateId: 'tx', type: 'Garage Conversion', minSize: 300, maxSize: 500, avgCost: 120000, pricePerSqFt: 280, designCost: 8000, permitCost: 3000, constructionCost: 109000 },
-  { id: 'cost-or-attached', stateId: 'or', type: 'Attached', minSize: 400, maxSize: 700, avgCost: 175000, pricePerSqFt: 310, designCost: 12000, permitCost: 5000, constructionCost: 158000 }
+  { id: 'cost-ca-detached', state: 'California', type: 'Detached', minSize: 500, maxSize: 800, avgCost: 245000, pricePerSqFt: 385, designCost: 18000, permitCost: 8000, constructionCost: 219000, utilityCost: 7500, impactCost: 4500 },
+  { id: 'cost-wa-detached', state: 'Washington', type: 'Detached', minSize: 500, maxSize: 800, avgCost: 220000, pricePerSqFt: 340, designCost: 15000, permitCost: 6000, constructionCost: 199000, utilityCost: 6000, impactCost: 3500 },
+  { id: 'cost-tx-conversion', state: 'Texas', type: 'Garage Conversion', minSize: 300, maxSize: 500, avgCost: 120000, pricePerSqFt: 280, designCost: 8000, permitCost: 3000, constructionCost: 109000, utilityCost: 4000, impactCost: 2000 },
+  { id: 'cost-or-attached', state: 'Oregon', type: 'Attached', minSize: 400, maxSize: 700, avgCost: 175000, pricePerSqFt: 310, designCost: 12000, permitCost: 5000, constructionCost: 158000, utilityCost: 5000, impactCost: 2500 }
 ];
 
 export const SEED_LAW_UPDATES = [
