@@ -17,15 +17,15 @@ const Footer = () => {
               {appConfig.description}
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors">
+              <button type="button" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">
                 <Send className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors">
+              </button>
+              <button type="button" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">
                 <Briefcase className="w-5 h-5" />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors">
+              </button>
+              <button type="button" className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-secondary transition-colors cursor-pointer">
                 <Code className="w-5 h-5" />
-              </a>
+              </button>
             </div>
           </div>
 
