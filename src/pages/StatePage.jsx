@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { dbService } from '../services/dbService';
-import { 
-  CheckCircle2, 
-  Info, 
-  ChevronRight, 
-  ArrowLeft, 
-  Download, 
+import {
+  CheckCircle2,
+  Info,
+  ChevronRight,
+  ArrowLeft,
+  Download,
   Calendar,
   Building,
   Ruler,
@@ -47,9 +47,34 @@ const StatePage = () => {
   const rules = stateData?.rules || [];
   const grants = stateData?.grants || [];
 
+  const timeline = stateData?.timeline || [
+    { year: '2024', title: 'SB 423 Implementation', desc: 'Accelerated permit processing for multi-family ADUs in certain zones.' },
+    { year: '2023', title: 'AB 1033 Passing', desc: 'Allows local agencies to permit ADUs to be sold separately as condos.' },
+    { year: '2020', title: 'The ADU Revolution', desc: 'Major state-wide changes removing parking and owner-occupancy requirements.' }
+  ];
+
+  const handleDownloadPdf = () => {
+    const url = stateData?.pdfUrl;
+    if (!url) {
+      alert("No PDF handbook is uploaded for this state yet.");
+      return;
+    }
+
+    if (url.startsWith('data:application/pdf;base64,')) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${formattedState.toLowerCase()}-adu-handbook.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.open(url, '_blank');
+    }
+  };
+
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="bg-slate-50 min-h-screen pb-24"
@@ -64,7 +89,7 @@ const StatePage = () => {
             <ArrowLeft className="w-4 h-4" />
             Back to States
           </Link>
-          
+
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="max-w-2xl">
               <div className="flex items-center gap-4 mb-4">
@@ -78,7 +103,14 @@ const StatePage = () => {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-              <button className="btn-secondary !bg-white/10 !text-white hover:!bg-white/20 border border-white/20 flex items-center justify-center gap-2 !py-3">
+              <button
+                onClick={handleDownloadPdf}
+                className={`btn-secondary flex items-center justify-center gap-2 !py-3 transition-all ${stateData?.pdfUrl
+                    ? '!bg-white/10 !text-white hover:!bg-white/20 border border-white/20 cursor-pointer'
+                    : '!bg-white/5 !text-white/30 border border-white/10 cursor-not-allowed opacity-40'
+                  }`}
+                title={stateData?.pdfUrl ? "Download Reference PDF Handbook" : "No PDF reference handbook uploaded"}
+              >
                 <Download className="w-4 h-4" />
                 Download PDF
               </button>
@@ -99,7 +131,7 @@ const StatePage = () => {
             </div>
             <div>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Average Cost</p>
-              <p className="text-2xl font-bold text-primary">$180k - $250k</p>
+              <p className="text-2xl font-bold text-primary">{stateData?.avgCost || '$180k - $250k'}</p>
             </div>
           </div>
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
@@ -108,7 +140,7 @@ const StatePage = () => {
             </div>
             <div>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Typical ROI</p>
-              <p className="text-2xl font-bold text-primary">8% - 12%</p>
+              <p className="text-2xl font-bold text-primary">{stateData?.typicalRoi || '8% - 12%'}</p>
             </div>
           </div>
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
@@ -117,7 +149,7 @@ const StatePage = () => {
             </div>
             <div>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Permit Time</p>
-              <p className="text-2xl font-bold text-primary">2 - 6 Months</p>
+              <p className="text-2xl font-bold text-primary">{stateData?.permitTime || '2 - 6 Months'}</p>
             </div>
           </div>
         </div>
@@ -125,9 +157,9 @@ const StatePage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-12">
-            
-             {/* Summary Grid */}
-             <section>
+
+            {/* Summary Grid */}
+            <section>
               <h2 className="text-3xl font-bold text-primary mb-8">Key Regulations</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {rules.map((rule, idx) => (
@@ -187,11 +219,7 @@ const StatePage = () => {
                 Timeline of Legislative Changes
               </h2>
               <div className="space-y-0 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-200 ml-2">
-                {[
-                  { year: '2024', title: 'SB 423 Implementation', desc: 'Accelerated permit processing for multi-family ADUs in certain zones.' },
-                  { year: '2023', title: 'AB 1033 Passing', desc: 'Allows local agencies to permit ADUs to be sold separately as condos.' },
-                  { year: '2020', title: 'The ADU Revolution', desc: 'Major state-wide changes removing parking and owner-occupancy requirements.' }
-                ].map((item, idx) => (
+                {timeline.map((item, idx) => (
                   <div key={idx} className="relative pl-12 pb-10 last:pb-0">
                     <div className="absolute left-[-2px] top-1 w-10 h-10 rounded-full bg-white border-2 border-secondary flex items-center justify-center z-10 shadow-sm">
                       <div className="w-3 h-3 rounded-full bg-secondary"></div>
@@ -203,6 +231,9 @@ const StatePage = () => {
                     </div>
                   </div>
                 ))}
+                {timeline.length === 0 && (
+                  <p className="text-xs text-slate-400 font-medium py-4">No legislative updates timeline recorded for this state.</p>
+                )}
               </div>
             </section>
 
@@ -211,7 +242,7 @@ const StatePage = () => {
               <h2 className="text-3xl font-bold text-primary mb-8">Major Cities in {formattedState}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {cities.map((city) => (
-                  <Link 
+                  <Link
                     key={city}
                     to={`/state/${stateName || 'california'}/city/${city.toLowerCase().replace(' ', '-')}`}
                     className="flex items-center justify-between p-5 bg-white rounded-xl border border-slate-200 hover:border-secondary hover:shadow-md group transition-all"
@@ -227,9 +258,9 @@ const StatePage = () => {
           {/* Sidebar */}
           <div className="space-y-8">
             <div className="bg-primary rounded-[24px] p-8 text-white shadow-xl relative overflow-hidden">
-               <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none">
-                  <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
-               </div>
+              <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none">
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
+              </div>
               <h3 className="text-2xl font-bold mb-4 relative z-10">Need Help?</h3>
               <p className="text-slate-300 text-sm mb-8 leading-relaxed relative z-10">
                 Our ADU experts can help you navigate the complex laws in {formattedState}.

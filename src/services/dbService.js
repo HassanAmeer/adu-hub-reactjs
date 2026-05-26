@@ -330,13 +330,91 @@ export const dbService = {
   },
 
   // --- STATES & CITIES ---
-  getStates: () => loadCollection('adu-db-states', initialStates.map(s => ({
-    ...s,
-    rules: initialRules,
-    grants: [
-      { id: 'grant-1', name: s.name + ' ADU Development Grant', value: '$35,000', status: 'Active', desc: 'Financial support for qualifying middle-income and low-income homeowners to cover pre-development plans.' }
-    ]
-  }))),
+  getStates: () => {
+    const states = loadCollection('adu-db-states', initialStates.map(s => ({
+      avgCost: '$180,000 - $250,000',
+      typicalRoi: '8% - 12%',
+      permitTime: '2 - 6 Months',
+      pdfUrl: '',
+      timeline: [
+        { year: '2024', title: 'SB 423 Implementation', desc: 'Accelerated permit processing for multi-family ADUs in certain zones.' },
+        { year: '2023', title: 'AB 1033 Passing', desc: 'Allows local agencies to permit ADUs to be sold separately as condos.' },
+        { year: '2020', title: 'The ADU Revolution', desc: 'Major state-wide changes removing parking and owner-occupancy requirements.' }
+      ],
+      ...s,
+      rules: s.rules || initialRules,
+      grants: s.grants && s.grants.length > 0 ? s.grants : [
+        { id: 'grant-1', name: s.name + ' ADU Development Grant', value: '$35,000', status: 'Active', desc: 'Financial support for qualifying middle-income and low-income homeowners to cover pre-development plans.' }
+      ],
+      cityDetails: s.cityDetails || {}
+    })));
+
+    let modified = false;
+    const verified = states.map(s => {
+      if (!s.cityDetails) {
+        s.cityDetails = {};
+        modified = true;
+      }
+      if (s.id === 'ca' && Object.keys(s.cityDetails).length === 0) {
+        s.cityDetails = {
+          'san-diego': {
+            name: 'San Diego',
+            permitTime: '60-90 Days',
+            impactFees: '$0 - $5k',
+            alerts: [
+              { title: 'Coastal & Historic Overlays', desc: 'Properties within 1,000 yards of the coast or in designated historic districts require additional permits, adding 4-6 months to timelines.', type: 'amber' },
+              { title: 'Fee Waiver Active', desc: 'San Diego is currently waiving development impact fees for ADUs under 750 sq ft until December 2024.', type: 'emerald' },
+              { title: 'HOA Overlays', desc: 'State law restricts HOAs from banning ADUs, but they can impose "reasonable" aesthetic guidelines in San Diego.', type: 'blue' }
+            ],
+            amendments: [
+              { title: 'Height Increases', desc: 'Allows up to 18 ft (instead of 16 ft) for detached ADUs near transit.', type: 'success' },
+              { title: 'Front Yard ADUs', desc: 'Permitted only if rear yard is completely constrained.', type: 'success' },
+              { title: 'Owner Occupancy', desc: 'Suspended until 2025, but may be reinstated locally afterwards.', type: 'warning' }
+            ],
+            zoningStandards: [
+              { category: 'Setbacks', standard: '4 ft Side / Rear', notes: 'Reduced from standard 15ft' },
+              { category: 'Lot Coverage', standard: 'No maximum', notes: 'State law overrides local limit' },
+              { category: 'Min Lot Size', standard: 'None', notes: 'Any residentially zoned lot' },
+              { category: 'Fire Sprinklers', standard: 'Required', notes: 'Only if primary has them' },
+              { category: 'Architecture', standard: 'Must match primary', notes: 'Roof pitch and siding' }
+            ],
+            permitTimeline: [
+              { step: 'Intake', time: '1-2 Weeks' },
+              { step: 'Plan Review', time: '4-6 Weeks' },
+              { step: 'Corrections', time: '2-4 Weeks' }
+            ],
+            zoningChips: ['Single Family', 'Multi-Family', 'Transit Priority', 'Historic District', 'Wildfire Zone', 'HOA Zones']
+          },
+          'los-angeles': {
+            name: 'Los Angeles',
+            permitTime: '30-60 Days',
+            impactFees: '$1k - $8k',
+            alerts: [
+              { title: 'Hillside Regulations', desc: 'ADUs in Hillside areas have stricter height and grading limits.', type: 'amber' }
+            ],
+            amendments: [
+              { title: 'Size Exemptions', desc: 'Allows up to 1,200 sq ft regardless of primary home size.', type: 'success' }
+            ],
+            zoningStandards: [
+              { category: 'Setbacks', standard: '4 ft Side / Rear', notes: 'Standard for detached' }
+            ],
+            permitTimeline: [
+              { step: 'Intake', time: '1 Week' },
+              { step: 'Review', time: '3-5 Weeks' }
+            ],
+            zoningChips: ['Single Family', 'Multi-Family', 'Hillside Area']
+          }
+        };
+        modified = true;
+      }
+      return s;
+    });
+
+    if (modified) {
+      saveCollection('adu-db-states', verified);
+    }
+    return verified;
+  },
   saveStates: (states) => saveCollection('adu-db-states', states),
   addState: (state) => {
     const states = dbService.getStates();
@@ -346,9 +424,17 @@ export const dbService = {
       status: state.status || 'Allowed',
       cities: state.cities || [],
       rules: state.rules || initialRules,
+      avgCost: state.avgCost || '$180,000 - $250,000',
+      typicalRoi: state.typicalRoi || '8% - 12%',
+      permitTime: state.permitTime || '2 - 6 Months',
+      pdfUrl: state.pdfUrl || '',
       grants: state.grants || [
         { id: 'grant-custom', name: state.name + ' Local Incentive Program', value: '$20,000', status: 'Active', desc: 'Direct cost incentives or development fee waivers.' }
-      ]
+      ],
+      timeline: state.timeline || [
+        { year: new Date().getFullYear().toString(), title: 'Ordinance Created', desc: 'Baseline local ADU ordinance finalized.' }
+      ],
+      cityDetails: state.cityDetails || {}
     };
     states.push(newState);
     dbService.saveStates(states);

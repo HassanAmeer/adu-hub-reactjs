@@ -196,11 +196,134 @@ export const SEED_USERS = [
 ];
 
 export const SEED_STATES = [
-  { id: 'ca', name: 'California', status: 'Allowed', cities: ['San Diego', 'Los Angeles', 'San Francisco', 'Sacramento'] },
-  { id: 'wa', name: 'Washington', status: 'Allowed', cities: ['Seattle', 'Tacoma', 'Spokane'] },
-  { id: 'or', name: 'Oregon', status: 'Allowed', cities: ['Portland', 'Eugene', 'Salem'] },
-  { id: 'tx', name: 'Texas', status: 'Restricted', cities: ['Austin', 'Dallas', 'Houston'] },
-  { id: 'fl', name: 'Florida', status: 'Restricted', cities: ['Miami', 'Tampa', 'Orlando'] }
+  {
+    id: 'ca',
+    name: 'California',
+    status: 'Allowed',
+    cities: ['San Diego', 'Los Angeles', 'San Francisco', 'Sacramento'],
+    avgCost: '$180,000 - $250,000',
+    typicalRoi: '8% - 12%',
+    permitTime: '2 - 6 Months',
+    pdfUrl: '',
+    grants: [
+      { name: 'CalHFA ADU Grant Program', value: '$40,000', status: 'Active', desc: 'Provides up to $40,000 in assistance for predevelopment costs associated with the construction of an ADU.' }
+    ],
+    timeline: [
+      { year: '2024', title: 'SB 423 Implementation', desc: 'Accelerated permit processing for multi-family ADUs in certain zones.' },
+      { year: '2023', title: 'AB 1033 Passing', desc: 'Allows local agencies to permit ADUs to be sold separately as condos.' },
+      { year: '2020', title: 'The ADU Revolution', desc: 'Major state-wide changes removing parking and owner-occupancy requirements.' }
+    ],
+    cityDetails: {
+      'san-diego': {
+        name: 'San Diego',
+        permitTime: '60-90 Days',
+        impactFees: '$0 - $5k',
+        alerts: [
+          { title: 'Coastal & Historic Overlays', desc: 'Properties within 1,000 yards of the coast or in designated historic districts require additional permits, adding 4-6 months to timelines.', type: 'amber' },
+          { title: 'Fee Waiver Active', desc: 'San Diego is currently waiving development impact fees for ADUs under 750 sq ft until December 2024.', type: 'emerald' },
+          { title: 'HOA Overlays', desc: 'State law restricts HOAs from banning ADUs, but they can impose "reasonable" aesthetic guidelines in San Diego.', type: 'blue' }
+        ],
+        amendments: [
+          { title: 'Height Increases', desc: 'Allows up to 18 ft (instead of 16 ft) for detached ADUs near transit.', type: 'success' },
+          { title: 'Front Yard ADUs', desc: 'Permitted only if rear yard is completely constrained.', type: 'success' },
+          { title: 'Owner Occupancy', desc: 'Suspended until 2025, but may be reinstated locally afterwards.', type: 'warning' }
+        ],
+        zoningStandards: [
+          { category: 'Setbacks', standard: '4 ft Side / Rear', notes: 'Reduced from standard 15ft' },
+          { category: 'Lot Coverage', standard: 'No maximum', notes: 'State law overrides local limit' },
+          { category: 'Min Lot Size', standard: 'None', notes: 'Any residentially zoned lot' },
+          { category: 'Fire Sprinklers', standard: 'Required', notes: 'Only if primary has them' },
+          { category: 'Architecture', standard: 'Must match primary', notes: 'Roof pitch and siding' }
+        ],
+        permitTimeline: [
+          { step: 'Intake', time: '1-2 Weeks' },
+          { step: 'Plan Review', time: '4-6 Weeks' },
+          { step: 'Corrections', time: '2-4 Weeks' }
+        ],
+        zoningChips: ['Single Family', 'Multi-Family', 'Transit Priority', 'Historic District', 'Wildfire Zone', 'HOA Zones']
+      },
+      'los-angeles': {
+        name: 'Los Angeles',
+        permitTime: '30-60 Days',
+        impactFees: '$1k - $8k',
+        alerts: [
+          { title: 'Hillside Regulations', desc: 'ADUs in Hillside areas have stricter height and grading limits.', type: 'amber' }
+        ],
+        amendments: [
+          { title: 'Size Exemptions', desc: 'Allows up to 1,200 sq ft regardless of primary home size.', type: 'success' }
+        ],
+        zoningStandards: [
+          { category: 'Setbacks', standard: '4 ft Side / Rear', notes: 'Standard for detached' }
+        ],
+        permitTimeline: [
+          { step: 'Intake', time: '1 Week' },
+          { step: 'Review', time: '3-5 Weeks' }
+        ],
+        zoningChips: ['Single Family', 'Multi-Family', 'Hillside Area']
+      }
+    }
+  },
+  {
+    id: 'wa',
+    name: 'Washington',
+    status: 'Allowed',
+    cities: ['Seattle', 'Tacoma', 'Spokane'],
+    avgCost: '$160,000 - $220,000',
+    typicalRoi: '7% - 10%',
+    permitTime: '3 - 6 Months',
+    pdfUrl: '',
+    grants: [
+      { name: 'Seattle Housing Incentive Program', value: '$25,000', status: 'Active', desc: 'Seattle grants and loan assistance for building accessory dwelling units for low-income tenants.' }
+    ],
+    timeline: [
+      { year: '2025', title: 'HB 1110 Implementation', desc: 'Cities must allow up to 2 ADUs per lot statewide.' },
+      { year: '2023', title: 'Middle Housing Bill Passed', desc: 'Washington state legislature passes historic legalization of ADUs.' }
+    ]
+  },
+  {
+    id: 'or',
+    name: 'Oregon',
+    status: 'Allowed',
+    cities: ['Portland', 'Eugene', 'Salem'],
+    avgCost: '$150,000 - $210,000',
+    typicalRoi: '6% - 9%',
+    permitTime: '2 - 5 Months',
+    pdfUrl: '',
+    grants: [
+      { name: 'Oregon Revolving Loan Fund', value: '$15,000', status: 'Active', desc: 'State infrastructure loans to support local low-income homeowners building backyard units.' }
+    ],
+    timeline: [
+      { year: '2024', title: 'SB 1537 Signed', desc: 'Oregon Governor signs new infrastructure and revolving fund bill for ADUs.' }
+    ]
+  },
+  {
+    id: 'tx',
+    name: 'Texas',
+    status: 'Restricted',
+    cities: ['Austin', 'Dallas', 'Houston'],
+    avgCost: '$110,000 - $160,000',
+    typicalRoi: '9% - 14%',
+    permitTime: '1 - 3 Months',
+    pdfUrl: '',
+    grants: [],
+    timeline: [
+      { year: '2024', title: 'Austin HOME Initiative Phase 2', desc: 'Allows up to 3 units on single-family lots, removing setbacks.' }
+    ]
+  },
+  {
+    id: 'fl',
+    name: 'Florida',
+    status: 'Restricted',
+    cities: ['Miami', 'Tampa', 'Orlando'],
+    avgCost: '$130,000 - $190,000',
+    typicalRoi: '8% - 11%',
+    permitTime: '3 - 7 Months',
+    pdfUrl: '',
+    grants: [],
+    timeline: [
+      { year: '2023', title: 'Miami ADU Ordinance Updated', desc: 'Relief of lot coverage rules for properties located near urban transit centers.' }
+    ]
+  }
 ];
 
 export const SEED_CITIES = [

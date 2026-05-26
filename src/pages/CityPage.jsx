@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   AlertTriangle, 
@@ -14,11 +14,89 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import MockMap from '../components/shared/MockMap';
+import { dbService } from '../services/dbService';
+import { DetailPageSkeleton } from '../components/common/Skeleton';
 
 const CityPage = () => {
   const { state, cityName } = useParams();
-  const formattedCity = cityName ? cityName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'San Diego';
-  const formattedState = state ? state.charAt(0).toUpperCase() + state.slice(1) : 'California';
+  const [stateData, setStateData] = useState(null);
+  const [cityData, setCityData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const allStates = dbService.getStates();
+    const foundState = allStates.find(
+      s => s.id === state?.toLowerCase() || s.name.toLowerCase() === state?.toLowerCase()
+    );
+    if (foundState) {
+      setStateData(foundState);
+      const details = foundState.cityDetails || {};
+      
+      // Attempt to find by slug first, then fallback to direct match
+      const citySlug = cityName?.toLowerCase();
+      const matchedKey = Object.keys(details).find(
+        key => key.toLowerCase() === citySlug || key.toLowerCase().replace(/\s+/g, '-') === citySlug
+      );
+      
+      if (matchedKey && details[matchedKey]) {
+        setCityData(details[matchedKey]);
+      } else {
+        // Find if there's any key that has a name matching the cityName
+        const matchByName = Object.values(details).find(
+          c => c.name?.toLowerCase() === cityName?.toLowerCase().replace(/-/g, ' ')
+        );
+        if (matchByName) {
+          setCityData(matchByName);
+        }
+      }
+    }
+    setLoading(false);
+  }, [state, cityName]);
+
+  if (loading) {
+    return <DetailPageSkeleton />;
+  }
+
+  const formattedCity = cityData?.name || (cityName ? cityName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'San Diego');
+  const formattedState = stateData?.name || (state ? state.charAt(0).toUpperCase() + state.slice(1) : 'California');
+
+  // Dynamic Fields Fallbacks
+  const permitTime = cityData?.permitTime || '60-90 Days';
+  const impactFees = cityData?.impactFees || '$0 - $5k';
+  
+  const alerts = cityData?.alerts || [
+    { title: 'Coastal & Historic Overlays', desc: 'Properties within 1,000 yards of the coast or in designated historic districts require additional permits, adding 4-6 months to timelines.', type: 'amber' },
+    { title: 'Fee Waiver Active', desc: `${formattedCity} is currently waiving development impact fees for ADUs under 750 sq ft until December 2024.`, type: 'emerald' },
+    { title: 'HOA Overlays', desc: `State law restricts HOAs from banning ADUs, but they can impose "reasonable" aesthetic guidelines in ${formattedCity}.`, type: 'blue' }
+  ];
+
+  const amendments = cityData?.amendments || [
+    { title: 'Height Increases', desc: 'Allows up to 18 ft (instead of 16 ft) for detached ADUs near transit.', type: 'success' },
+    { title: 'Front Yard ADUs', desc: 'Permitted only if rear yard is completely constrained.', type: 'success' },
+    { title: 'Owner Occupancy', desc: 'Suspended until 2025, but may be reinstated locally afterwards.', type: 'warning' }
+  ];
+
+  const zoningStandards = cityData?.zoningStandards || [
+    { category: 'Setbacks', standard: '4 ft Side / Rear', notes: 'Reduced from standard 15ft' },
+    { category: 'Lot Coverage', standard: 'No maximum', notes: 'State law overrides local limit' },
+    { category: 'Min Lot Size', standard: 'None', notes: 'Any residentially zoned lot' },
+    { category: 'Fire Sprinklers', standard: 'Required', notes: 'Only if primary has them' },
+    { category: 'Architecture', standard: 'Must match primary', notes: 'Roof pitch and siding' }
+  ];
+
+  const permitTimeline = cityData?.permitTimeline || [
+    { step: 'Intake', time: '1-2 Weeks' },
+    { step: 'Plan Review', time: '4-6 Weeks' },
+    { step: 'Corrections', time: '2-4 Weeks' }
+  ];
+
+  const zoningChips = cityData?.zoningChips || ['Single Family', 'Multi-Family', 'Transit Priority', 'Historic District', 'Wildfire Zone', 'HOA Zones'];
+
+  const getTimelineIcon = (index) => {
+    if (index === 0) return Search;
+    if (index === 1) return Clock;
+    return Info;
+  };
 
   return (
     <motion.div 
@@ -56,11 +134,11 @@ const CityPage = () => {
             <div className="flex items-center gap-4 bg-slate-800/50 backdrop-blur-md p-3 rounded-2xl border border-white/10">
               <div className="px-5 py-3 bg-slate-800 rounded-xl shadow-lg border border-white/5 text-center">
                 <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Permit Time</p>
-                <p className="font-bold text-white text-lg">60-90 Days</p>
+                <p className="font-bold text-white text-lg">{permitTime}</p>
               </div>
               <div className="px-5 py-3 bg-slate-800 rounded-xl shadow-lg border border-white/5 text-center">
                 <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Impact Fees</p>
-                <p className="font-bold text-white text-lg">$0 - $5k</p>
+                <p className="font-bold text-white text-lg">{impactFees}</p>
               </div>
             </div>
           </div>
@@ -69,136 +147,129 @@ const CityPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         {/* Overlays & Alerts */}
-        <div className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-amber-50 border border-amber-200 rounded-[20px] p-6 flex items-start gap-4 shadow-sm hover:shadow-md transition-shadow">
-            <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0" />
-            <div>
-              <h4 className="font-bold text-amber-900 mb-1">Coastal & Historic Overlays</h4>
-              <p className="text-sm text-amber-800/80 leading-relaxed">
-                Properties within 1,000 yards of the coast or in designated historic districts require additional permits, adding 4-6 months to timelines.
-              </p>
-            </div>
+        {alerts.length > 0 && (
+          <div className="mb-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {alerts.map((al, idx) => {
+              const Icon = al.type === 'amber' ? AlertTriangle : al.type === 'emerald' ? CheckCircle2 : Home;
+              const bgClass = al.type === 'amber' ? 'bg-amber-50 border-amber-200' : al.type === 'emerald' ? 'bg-emerald-50 border-emerald-200' : 'bg-blue-50 border-blue-200';
+              const textClass = al.type === 'amber' ? 'text-amber-900' : al.type === 'emerald' ? 'text-emerald-900' : 'text-blue-900';
+              const bodyClass = al.type === 'amber' ? 'text-amber-800/80' : al.type === 'emerald' ? 'text-emerald-800/80' : 'text-blue-800/80';
+              const iconColor = al.type === 'amber' ? 'text-amber-500' : al.type === 'emerald' ? 'text-emerald-500' : 'text-blue-500';
+
+              return (
+                <div key={idx} className={`${bgClass} border rounded-[20px] p-6 flex items-start gap-4 shadow-sm hover:shadow-md transition-shadow`}>
+                  <Icon className={`w-6 h-6 ${iconColor} flex-shrink-0`} />
+                  <div>
+                    <h4 className={`font-bold ${textClass} mb-1`}>{al.title}</h4>
+                    <p className={`text-sm ${bodyClass} leading-relaxed`}>{al.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="bg-emerald-50 border border-emerald-200 rounded-[20px] p-6 flex items-start gap-4 shadow-sm hover:shadow-md transition-shadow">
-            <CheckCircle2 className="w-6 h-6 text-emerald-500 flex-shrink-0" />
-            <div>
-              <h4 className="font-bold text-emerald-900 mb-1">Fee Waiver Active</h4>
-              <p className="text-sm text-emerald-800/80 leading-relaxed">
-                {formattedCity} is currently waiving development impact fees for ADUs under 750 sq ft until December 2024.
-              </p>
-            </div>
-          </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-[20px] p-6 flex items-start gap-4 shadow-sm hover:shadow-md transition-shadow">
-            <Home className="w-6 h-6 text-blue-500 flex-shrink-0" />
-            <div>
-              <h4 className="font-bold text-blue-900 mb-1">HOA Overlays</h4>
-              <p className="text-sm text-blue-800/80 leading-relaxed">
-                State law restricts HOAs from banning ADUs, but they can impose "reasonable" aesthetic guidelines in {formattedCity}.
-              </p>
-            </div>
-          </div>
-        </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-12">
             
             {/* Local Amendments */}
-            <section className="card border-l-4 border-l-secondary">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
-                  <BookOpen className="w-5 h-5" />
+            {amendments.length > 0 && (
+              <section className="card border-l-4 border-l-secondary">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-primary m-0">Local Amendments to State Law</h2>
                 </div>
-                <h2 className="text-2xl font-bold text-primary m-0">Local Amendments to State Law</h2>
-              </div>
-              <p className="text-slate-600 mb-4">
-                While state law provides baseline allowances, {formattedCity} has passed local ordinances that modify these rules:
-              </p>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3 text-slate-700">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span><strong>Height Increases:</strong> Allows up to 18 ft (instead of 16 ft) for detached ADUs near transit.</span>
-                </li>
-                <li className="flex items-start gap-3 text-slate-700">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span><strong>Front Yard ADUs:</strong> Permitted only if rear yard is completely constrained.</span>
-                </li>
-                <li className="flex items-start gap-3 text-slate-700">
-                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <span><strong>Owner Occupancy:</strong> Suspended until 2025, but may be reinstated locally afterwards.</span>
-                </li>
-              </ul>
-            </section>
+                <p className="text-slate-600 mb-4">
+                  While state law provides baseline allowances, {formattedCity} has passed local ordinances that modify these rules:
+                </p>
+                <ul className="space-y-3">
+                  {amendments.map((am, idx) => {
+                    const Icon = am.type === 'success' ? CheckCircle2 : AlertTriangle;
+                    const iconColor = am.type === 'success' ? 'text-emerald-500' : 'text-amber-500';
+                    return (
+                      <li key={idx} className="flex items-start gap-3 text-slate-700">
+                        <Icon className={`w-5 h-5 ${iconColor} flex-shrink-0 mt-0.5`} />
+                        <span><strong>{am.title}:</strong> {am.desc}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
 
             {/* Detailed Rules Table */}
-            <section>
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-primary">Zoning Standards</h2>
-              </div>
-              <div className="bg-white border border-slate-200 rounded-[20px] overflow-hidden shadow-sm">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200">
-                      <th className="px-6 py-4 font-bold text-slate-500 text-xs uppercase tracking-wider">Category</th>
-                      <th className="px-6 py-4 font-bold text-slate-500 text-xs uppercase tracking-wider">Standard</th>
-                      <th className="px-6 py-4 font-bold text-slate-500 text-xs uppercase tracking-wider">Notes</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {[
-                      { cat: 'Setbacks', std: '4 ft Side / Rear', notes: 'Reduced from standard 15ft' },
-                      { cat: 'Lot Coverage', std: 'No maximum', notes: 'State law overrides local limit' },
-                      { cat: 'Min Lot Size', std: 'None', notes: 'Any residentially zoned lot' },
-                      { cat: 'Fire Sprinklers', std: 'Required', notes: 'Only if primary has them' },
-                      { cat: 'Architecture', std: 'Must match primary', notes: 'Roof pitch and siding' },
-                    ].map((row, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-4 font-semibold text-slate-800">{row.cat}</td>
-                        <td className="px-6 py-4 text-slate-600 font-medium">{row.std}</td>
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
-                            {row.notes}
-                          </span>
-                        </td>
+            {zoningStandards.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-bold text-primary">Zoning Standards</h2>
+                </div>
+                <div className="bg-white border border-slate-200 rounded-[20px] overflow-hidden shadow-sm">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200">
+                        <th className="px-6 py-4 font-bold text-slate-500 text-xs uppercase tracking-wider">Category</th>
+                        <th className="px-6 py-4 font-bold text-slate-500 text-xs uppercase tracking-wider">Standard</th>
+                        <th className="px-6 py-4 font-bold text-slate-500 text-xs uppercase tracking-wider">Notes</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {zoningStandards.map((row, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="px-6 py-4 font-semibold text-slate-800">{row.category}</td>
+                          <td className="px-6 py-4 text-slate-600 font-medium">{row.standard}</td>
+                          <td className="px-6 py-4">
+                            {row.notes && (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
+                                {row.notes}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
 
             {/* Permit Process */}
-            <section>
-              <h2 className="text-2xl font-bold text-primary mb-8">Permit Timeline</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {[
-                  { step: 'Intake', time: '1-2 Weeks', icon: Search },
-                  { step: 'Plan Review', time: '4-6 Weeks', icon: Clock },
-                  { step: 'Corrections', time: '2-4 Weeks', icon: Info },
-                ].map((item, idx) => (
-                  <div key={idx} className="bg-white p-8 rounded-[20px] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow hover:border-secondary/30">
-                    <div className="w-14 h-14 rounded-2xl bg-secondary/10 text-secondary mx-auto mb-5 flex items-center justify-center">
-                      <item.icon className="w-7 h-7" />
-                    </div>
-                    <h4 className="font-bold text-slate-800 mb-2">{item.step}</h4>
-                    <p className="text-xl font-extrabold text-secondary">{item.time}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
+            {permitTimeline.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-primary mb-8">Permit Timeline</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  {permitTimeline.map((item, idx) => {
+                    const Icon = getTimelineIcon(idx);
+                    return (
+                      <div key={idx} className="bg-white p-8 rounded-[20px] border border-slate-200 text-center shadow-sm hover:shadow-md transition-shadow hover:border-secondary/30">
+                        <div className="w-14 h-14 rounded-2xl bg-secondary/10 text-secondary mx-auto mb-5 flex items-center justify-center">
+                          <Icon className="w-7 h-7" />
+                        </div>
+                        <h4 className="font-bold text-slate-800 mb-2">{item.step}</h4>
+                        <p className="text-xl font-extrabold text-secondary">{item.time}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Sidebar */}
           <div className="space-y-8">
-            <div className="card">
-              <h4 className="text-lg font-bold text-primary mb-6">Zoning Overlays</h4>
-              <div className="flex flex-wrap gap-2">
-                {['Single Family', 'Multi-Family', 'Transit Priority', 'Historic District', 'Wildfire Zone', 'HOA Zones'].map(chip => (
-                  <button key={chip} className="px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-600 hover:border-secondary hover:text-secondary hover:bg-secondary/5 transition-all">
-                    {chip}
-                  </button>
-                ))}
+            {zoningChips.length > 0 && (
+              <div className="card">
+                <h4 className="text-lg font-bold text-primary mb-6">Zoning Overlays</h4>
+                <div className="flex flex-wrap gap-2">
+                  {zoningChips.map(chip => (
+                    <span key={chip} className="px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-650 hover:border-secondary hover:text-secondary hover:bg-secondary/5 transition-all">
+                      {chip}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="card !bg-primary !text-white !border-slate-800 shadow-xl">
               <h4 className="text-xl font-bold mb-4">Start your project</h4>
