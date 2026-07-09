@@ -2,7 +2,8 @@
 // Provides CRUD capabilities for Super Admin and User dashboards
 // Falls back to localStorage and loads default mock data if not initialized.
 
-import { states as initialStates, aduRules as initialRules, buildSteps as initialBuildSteps } from '../data/mockData';
+import { aduRules as initialRules, buildSteps as initialBuildSteps } from '../data/mockData';
+import { ALL_50_STATES } from '../data/statesData';
 import { doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { COLLECTIONS } from '../config';
@@ -126,46 +127,70 @@ const DEFAULT_DIRECTORY = [
     ],
     price: '$$$$',
     verified: true,
+    isReferralEligible: false,
     email: 'info@goldenstatearch.com',
     phone: '916-555-8833',
     website: 'https://goldenstatearch.com',
     description: 'Award-winning architectural studio focused on high-end custom accessory units and historic overlays compliance.'
+  },
+  {
+    id: 5,
+    name: 'Top Tier Builders Yelp',
+    role: 'General Contractor',
+    rating: 4.8,
+    reviews: 310,
+    location: 'Austin, TX',
+    tags: ['Yelp 4.5+', 'Top Rated'],
+    images: ['https://images.unsplash.com/photo-1541913007727-4dd01126ac03?q=80&w=400&auto=format&fit=crop'],
+    price: '$$$',
+    verified: true,
+    isReferralEligible: true,
+    email: 'contact@toptier.com',
+    phone: '512-555-0000',
+    website: 'https://toptier.com',
+    description: 'Top rated Yelp contractor in Austin.'
   }
 ];
 
 const DEFAULT_ALERTS = [
   {
-    id: 'alert-1',
-    date: '2026-05-12',
+    id: 'ticket-1',
+    date: '2026-07-08',
     state: 'California',
-    title: 'SB 1211: Parking & Coverage Relief',
-    status: 'Passed',
+    title: 'Map Loading Error in Property Checker',
+    status: 'critical alert',
     impact: 'High',
-    desc: 'This bill removes local authority to require replacement parking when a garage is converted to an ADU, and clarifies lot coverage limits.',
-    before: 'Cities could require up to 1 parking space per bedroom for any ADU project, making many conversions unfeasible.',
-    after: 'No replacement parking required for conversions or projects near transit. Lot coverage exemptions expanded.'
+    desc: 'Users reporting that the Google Maps API is failing to load on the property checker page for San Diego addresses.',
+    timeline: [
+      { status: 'pending', date: '2026-07-08T09:00:00Z', note: 'Issue reported by 3 users.' },
+      { status: 'critical alert', date: '2026-07-08T09:30:00Z', note: 'Escalated to engineering team.' }
+    ]
   },
   {
-    id: 'alert-2',
-    date: '2026-04-15',
+    id: 'ticket-2',
+    date: '2026-07-07',
     state: 'Washington',
-    title: 'HB 1110: Middle Housing Act',
-    status: 'Implementation Phase',
-    impact: 'Very High',
-    desc: 'Mandates cities to allow at least two ADUs per lot in all residential zones. Cities have until 2025 to update local codes.',
-    before: 'Most cities limited single-family lots to a maximum of one attached or detached ADU.',
-    after: 'Cities must allow at least two ADUs per lot in all residential zones, drastically increasing housing density options.'
+    title: 'Update Zoning Codes for Seattle',
+    status: 'in progress',
+    impact: 'Medium',
+    desc: 'New middle housing legislation requires updating the backend rules for Seattle.',
+    timeline: [
+      { status: 'pending', date: '2026-07-07T10:00:00Z', note: 'Task created.' },
+      { status: 'in progress', date: '2026-07-07T14:00:00Z', note: 'Data team is reviewing city ordinances.' }
+    ]
   },
   {
-    id: 'alert-3',
-    date: '2026-03-28',
+    id: 'ticket-3',
+    date: '2026-07-05',
     state: 'Oregon',
-    title: 'SB 1537: Housing Infrastructure',
-    status: 'Signed by Governor',
-    impact: 'Medium',
-    desc: 'Expands the use of revolving loan funds for ADU construction and infrastructure upgrades.',
-    before: 'Limited state funding available specifically for homeowner-driven ADU projects.',
-    after: 'Expands a $3M revolving loan fund to provide targeted financing for ADU construction.'
+    title: 'Fix Payment Gateway Typo',
+    status: 'fixed',
+    impact: 'Low',
+    desc: 'Typo on the subscriptions page "Zelle Transfer" text.',
+    timeline: [
+      { status: 'pending', date: '2026-07-05T11:00:00Z', note: 'Reported by admin.' },
+      { status: 'fixed', date: '2026-07-06T09:00:00Z', note: 'Typo corrected and pushed to production.' }
+    ]
   }
 ];
 
@@ -331,15 +356,15 @@ export const dbService = {
 
   // --- STATES & CITIES ---
   getStates: () => {
-    const states = loadCollection('adu-db-states', initialStates.map(s => ({
+    const states = loadCollection('adu-db-states', ALL_50_STATES.map(s => ({
       avgCost: '$180,000 - $250,000',
       typicalRoi: '8% - 12%',
       permitTime: '2 - 6 Months',
       pdfUrl: '',
       timeline: [
-        { year: '2024', title: 'SB 423 Implementation', desc: 'Accelerated permit processing for multi-family ADUs in certain zones.' },
-        { year: '2023', title: 'AB 1033 Passing', desc: 'Allows local agencies to permit ADUs to be sold separately as condos.' },
-        { year: '2020', title: 'The ADU Revolution', desc: 'Major state-wide changes removing parking and owner-occupancy requirements.' }
+        { year: '2024', title: 'Statewide ADU Legislation Updates', desc: 'Various laws introduced to ease ADU construction.' },
+        { year: '2023', title: 'Local Zoning Revisions', desc: 'Many municipalities updating codes to reflect state law.' },
+        { year: '2020', title: 'The ADU Revolution', desc: 'Major changes removing strict parking and owner-occupancy requirements.' }
       ],
       ...s,
       rules: s.rules || initialRules,
@@ -474,8 +499,8 @@ export const dbService = {
   },
 
   // --- PROFESSIONAL DIRECTORY ---
-  getDirectory: () => loadCollection('adu-db-directory', DEFAULT_DIRECTORY),
-  saveDirectory: (dir) => saveCollection('adu-db-directory', dir),
+  getDirectory: () => loadCollection('adu-db-directory-v2', DEFAULT_DIRECTORY),
+  saveDirectory: (dir) => saveCollection('adu-db-directory-v2', dir),
   addPro: (pro) => {
     const dir = dbService.getDirectory();
     const newPro = {
@@ -532,8 +557,8 @@ export const dbService = {
   },
 
   // --- LAW TRACKER & ALERTS ---
-  getAlerts: () => loadCollection('adu-db-alerts', DEFAULT_ALERTS),
-  saveAlerts: (alerts) => saveCollection('adu-db-alerts', alerts),
+  getAlerts: () => loadCollection('adu-db-alerts-v2', DEFAULT_ALERTS),
+  saveAlerts: (alerts) => saveCollection('adu-db-alerts-v2', alerts),
   addAlert: (alert) => {
     const alerts = dbService.getAlerts();
     const newAlert = {
