@@ -271,12 +271,44 @@ const CityPage = () => {
               </div>
             )}
 
-            <div className="card !bg-primary !text-white !border-slate-800 shadow-xl">
-              <h4 className="text-xl font-bold mb-4">Start your project</h4>
-              <p className="text-slate-300 text-sm mb-6 leading-relaxed">
-                Connect with local contractors who have successfully built in {formattedCity}.
-              </p>
-              <Link to="/directory" className="w-full btn-primary block text-center !py-3">Find Local Pros</Link>
+            {/* Top Local Reviewed Contractors */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+              <h4 className="text-lg font-bold text-primary mb-4 flex items-center justify-between">
+                <span>Top Reviewed Local Pros</span>
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase">4.5+ Star Rated</span>
+              </h4>
+              <p className="text-xs text-slate-400 mb-4 font-medium">Top Google, Yelp & Angi-approved builders operating in {formattedCity}.</p>
+              
+              <div className="space-y-3">
+                {dbService.getDirectory()
+                  .filter(p => p.location.toLowerCase().includes(formattedCity.toLowerCase()) || p.location.toLowerCase().includes(formattedState.toLowerCase()))
+                  .slice(0, 3)
+                  .map((pro) => (
+                    <div key={pro.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between hover:border-secondary/30 transition-all">
+                      <div>
+                        <h5 className="text-xs font-bold text-slate-800">{pro.name}</h5>
+                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">{pro.role}</p>
+                        <div className="mt-1 flex items-center gap-1">
+                          <span className="text-[10px] font-extrabold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded flex items-center gap-1">
+                            {pro.reviewSource || 'Google'} {pro.rating}★
+                          </span>
+                        </div>
+                      </div>
+                      <Link 
+                        to={`/directory?search=${encodeURIComponent(pro.name)}`}
+                        className="text-[11px] font-bold text-secondary hover:underline shrink-0"
+                      >
+                        Contact
+                      </Link>
+                    </div>
+                  ))}
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-slate-100">
+                <Link to="/directory" className="w-full btn-primary block text-center !py-2.5 text-xs font-bold">
+                  View All {formattedCity} Directory Pros
+                </Link>
+              </div>
             </div>
             
             <div className="h-64 rounded-[20px] overflow-hidden border border-slate-200 shadow-sm relative">

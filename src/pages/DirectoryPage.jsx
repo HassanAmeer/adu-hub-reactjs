@@ -349,11 +349,21 @@ const DirectoryPage = () => {
                           <span className="text-sm font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg">{pro.price}</span>
                         </div>
                         
-                        <div className="flex items-center gap-3 mb-5">
+                        <div className="flex flex-wrap items-center gap-2 mb-4">
                           <p className="text-sm font-bold text-secondary">{pro.role}</p>
                           {pro.verified && (
                             <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
                               <ShieldCheck className="w-3.5 h-3.5" /> Verified
+                            </span>
+                          )}
+                          {pro.reviewSource && (
+                            <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {pro.reviewSource} ({pro.rating}★)
+                            </span>
+                          )}
+                          {pro.isReferralEligible && (
+                            <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md">
+                              ADUNAVI Approved
                             </span>
                           )}
                         </div>
@@ -372,7 +382,14 @@ const DirectoryPage = () => {
                         </div>
 
                         <div className="flex gap-3">
-                          <button className="flex-1 btn-primary !py-3 text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+                          <button 
+                            className="flex-1 btn-primary !py-3 text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              dbService.trackProInteraction(pro.id, 'lead');
+                              setSelectedPro(pro);
+                            }}
+                          >
                             <MessageCircle className="w-4.5 h-4.5" />
                             Message
                           </button>
@@ -380,8 +397,10 @@ const DirectoryPage = () => {
                             className="w-14 h-[46px] bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-primary transition-all"
                             onClick={(e) => {
                               e.stopPropagation();
+                              dbService.trackProInteraction(pro.id, 'website');
                               if (pro.website) window.open(pro.website, '_blank');
                             }}
+                            title="Visit Website"
                           >
                             <ExternalLink className="w-5 h-5" />
                           </button>

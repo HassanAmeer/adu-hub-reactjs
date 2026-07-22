@@ -99,12 +99,17 @@ const Modal = ({ isOpen, onClose, professional }) => {
                 </div>
                 <h3 className="text-2xl font-bold text-primary mb-3">{professional.name}</h3>
                 
-                <div className="flex items-center gap-4 mb-4">
-                   <div className="flex items-center gap-1 bg-amber-50 text-amber-500 px-3 py-1 rounded-full text-xs font-bold">
-                      <Star className="w-3.5 h-3.5 fill-amber-500" />
-                      {professional.rating}
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                   <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1 rounded-full text-xs font-extrabold">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      {professional.reviewSource || 'Google Reviews'} {professional.rating}★
                    </div>
-                   <div className="text-xs text-slate-400 font-bold">{professional.reviews} reviews</div>
+                   <div className="text-xs text-slate-400 font-bold">({professional.reviews || 0} reviews)</div>
+                   {professional.isReferralEligible && (
+                     <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
+                       ADUNAVI Approved Partner
+                     </span>
+                   )}
                 </div>
 
                 <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
