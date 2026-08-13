@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useUserAuth';
 import { dbService } from '../../services/dbService';
 import { usePlanLimits } from '../hooks/usePlanLimits';
+import StripePaymentModal from './StripePaymentModal';
 import { 
   CreditCard, 
   CheckCircle2, 
@@ -215,6 +216,32 @@ const Subscriptions = () => {
     }, 1200);
   };
 
+  const handleStripePaymentSuccess = (paymentMethod) => {
+    try {
+      const newDep = dbService.addDeposit({
+        userId: currentUser.id,
+        userName: currentUser.name || currentUser.email,
+        userEmail: currentUser.email,
+        planId: selectedPlan.id,
+        planName: selectedPlan.name,
+        price: selectedPlan.price,
+        screenshot: 'stripe_demo_mode', // marker for stripe
+        status: 'pending'
+      });
+
+      setPendingDeposit(newDep);
+      setSuccess('Stripe Payment demo successful! Admin will review and activate your subscription.');
+      setShowPaymentModal(false);
+      setSelectedPlan(null);
+      refreshUser();
+      
+      setTimeout(() => setSuccess(''), 6000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
   const plans = dbService.getPlans().map(p => ({
     ...p,
     button: activePlan === p.id ? 'Current Plan' : (p.id === 'free' ? 'Basic Plan' : (p.id === 'pro' ? 'Upgrade to Pro' : 'Upgrade to Expert')),
@@ -291,7 +318,7 @@ const Subscriptions = () => {
             <div>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Active Membership</span>
               <h4 className="text-3xl font-black tracking-tight text-white flex items-center gap-2 capitalize">
-                {activePlan} Tier
+                {plans.find(p => p.id === activePlan)?.name || activePlan} Tier
                 <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
                   isFree ? 'bg-slate-800 text-slate-300 border border-slate-700' : 'bg-emerald-500 text-white animate-pulse'
                 }`}>
@@ -711,7 +738,13 @@ const Subscriptions = () => {
       </div>
 
       {/* ── PAYMENT SCREENSHOT UPLOADER MODAL ── */}
-      {showPaymentModal && selectedPlan && (
+      {showPaymentModal && selectedPlan && import.meta.env.VITE_STRIPE_SANDBOX_MODE === 'true' ? (
+        <StripePaymentModal
+          plan={selectedPlan}
+          onClose={() => { setShowPaymentModal(false); setSelectedPlan(null); }}
+          onSuccess={handleStripePaymentSuccess}
+        />
+      ) : showPaymentModal && selectedPlan && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-[32px] max-w-lg w-full shadow-2xl relative overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
             

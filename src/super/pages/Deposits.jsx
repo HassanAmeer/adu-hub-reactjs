@@ -42,6 +42,13 @@ const Deposits = () => {
   useEffect(() => {
     setDeposits(dbService.getDeposits());
     setUsers(dbService.getUsers());
+    const syncUsers = async () => {
+      if (dbService.syncUsersFromFirestore) {
+        const synced = await dbService.syncUsersFromFirestore();
+        if (synced) setUsers(synced);
+      }
+    };
+    syncUsers();
     const globalSettings = dbService.getSettings();
     setSettings(globalSettings);
     setPaymentTitle(globalSettings.paymentTitle || '');

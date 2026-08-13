@@ -46,9 +46,18 @@ const AdminDashboard = () => {
     loadData();
   }, []);
 
-  const loadData = () => {
-    const usersData = dbService.getUsers();
-    setAllUsers(usersData);
+  const loadData = async () => {
+    let usersData = dbService.getUsers();
+    setAllUsers(usersData); // Initial load for speed
+    
+    if (dbService.syncUsersFromFirestore) {
+      const synced = await dbService.syncUsersFromFirestore();
+      if (synced) {
+        usersData = synced;
+        setAllUsers(synced);
+      }
+    }
+
     setStats({
       users: usersData.length,
       states: dbService.getStates().length,

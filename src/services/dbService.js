@@ -4,7 +4,7 @@
 
 import { aduRules as initialRules, buildSteps as initialBuildSteps } from '../data/mockData';
 import { ALL_50_STATES } from '../data/statesData';
-import { doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, deleteDoc, getDocs, collection } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { COLLECTIONS } from '../config';
 import { SEED_RESOURCES } from '../seed/seedData';
@@ -536,6 +536,30 @@ const saveCollection = (key, data) => {
 export const dbService = {
   // --- USERS ---
   getUsers: () => loadCollection('adu-db-users', DEFAULT_USERS),
+  syncUsersFromFirestore: async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+      const firestoreUsers = [];
+      querySnapshot.forEach((docSnap) => {
+        firestoreUsers.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      
+      const localUsers = loadCollection('adu-db-users', DEFAULT_USERS);
+      firestoreUsers.forEach(fUser => {
+        const idx = localUsers.findIndex(u => u.id === fUser.id);
+        if (idx !== -1) {
+          localUsers[idx] = { ...localUsers[idx], ...fUser };
+        } else {
+          localUsers.push(fUser);
+        }
+      });
+      saveCollection('adu-db-users', localUsers);
+      return localUsers;
+    } catch (err) {
+      console.error("Error syncing users from Firestore:", err);
+      return null;
+    }
+  },
   saveUsers: (users) => saveCollection('adu-db-users', users),
   updateUser: (userId, updatedFields) => {
     const users = dbService.getUsers();

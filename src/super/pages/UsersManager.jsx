@@ -29,6 +29,11 @@ const UsersManager = () => {
 
   useEffect(() => {
     setUsers(dbService.getUsers());
+    const syncUsers = async () => {
+      const synced = await dbService.syncUsersFromFirestore();
+      if (synced) setUsers(synced);
+    };
+    syncUsers();
   }, []);
 
   const openEditModal = (user) => {
