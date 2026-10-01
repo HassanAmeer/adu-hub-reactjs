@@ -41,6 +41,7 @@ const Subscriptions = () => {
 
   // Payment upload states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethodChoice, setPaymentMethodChoice] = useState('stripe');
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [screenshotFile, setScreenshotFile] = useState(null);
   const [screenshotBase64, setScreenshotBase64] = useState('');
@@ -80,6 +81,7 @@ const Subscriptions = () => {
 
   const handleOpenPaymentModal = (plan) => {
     setSelectedPlan(plan);
+    setPaymentMethodChoice('stripe');
     setScreenshotFile(null);
     setScreenshotBase64('');
     setShowPaymentModal(true);
@@ -218,6 +220,10 @@ const Subscriptions = () => {
 
   const handleStripePaymentSuccess = (paymentMethod) => {
     try {
+      // 1. Immediately upgrade user subscription to the selected plan
+      dbService.updateUser(currentUser.id, { subscription: selectedPlan.id });
+
+      // 2. Add approved deposit / transaction record with Stripe payment details
       const newDep = dbService.addDeposit({
         userId: currentUser.id,
         userName: currentUser.name || currentUser.email,
@@ -225,19 +231,34 @@ const Subscriptions = () => {
         planId: selectedPlan.id,
         planName: selectedPlan.name,
         price: selectedPlan.price,
-        screenshot: 'stripe_demo_mode', // marker for stripe
-        status: 'pending'
+        paymentType: 'stripe',
+        paymentMethodId: paymentMethod?.id || `pm_${Date.now()}`,
+        cardBrand: paymentMethod?.card?.brand || 'visa',
+        cardLast4: paymentMethod?.card?.last4 || '4242',
+        screenshot: `stripe_txn_${paymentMethod?.id || Date.now()}`,
+        status: 'approved'
       });
 
-      setPendingDeposit(newDep);
-      setSuccess('Stripe Payment demo successful! Admin will review and activate your subscription.');
+      dbService.addLog(`Stripe payment completed for user ${currentUser.email}. Subscription upgraded to ${selectedPlan.name.toUpperCase()}.`);
+
+      setPendingDeposit(null);
+      setSuccess(`Payment successful! Your account has been upgraded to ${selectedPlan.name} plan.`);
       setShowPaymentModal(false);
       setSelectedPlan(null);
       refreshUser();
-      
+
+      // Refresh invoices ledger
+      const updatedDeposits = dbService.getDeposits();
+      const myDeposits = updatedDeposits
+        .filter(d => d.userId === currentUser.id)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      setUserInvoices(myDeposits);
+      setActivePlan(selectedPlan.id);
+
       setTimeout(() => setSuccess(''), 6000);
     } catch (err) {
-      console.error(err);
+      console.error('Stripe payment error:', err);
+      setError('Payment processing encountered an issue. Please try again.');
     }
   };
 
@@ -693,7 +714,12 @@ const Subscriptions = () => {
                       </td>
                       <td className="py-4 text-center">
                         {inv.screenshot ? (
-                          inv.screenshot === 'instant_demo_mode' ? (
+                          inv.paymentType === 'stripe' || (typeof inv.screenshot === 'string' && inv.screenshot.startsWith('stripe_')) ? (
+                            <span className="inline-flex items-center gap-1.5 text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg px-2.5 py-1 text-[10px] font-bold tracking-wide">
+                              <CreditCard className="w-3.5 h-3.5 text-indigo-600" />
+                              <span>Stripe •••• {inv.cardLast4 || '4242'}</span>
+                            </span>
+                          ) : inv.screenshot === 'instant_demo_mode' ? (
                             <span className="inline-block text-indigo-700 bg-indigo-50 border border-indigo-150 rounded-lg px-2 py-1 text-[9px] font-bold uppercase tracking-wider">
                               Demo Instant
                             </span>
@@ -737,14 +763,16 @@ const Subscriptions = () => {
         </div>
       </div>
 
-      {/* ── PAYMENT SCREENSHOT UPLOADER MODAL ── */}
-      {showPaymentModal && selectedPlan && import.meta.env.VITE_STRIPE_SANDBOX_MODE === 'true' ? (
+      {/* ── PAYMENT MODAL: STRIPE CARD OR MANUAL WIRE ── */}
+      {showPaymentModal && selectedPlan && paymentMethodChoice === 'stripe' ? (
         <StripePaymentModal
           plan={selectedPlan}
+          currentUser={currentUser}
           onClose={() => { setShowPaymentModal(false); setSelectedPlan(null); }}
           onSuccess={handleStripePaymentSuccess}
+          onSwitchToManual={() => setPaymentMethodChoice('manual')}
         />
-      ) : showPaymentModal && selectedPlan && (
+      ) : showPaymentModal && selectedPlan && paymentMethodChoice === 'manual' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-[32px] max-w-lg w-full shadow-2xl relative overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
             
@@ -914,8 +942,20 @@ const Subscriptions = () => {
                 </div>
               </form>
 
+              {/* Switch back to Stripe button */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethodChoice('stripe')}
+                  className="w-full py-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 bg-slate-50 hover:bg-indigo-50/50 text-indigo-700 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <CreditCard className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Pay with Card (Stripe Gateway) instead</span>
+                </button>
+              </div>
+
               {/* Instant developer activation option */}
-              <div className="border-t border-slate-100 pt-4 mt-2">
+              <div className="border-t border-slate-100 pt-3 mt-1">
                 <button
                   type="button"
                   onClick={handleInstantActivate}

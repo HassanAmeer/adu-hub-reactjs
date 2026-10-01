@@ -115,7 +115,7 @@ const Deposits = () => {
   ];
 
   const freeUsers = users.filter(u => u.subscription === 'free').length;
-  const paidUsers = users.filter(u => u.subscription === 'pro').length;
+  const paidUsers = users.filter(u => u.subscription && u.subscription !== 'free').length;
   const approvedDeposits = deposits.filter(d => d.status === 'approved');
   const pendingDeposits = deposits.filter(d => d.status === 'pending');
   const totalRevenue = approvedDeposits.reduce((sum, dep) => {
@@ -360,19 +360,26 @@ const Deposits = () => {
                 {/* Receipt thumbnail */}
                 <td className="px-5 py-4">
                   {dep.screenshot ? (
-                    <button
-                      onClick={() => setSelectedScreenshot(dep.screenshot)}
-                      className="group relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer block"
-                    >
-                      <img
-                        src={dep.screenshot}
-                        alt="Receipt"
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-150">
-                        <Eye className="w-3.5 h-3.5 text-white" />
+                    dep.paymentType === 'stripe' || (typeof dep.screenshot === 'string' && dep.screenshot.startsWith('stripe_')) ? (
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold">
+                        <CreditCard className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>Stripe •••• {dep.cardLast4 || '4242'}</span>
                       </div>
-                    </button>
+                    ) : (
+                      <button
+                        onClick={() => setSelectedScreenshot(dep.screenshot)}
+                        className="group relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer block"
+                      >
+                        <img
+                          src={dep.screenshot}
+                          alt="Receipt"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-150">
+                          <Eye className="w-3.5 h-3.5 text-white" />
+                        </div>
+                      </button>
+                    )
                   ) : (
                     <div className="flex items-center gap-1.5 text-slate-300 text-xs italic">
                       <FileImage className="w-3.5 h-3.5" />

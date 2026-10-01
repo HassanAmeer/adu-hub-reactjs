@@ -335,13 +335,15 @@ const UsersManager = () => {
             <td className="px-6 py-4">
               <div>
                 <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                  user.subscription === 'pro' 
+                  user.subscription === 'expert'
+                    ? 'bg-purple-100 text-purple-800 border border-purple-250 shadow-xs'
+                    : user.subscription === 'pro' 
                     ? 'bg-amber-100 text-amber-850 border border-amber-250 shadow-xs' 
                     : 'bg-slate-100 text-slate-600 border border-slate-200'
                 }`}>
                   {user.subscription || 'free'}
                 </span>
-                {user.subscription === 'pro' && user.subscriptionExpiresDate && (
+                {user.subscription && user.subscription !== 'free' && user.subscriptionExpiresDate && (
                   <span className="text-[10px] text-slate-400 font-semibold block mt-1.5 whitespace-nowrap">
                     Expires: {user.subscriptionExpiresDate}
                   </span>

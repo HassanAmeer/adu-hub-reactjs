@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import { Mail, Lock, Globe, Loader2 } from 'lucide-react';
@@ -10,8 +10,15 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, logout } = useAuth();
+  const { login, logout, currentUser } = useAuth();
   const navigate = useNavigate();
+
+  // If already logged in, redirect directly to dashboard
+  useEffect(() => {
+    if (currentUser && !isAuthorizedAdmin(currentUser.role)) {
+      navigate(ROUTES.USER_DASHBOARD, { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   const getErrorMessage = (code) => {
     switch (code) {
@@ -48,7 +55,7 @@ const Login = () => {
         await logout();
         setError(`Admin accounts must log in through the secure portal at ${ROUTES.SUPER_GATEWAY}.`);
       } else {
-        navigate(ROUTES.USER_DASHBOARD);
+        navigate(ROUTES.USER_DASHBOARD, { replace: true });
       }
     } catch (err) {
       setError(getErrorMessage(err.code));

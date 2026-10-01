@@ -1062,11 +1062,16 @@ export const dbService = {
       price: deposit.price,
       screenshot: deposit.screenshot || '',
       status: deposit.status || 'pending',
-      timestamp: deposit.timestamp || new Date().toISOString()
+      timestamp: deposit.timestamp || new Date().toISOString(),
+      paymentType: deposit.paymentType || 'manual',
+      cardBrand: deposit.cardBrand || '',
+      cardLast4: deposit.cardLast4 || '',
+      paymentMethodId: deposit.paymentMethodId || '',
+      ...deposit
     };
     deposits.unshift(newDep);
     dbService.saveDeposits(deposits);
-    dbService.addLog(`Submitted payment deposit of ${newDep.price} for plan ${newDep.planId.toUpperCase()} by user ${newDep.userEmail}`);
+    dbService.addLog(`Payment deposit of ${newDep.price} for plan ${newDep.planName || newDep.planId} recorded for ${newDep.userEmail} (${newDep.paymentType === 'stripe' ? 'Stripe Online' : 'Manual Transfer'})`);
     return newDep;
   },
   updateDeposit: (depositId, updatedFields) => {

@@ -111,6 +111,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     localStorage.setItem('adu-hub-user-email', cleanEmail);
+    setCurrentUser(full);
     setActiveEmail(cleanEmail);
     return full;
   };
@@ -157,6 +158,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     localStorage.setItem('adu-hub-user-email', cleanEmail);
+    setCurrentUser(profile);
     setActiveEmail(cleanEmail);
     return profile;
   };
@@ -164,6 +166,7 @@ export const AuthProvider = ({ children }) => {
   // ─── LOG OUT ──────────────────────────────────────────────────────────────
   const logout = async () => {
     localStorage.removeItem('adu-hub-user-email');
+    setCurrentUser(null);
     setActiveEmail(null);
   };
 
