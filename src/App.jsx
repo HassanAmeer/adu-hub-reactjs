@@ -6,6 +6,24 @@ const ScrollToTop = () => {
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
 };
+
+// Auto-redirect /dashboard/* to /userpanel/* while preserving query strings (e.g. from Stripe)
+const DashboardRedirect = () => {
+  const location = useLocation();
+  const targetPath = location.pathname.replace(/^\/dashboard/, '/userpanel');
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center animate-in fade-in">
+      <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mb-3 shadow-xs">
+        <svg className="w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <circle cx="12" cy="12" r="10" strokeOpacity="0.2" />
+          <path d="M12 2a10 10 0 0 1 10 10" />
+        </svg>
+      </div>
+      <p className="text-xs font-bold text-slate-600">Connecting to your account...</p>
+      <Navigate to={`${targetPath}${location.search}`} replace />
+    </div>
+  );
+};
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import StatesPage from './pages/StatesPage';
@@ -201,6 +219,9 @@ function App() {
         <Route path={ROUTES.USER_REGISTER} element={<Register />} />
         <Route path={ROUTES.USER_FORGOT_PASSWORD} element={<ForgotPassword />} />
         <Route path={ROUTES.SUPER_GATEWAY} element={<SuperLoginPage />} />
+        
+        {/* Dashboard alias routes forwarding to /userpanel */}
+        <Route path="/dashboard/*" element={<DashboardRedirect />} />
         <Route path={ROUTES.DASHBOARD_REDIRECT} element={<Navigate to={ROUTES.USER_DASHBOARD} replace />} />
 
         {/* Segregated User Panel (Auth + Dashboard) */}
@@ -211,6 +232,9 @@ function App() {
 
         {/* Database Seeder Gateway */}
         <Route path={ROUTES.SEED} element={<SeedPage />} />
+
+        {/* Catch-all fallback */}
+        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>
     </Router>
   );

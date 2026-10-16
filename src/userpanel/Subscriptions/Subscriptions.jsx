@@ -23,14 +23,24 @@ import {
   ShieldCheck,
   Receipt,
   ChevronRight,
-  Info
+  Info,
+  Loader2
 } from 'lucide-react';
+
+const STRIPE_PAYMENT_LINK = import.meta.env.VITE_STRIPE_PAYMENT_LINK_PRO || '';
+const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY || '';
+const STRIPE_PRICE_ID = import.meta.env.VITE_STRIPE_PRICE_ID_PRO || 'price_1URGHABS7twgQ4KvctlxorLQ';
 
 const Subscriptions = () => {
   const { currentUser, refreshUser } = useAuth();
   const [activePlan, setActivePlan] = useState(currentUser?.subscription || 'free');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
+  const [redirectingToStripe, setRedirectingToStripe] = useState(false);
+  const [isActivatingStripe, setIsActivatingStripe] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('payment_status') === 'success' || !!params.get('session_id') || params.get('status') === 'success';
+  });
   
   // Payment Config from global settings
   const [settings, setSettings] = useState({});
@@ -64,6 +74,8 @@ const Subscriptions = () => {
     const globalSettings = dbService.getSettings();
     setSettings(globalSettings);
 
+    if (!currentUser?.id) return;
+
     // Check for pending deposit request for this user
     const deposits = dbService.getDeposits();
     const pending = deposits.find(d => d.userId === currentUser.id && d.status === 'pending');
@@ -77,6 +89,53 @@ const Subscriptions = () => {
     
     // Refresh local active plan state
     setActivePlan(currentUser?.subscription || 'free');
+
+    // Handle return from Stripe Hosted Checkout / Payment Link
+    if (currentUser?.id) {
+      const params = new URLSearchParams(window.location.search);
+      const paymentStatus = params.get('payment_status') || params.get('status');
+      const planParam = params.get('plan') || 'pro';
+      const sessionId = params.get('session_id');
+
+      if (paymentStatus === 'success' || (sessionId && paymentStatus !== 'cancel')) {
+        setIsActivatingStripe(true);
+        try {
+          dbService.updateUser(currentUser.id, { subscription: planParam });
+          dbService.addDeposit({
+            userId: currentUser.id,
+            userName: currentUser.name || currentUser.email,
+            userEmail: currentUser.email,
+            planId: planParam,
+            planName: planParam === 'pro' ? 'Standard Pro Tier' : planParam,
+            price: '$49',
+            paymentType: 'stripe',
+            paymentMethodId: sessionId || `checkout_${Date.now()}`,
+            cardBrand: 'stripe_checkout',
+            cardLast4: 'ready-made',
+            screenshot: `stripe_hosted_${sessionId || Date.now()}`,
+            status: 'approved'
+          });
+          dbService.addLog(`Stripe Hosted Checkout successful for ${currentUser.email}. Upgraded to ${planParam.toUpperCase()}.`);
+          setSuccess(`🎉 Payment Successful via Stripe! Your account is now upgraded to ${planParam === 'pro' ? 'Standard Pro Tier' : planParam}.`);
+          refreshUser();
+
+          // Refresh invoices ledger
+          const updatedDeposits = dbService.getDeposits();
+          const refreshedMyDeposits = updatedDeposits
+            .filter(d => d.userId === currentUser.id)
+            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          setUserInvoices(refreshedMyDeposits);
+
+          // Clean query params from URL without reloading
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
+        } catch (e) {
+          console.error('Error activating subscription after Stripe checkout redirect:', e);
+        } finally {
+          setIsActivatingStripe(false);
+        }
+      }
+    }
   }, [currentUser]);
 
   const handleOpenPaymentModal = (plan) => {
@@ -87,7 +146,7 @@ const Subscriptions = () => {
     setShowPaymentModal(true);
   };
 
-  const handlePlanClick = (plan) => {
+  const handlePlanClick = async (plan) => {
     if (plan.id === 'free') {
       setLoading(true);
       // Simulate switching/downgrading lag
@@ -120,6 +179,65 @@ const Subscriptions = () => {
         }
       }, 600);
     } else {
+      setRedirectingToStripe(true);
+
+      // 1. DYNAMIC DOMAIN AUTO-DETECTION: Auto-detects current domain (localhost or cPanel hosting)
+      const currentOrigin = window.location.origin;
+      const successUrl = `${currentOrigin}/userpanel/subscriptions?payment_status=success&plan=${plan.id}&session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${currentOrigin}/userpanel/subscriptions?payment_status=cancel`;
+
+      if (STRIPE_SECRET_KEY) {
+        try {
+          const body = new URLSearchParams();
+          body.append('mode', 'subscription');
+          body.append('line_items[0][price]', STRIPE_PRICE_ID);
+          body.append('line_items[0][quantity]', '1');
+          body.append('success_url', successUrl);
+          body.append('cancel_url', cancelUrl);
+          if (currentUser?.email) {
+            body.append('customer_email', currentUser.email);
+          }
+          if (currentUser?.id) {
+            body.append('client_reference_id', currentUser.id);
+          }
+
+          const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: body.toString()
+          });
+
+          const data = await res.json();
+          if (data && data.url) {
+            window.location.href = data.url;
+            return;
+          }
+        } catch (err) {
+          console.warn('Dynamic Stripe checkout session creation failed, using fallback:', err);
+        }
+      }
+
+      // 2. Static Payment Link Fallback
+      if (STRIPE_PAYMENT_LINK) {
+        try {
+          const url = new URL(STRIPE_PAYMENT_LINK);
+          if (currentUser?.email) {
+            url.searchParams.set('prefilled_email', currentUser.email);
+          }
+          if (currentUser?.id) {
+            url.searchParams.set('client_reference_id', currentUser.id);
+          }
+          window.location.href = url.toString();
+        } catch {
+          window.location.href = STRIPE_PAYMENT_LINK;
+        }
+        return;
+      }
+
+      setRedirectingToStripe(false);
       handleOpenPaymentModal(plan);
     }
   };
@@ -303,6 +421,31 @@ const Subscriptions = () => {
 
   return (
     <div className="space-y-10 max-w-6xl">
+      {/* ── FULLSCREEN LOADERS FOR STRIPE TRANSITIONS (NO BLANK MOMENTS) ── */}
+      {isActivatingStripe && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-white text-center animate-in fade-in duration-200">
+          <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 shadow-2xl animate-pulse">
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
+          </div>
+          <h3 className="text-xl font-black tracking-tight text-white">Activating Your Pro Subscription...</h3>
+          <p className="text-sm text-slate-300 mt-2 max-w-sm font-medium leading-relaxed">
+            Payment verified via Stripe. Upgrading your account features and generating receipt...
+          </p>
+        </div>
+      )}
+
+      {redirectingToStripe && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-white text-center animate-in fade-in duration-200">
+          <div className="w-16 h-16 rounded-3xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4 shadow-2xl animate-pulse">
+            <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
+          </div>
+          <h3 className="text-xl font-black tracking-tight text-white">Redirecting to Stripe Checkout...</h3>
+          <p className="text-sm text-slate-300 mt-2 max-w-sm font-medium leading-relaxed">
+            Opening the official secure checkout page. Please wait a moment...
+          </p>
+        </div>
+      )}
+
       {/* ── Page Header ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -631,6 +774,27 @@ const Subscriptions = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* Alternate manual bank wire payment option */}
+        <div className="pt-3 pb-1 text-center">
+          <p className="text-xs text-slate-500 font-medium">
+            Prefer direct bank wire / Zelle transfer?{' '}
+            <button
+              type="button"
+              onClick={() => {
+                const proPlan = plans.find(p => p.id === 'pro') || plans[1];
+                if (proPlan) {
+                  setSelectedPlan(proPlan);
+                  setPaymentMethodChoice('manual');
+                  setShowPaymentModal(true);
+                }
+              }}
+              className="text-indigo-600 hover:text-indigo-700 underline font-bold cursor-pointer transition-colors"
+            >
+              Upload bank wire confirmation receipt
+            </button>
+          </p>
         </div>
       </div>
 

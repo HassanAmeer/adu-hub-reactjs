@@ -13,11 +13,13 @@ import {
   ArrowRight,
   Landmark,
   Copy,
-  Check
+  Check,
+  ExternalLink
 } from 'lucide-react';
 
-// Stripe publishable key from environment, defaulting to standard test key
+// Stripe publishable key & payment link from environment
 const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx';
+const STRIPE_PAYMENT_LINK = import.meta.env.VITE_STRIPE_PAYMENT_LINK_PRO || '';
 const isTestKey = STRIPE_PK.startsWith('pk_test_') || import.meta.env.VITE_STRIPE_SANDBOX_MODE === 'true';
 
 let stripePromise = null;
@@ -123,6 +125,25 @@ const CheckoutForm = ({ plan, currentUser, onCancel, onSuccess, onSwitchToManual
     }, 800);
   };
 
+  const handleOpenHostedCheckout = () => {
+    if (!STRIPE_PAYMENT_LINK) {
+      setError('Please add VITE_STRIPE_PAYMENT_LINK_PRO in your .env file with your Stripe Payment Link.');
+      return;
+    }
+    try {
+      const url = new URL(STRIPE_PAYMENT_LINK);
+      if (currentUser?.email) {
+        url.searchParams.set('prefilled_email', currentUser.email);
+      }
+      if (currentUser?.id) {
+        url.searchParams.set('client_reference_id', currentUser.id);
+      }
+      window.location.href = url.toString();
+    } catch {
+      window.location.href = STRIPE_PAYMENT_LINK;
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Plan summary mini-banner */}
@@ -135,6 +156,44 @@ const CheckoutForm = ({ plan, currentUser, onCancel, onSuccess, onSwitchToManual
           <span className="text-lg font-black text-slate-900">{plan.price}</span>
           <span className="text-[10px] text-slate-400 font-bold block">/month</span>
         </div>
+      </div>
+
+      {/* ── READY-MADE STRIPE CHECKOUT PAGE OPTION ── */}
+      <div className="bg-gradient-to-br from-indigo-50/90 via-white to-violet-50/70 border-2 border-indigo-200/90 rounded-2xl p-4 space-y-3 shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-sm shrink-0">
+            S
+          </div>
+          <div>
+            <h6 className="text-xs font-black text-slate-900 uppercase tracking-wide">
+              Stripe Official Checkout Page
+            </h6>
+            <p className="text-[11px] text-slate-500 font-medium leading-tight">
+              Pay via Stripe hosted checkout with Apple Pay, Google Pay, or Card.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleOpenHostedCheckout}
+          className="w-full bg-slate-900 hover:bg-slate-850 active:bg-black text-white font-extrabold py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer text-xs group"
+        >
+          <span>Open Ready-Made Stripe Checkout</span>
+          <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+        </button>
+
+        {!STRIPE_PAYMENT_LINK && (
+          <p className="text-[10px] text-amber-800 font-medium bg-amber-50/80 px-2.5 py-1.5 rounded-lg border border-amber-200/70 leading-normal">
+            💡 Put <code className="font-mono font-bold bg-white px-1 py-0.5 rounded text-amber-950">VITE_STRIPE_PAYMENT_LINK_PRO</code> in <code className="font-mono font-bold">.env</code> to redirect directly to your Stripe Checkout page.
+          </p>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3 my-1">
+        <div className="h-px bg-slate-200 flex-1" />
+        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Or Pay With Card Below</span>
+        <div className="h-px bg-slate-200 flex-1" />
       </div>
 
       {/* Test Mode Helper Box */}

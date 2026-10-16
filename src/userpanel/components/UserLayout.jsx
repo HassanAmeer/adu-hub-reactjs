@@ -15,15 +15,14 @@ const UserLayout = () => {
   // Redirect if not logged in
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-6 w-full max-w-md px-8">
-          <Skeleton variant="circular" className="w-16 h-16" />
-          <div className="space-y-3 w-full">
-            <Skeleton className="h-4 w-3/4 mx-auto" />
-            <Skeleton className="h-3 w-1/2 mx-auto" />
-          </div>
-          <Skeleton className="h-10 w-40 mx-auto" />
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-150">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mb-3 shadow-xs">
+          <svg className="w-6 h-6 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <circle cx="12" cy="12" r="10" strokeOpacity="0.2" />
+            <path d="M12 2a10 10 0 0 1 10 10" />
+          </svg>
         </div>
+        <p className="text-xs font-bold text-slate-600">Loading your account...</p>
       </div>
     );
   }
